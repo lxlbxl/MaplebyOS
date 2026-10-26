@@ -1,0 +1,11 @@
+{
+    "name": "Operations",
+    "alias": "operations",
+    "description": "Operations module for ADGOD OS",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Operations\\Providers\\OperationsServiceProvider"
+    ],
+    "files": []
+}

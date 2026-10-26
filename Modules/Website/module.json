@@ -1,0 +1,11 @@
+{
+    "name": "Website",
+    "alias": "website",
+    "description": "Public-facing client website",
+    "keywords": ["website", "public", "frontend"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Website\\Providers\\WebsiteServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "CRM": true,
+    "Core": true,
+    "Inventory": true,
+    "Operations": true,
+    "Quoting": true,
+    "Tasks": true,
+    "Communications": true,
+    "Reports": true,
+    "Finance": true
+}

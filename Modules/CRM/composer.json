@@ -1,0 +1,17 @@
+{
+    "name": "adgudos/crm",
+    "description": "CRM module for ADGOD OS",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\CRM\\Providers\\CRMServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CRM\\": ""
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "CRM",
+    "alias": "crm",
+    "description": "CRM module for ADGOD OS",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CRM\\Providers\\CRMServiceProvider"
+    ],
+    "files": []
+}

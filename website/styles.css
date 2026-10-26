@@ -1,0 +1,133 @@
+:root {
+  --maple-red: #D43F3A;
+  --deep-slate: #0A0F14;
+  --steel-gray: #B0B3B8;
+  --clean-white: #FFFFFF;
+}
+
+body {
+  background-color: var(--deep-slate);
+  color: var(--clean-white);
+  font-family: 'Archivo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Oswald', sans-serif;
+}
+
+/* Utilities Replacement */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--maple-red);
+  color: white;
+  padding: 1rem 2rem;
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 90% 100%, 0 100%);
+}
+
+.btn-primary:hover {
+  background-color: white;
+  color: var(--deep-slate);
+}
+
+.btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 1rem 2rem;
+}
+
+.btn-secondary:hover {
+  border-color: var(--maple-red);
+  color: var(--maple-red);
+}
+
+.input-field {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+  color: white;
+  outline: none;
+  font-family: monospace;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  border-color: var(--maple-red);
+}
+
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.clip-corner {
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 90% 100%, 0 100%);
+}
+
+.text-outline-w {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  color: transparent;
+}
+
+.text-outline-r {
+  -webkit-text-stroke: 1px rgba(212, 63, 58, 0.3);
+  color: transparent;
+}
+
+.maple-grid {
+  background-color: var(--deep-slate);
+  background-image:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 50px 50px, 50px 50px;
+}
+
+/* Animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--deep-slate);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--maple-red);
+}

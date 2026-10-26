@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADGOD Inc. — Logistics Rewired</title>
+    <meta name="description"
+        content="ADGOD Inc. delivers premier global logistics solutions, specializing in heavy equipment export, vehicle shipping, and freight forwarding. Trusted by 1500+ clients worldwide.">
+    <meta name="keywords"
+        content="logistics, shipping, heavy equipment, vehicle export, freight forwarding, Toronto, global shipping, adgod">
+    <meta property="og:title" content="ADGOD Inc. — Logistics Rewired">
+    <meta property="og:description"
+        content="Premier global logistics solutions for heavy equipment and vehicle export. Experience the future of shipping.">
+    <meta property="og:image"
+        content="https://images.unsplash.com/photo-1494412574643-35d324688b91?q=80&w=2670&auto=format&fit=crop">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Preload Critical Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP for High-Performance Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Manrope', 'sans-serif'],
+                        'display': ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        'void': '#050505',
+                        'concrete': '#141414',
+                        'mist': '#E0E0E0',
+                        'int-orange': '#FF3300',
+                        'accent-blue': '#2E5CFF'
+                    },
+                    letterSpacing: {
+                        'tighter': '-0.04em',
+                        'loose': '0.15em'
+                    },
+                    fontSize: {
+                        '10xl': '10rem',
+                        '12xl': '14rem'
+                    },
+                    animation: {
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Critical Styles */
+        body {
+            background-color: #050505;
+            color: #E0E0E0;
+            opacity: 0;
+            /* JS will reveal */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        /* Utility */
+        .reveal-mask {
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .reveal-mask.visible {
+            clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 0);
+        }
+
+        .text-outline {
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            color: transparent;
+            transition: all 0.5s ease;
+        }
+
+        .group:hover .text-outline {
+            -webkit-text-stroke: 0px;
+            color: #fff;
+        }
+
+        /* Gradient Noise Overlay */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.04;
+            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* AB Test Badge */
+        .ab-test-badge {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 51, 0, 0.9);
+            color: white;
+            padding: 8px 16px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body class="antialiased overflow-x-hidden selection:bg-int-orange selection:text-white">
+
+    <!-- Noise Filter -->
+    <div class="noise"></div>
+
+    <!-- Intro Loader -->
+    <div id="loader">
+        <div class="flex flex-col items-center gap-4">
+            <span class="font-display font-bold text-4xl tracking-tighter text-white">ADGOD<span
+                    class="text-int-orange">.</span></span>
+            <div class="w-32 h-[1px] bg-white/20 relative overflow-hidden">
+                <div class="absolute inset-0 bg-white w-full -translate-x-full animate-[shimmer_1.5s_infinite]"></div>
+            </div>
+            <style>
+                @keyframes shimmer {
+                    100% {
+                        transform: translateX(100%);
+                    }
+                }
+            </style>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 mix-blend-difference px-6 py-6 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="font-display font-bold text-2xl tracking-tighter text-white z-50 relative group">
+            ADGOD<span class="text-int-orange">.INC</span>
+            <div class="h-px w-0 group-hover:w-full bg-white transition-all duration-300"></div>
+        </a>
+
+        <div class="hidden md:flex gap-8 items-center">
+            <a href="index.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Home</a>
+            <a href="services.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Services</a>
+            <a href="inventory.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Inventory</a>
+            <a href="process.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Process</a>
+            <a href="blog.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Blog</a>
+            <a href="about.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">About</a>
+            <a href="contact.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Contact</a>
+            <button onclick="toggleModal()"
+                class="border border-white/20 px-6 py-2 text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300">
+                Get Quote
+            </button>
+        </div>
+
+        <button class="md:hidden text-white z-50" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" class="w-8 h-8"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu"
+        class="fixed inset-0 bg-int-orange z-40 translate-x-full transition-transform duration-500 ease-expo flex flex-col justify-center px-12">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-black">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        <div class="flex flex-col gap-2">
+            <a href="index.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">HOME</a>
+            <a href="services.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">SERVICES</a>
+            <a href="inventory.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">INVENTORY</a>
+            <a href="process.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">PROCESS</a>
+            <a href="blog.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">BLOG</a>
+            <a href="about.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">ABOUT</a>
+            <a href="contact.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">CONTACT</a>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <header
+        class="relative w-full h-screen flex flex-col justify-between pt-32 pb-12 px-6 md:px-12 border-b border-white/10 overflow-hidden">
+        <!-- Background Video/Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2670&auto=format&fit=crop"
+                class="w-full h-full object-cover opacity-30 scale-105" data-scroll-speed="0.5"
+                alt="Shipping Container Abstract">
+            <div class="absolute inset-0 bg-gradient-to-b from-void/90 via-void/50 to-void"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="relative z-10 max-w-[1800px] mx-auto w-full h-full flex flex-col justify-center">
+            <div class="overflow-hidden mb-4">
+                <p class="text-int-orange font-mono text-sm uppercase tracking-loose reveal-text translate-y-full">///
+                    Global Logistics Systems</p>
+            </div>
+
+            <h1
+                class="font-display font-bold text-6xl md:text-8xl lg:text-[9rem] leading-[0.85] tracking-tighter mix-blend-lighten uppercase mb-8">
+                <div class="overflow-hidden"><span class="block reveal-text translate-y-full">Logistics</span></div>
+                <div class="overflow-hidden"><span
+                        class="block text-outline reveal-text translate-y-full delay-100">Rewired</span></div>
+                <div class="overflow-hidden"><span class="block reveal-text translate-y-full delay-200">Globally<span
+                            class="text-int-orange">.</span></span></div>
+            </h1>
+
+            <div
+                class="flex flex-col md:flex-row gap-8 items-start md:items-center mt-8 reveal-text translate-y-full delay-300 transition-all duration-700">
+                <button onclick="toggleModal()"
+                    class="group flex items-center gap-4 bg-white text-black px-8 py-4 rounded-full hover:bg-int-orange transition-colors duration-300">
+                    <span class="font-bold uppercase tracking-wide text-sm">Initiate Shipment</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-2 transition-transform"></i>
+                </button>
+                <div class="flex items-center gap-4 text-white/60">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="font-mono text-xs uppercase tracking-widest">System Operational • Toronto HQ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Ticker -->
+        <div
+            class="absolute bottom-0 left-0 w-full border-t border-white/10 bg-void/80 backdrop-blur-sm z-20 py-3 overflow-hidden">
+            <div
+                class="animate-marquee whitespace-nowrap flex gap-12 text-xs font-mono uppercase tracking-widest text-white/40">
+                <span>Heavy Equipment Export</span><span>•</span>
+                <span>Vehicle Shipping</span><span>•</span>
+                <span>Freight Forwarding</span><span>•</span>
+                <span>Customs Clearance</span><span>•</span>
+                <span>Warehousing Solutions</span><span>•</span>
+                <span>Heavy Equipment Export</span><span>•</span>
+                <span>Vehicle Shipping</span><span>•</span>
+                <span>Freight Forwarding</span><span>•</span>
+                <span>Customs Clearance</span><span>•</span>
+                <span>Warehousing Solutions</span><span>•</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- STATS STRIP -->
+    <section class="border-b border-white/10 bg-concrete/30 backdrop-blur-md">
+        <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+            <div class="p-8 group hover:bg-white/5 transition-colors">
+                <h3 class="font-display text-4xl font-bold text-white mb-2">1.5K+</h3>
+                <p class="font-mono text-xs text-white/50 uppercase tracking-widest">Vehicles Shipped</p>
+            </div>
+            <div class="p-8 group hover:bg-white/5 transition-colors">
+                <h3 class="font-display text-4xl font-bold text-white mb-2">25Y</h3>
+                <p class="font-mono text-xs text-white/50 uppercase tracking-widest">Industry Legacy</p>
+            </div>
+            <div class="p-8 group hover:bg-white/5 transition-colors">
+                <h3 class="font-display text-4xl font-bold text-white mb-2">40+</h3>
+                <p class="font-mono text-xs text-white/50 uppercase tracking-widest">Global Ports</p>
+            </div>
+            <div class="p-8 group hover:bg-white/5 transition-colors">
+                <h3 class="font-display text-4xl font-bold text-white mb-2">24/7</h3>
+                <p class="font-mono text-xs text-white/50 uppercase tracking-widest">Live Support</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MANIFESTO -->
+    <section class="py-32 px-6 md:px-12 max-w-[1800px] mx-auto">
+        <div class="grid md:grid-cols-12 gap-12">
+            <div class="md:col-span-4">
+                <span class="text-int-orange font-mono text-xs uppercase tracking-widest mb-4 block">[ Mission Protocol
+                    ]</span>
+                <div class="h-px w-12 bg-white/20"></div>
+            </div>
+            <div class="md:col-span-8">
+                <h2
+                    class="font-display text-3xl md:text-5xl font-medium leading-tight text-white mb-8 reveal-on-scroll">
+                    We don't just move cargo. <span class="text-white/30">We engineer the pathways that allow your
+                        business to expand without borders. Precision handling for the world's most complex
+                        assets.</span>
+                </h2>
+                <a href="services.html"
+                    class="inline-flex items-center gap-2 text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
+                    <span class="text-sm font-bold uppercase tracking-widest">Explore Capabilities</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STICKY SERVICES -->
+    <section id="services" class="relative px-6 md:px-12 pb-32">
+
+        <!-- Header -->
+        <div class="mb-20 flex flex-col md:flex-row justify-between items-end border-b border-white/10 pb-8">
+            <h2 class="font-display text-6xl md:text-8xl font-bold uppercase text-white tracking-tighter">Capabilities
+            </h2>
+            <span class="font-mono text-xs text-white/50 uppercase tracking-widest mb-2">/// Validated Solutions</span>
+        </div>
+
+        <!-- Card 1 -->
+        <div
+            class="sticky top-24 bg-concrete border border-white/10 p-8 md:p-16 mb-8 rounded-sm overflow-hidden group transition-transform hover:-translate-y-2">
+            <div class="absolute right-0 top-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
+                <i data-lucide="anchor" class="w-32 h-32 text-white"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row gap-12 justify-between">
+                <div>
+                    <span class="text-int-orange font-mono text-sm mb-4 block">01</span>
+                    <h3 class="font-display text-4xl md:text-5xl font-bold text-white mb-6">HEAVY EQUIPMENT</h3>
+                    <p class="text-white/60 max-w-md leading-relaxed">
+                        Construction, mining, and agricultural machinery export. We specialize in roll-on/roll-off
+                        (RoRo) and dismantling services to optimize shipping costs.
+                    </p>
+                    <ul class="mt-8 space-y-2 font-mono text-xs text-white/40 uppercase">
+                        <li>— Excavators & Dozers</li>
+                        <li>— Cranes & Industrial Loaders</li>
+                        <li>— Customs Documentation</li>
+                    </ul>
+                    <a href="services.html"
+                        class="inline-flex items-center gap-2 mt-6 text-int-orange hover:text-white transition-colors">
+                        <span class="text-sm font-bold uppercase tracking-widest">Learn More</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <div class="w-full md:w-1/3 aspect-video bg-black/50 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1578326457599-462991666662?q=80&w=2670&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:scale-110 transition-transform duration-700"
+                        alt="Heavy Equipment">
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div
+            class="sticky top-28 bg-[#1a1a1a] border border-white/10 p-8 md:p-16 mb-8 rounded-sm overflow-hidden group transition-transform hover:-translate-y-2 shadow-2xl">
+            <div class="absolute right-0 top-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
+                <i data-lucide="car" class="w-32 h-32 text-white"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row gap-12 justify-between">
+                <div>
+                    <span class="text-int-orange font-mono text-sm mb-4 block">02</span>
+                    <h3 class="font-display text-4xl md:text-5xl font-bold text-white mb-6">VEHICLE EXPORT</h3>
+                    <p class="text-white/60 max-w-md leading-relaxed">
+                        Secure containerized and RoRo shipping for vehicle fleets, luxury automobiles, and commercial
+                        trucks. Showroom condition guaranteed on arrival.
+                    </p>
+                    <ul class="mt-8 space-y-2 font-mono text-xs text-white/40 uppercase">
+                        <li>— Fleet Management</li>
+                        <li>— Secure Container Loading</li>
+                        <li>— Insurance Coverage</li>
+                    </ul>
+                    <a href="services.html"
+                        class="inline-flex items-center gap-2 mt-6 text-int-orange hover:text-white transition-colors">
+                        <span class="text-sm font-bold uppercase tracking-widest">Learn More</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <div class="w-full md:w-1/3 aspect-video bg-black/50 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=2670&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:scale-110 transition-transform duration-700"
+                        alt="Cars">
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div
+            class="sticky top-32 bg-[#222] border border-white/10 p-8 md:p-16 mb-8 rounded-sm overflow-hidden group transition-transform hover:-translate-y-2 shadow-2xl">
+            <div class="absolute right-0 top-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
+                <i data-lucide="globe" class="w-32 h-32 text-white"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row gap-12 justify-between">
+                <div>
+                    <span class="text-int-orange font-mono text-sm mb-4 block">03</span>
+                    <h3 class="font-display text-4xl md:text-5xl font-bold text-white mb-6">FREIGHT FORWARDING</h3>
+                    <p class="text-white/60 max-w-md leading-relaxed">
+                        End-to-end supply chain management. We navigate the complexities of international waters, air
+                        freight, and land transport so you don't have to.
+                    </p>
+                    <ul class="mt-8 space-y-2 font-mono text-xs text-white/40 uppercase">
+                        <li>— Ocean, Air & Land</li>
+                        <li>— Project Cargo</li>
+                        <li>— Real-time Tracking</li>
+                    </ul>
+                    <a href="services.html"
+                        class="inline-flex items-center gap-2 mt-6 text-int-orange hover:text-white transition-colors">
+                        <span class="text-sm font-bold uppercase tracking-widest">Learn More</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <div class="w-full md:w-1/3 aspect-video bg-black/50 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1494412574643-35d324688b91?q=80&w=2670&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:scale-110 transition-transform duration-700"
+                        alt="Freight">
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- LIVE TRACKING (Map Abstract) -->
+    <section
+        class="relative h-[80vh] w-full bg-void overflow-hidden flex items-center justify-center border-y border-white/10">
+        <!-- Abstract Grid Map -->
+        <div class="absolute inset-0 opacity-20"
+            style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px;">
+        </div>
+
+        <!-- Rotating World Graphic (CSS Only) -->
+        <div
+            class="w-[600px] h-[600px] border border-white/10 rounded-full flex items-center justify-center relative animate-[spin_60s_linear_infinite]">
+            <div class="absolute inset-0 border border-dashed border-white/20 rounded-full scale-75"></div>
+            <div class="absolute inset-0 border border-dotted border-white/20 rounded-full scale-50"></div>
+
+            <!-- Nodes -->
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-int-orange rounded-full shadow-[0_0_20px_rgba(255,51,0,0.5)]">
+            </div>
+            <div class="absolute bottom-1/4 right-1/4 w-3 h-3 bg-white rounded-full"></div>
+            <div class="absolute top-1/3 left-1/4 w-3 h-3 bg-white rounded-full"></div>
+        </div>
+
+        <div class="absolute z-10 text-center">
+            <span class="font-mono text-int-orange text-xs uppercase tracking-widest mb-4 block">[ Live Telemetry
+                ]</span>
+            <h2 class="font-display text-5xl md:text-7xl font-bold text-white mb-8 tracking-tighter">NETWORK ACTIVE</h2>
+            <div class="flex justify-center gap-8">
+                <div class="text-left">
+                    <p class="font-mono text-xs text-white/50">LAGOS</p>
+                    <p class="font-bold text-white">ON TIME</p>
+                </div>
+                <div class="text-left">
+                    <p class="font-mono text-xs text-white/50">DUBAI</p>
+                    <p class="font-bold text-white">ARRIVED</p>
+                </div>
+                <div class="text-left">
+                    <p class="font-mono text-xs text-white/50">SHANGHAI</p>
+                    <p class="font-bold text-white">DEPARTED</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JOURNAL / BLOG -->
+    <section id="journal" class="py-32 px-6 md:px-12 max-w-[1800px] mx-auto">
+        <div class="flex justify-between items-end mb-16">
+            <h2 class="font-display text-4xl font-bold text-white uppercase">Field Intel</h2>
+            <a href="blog.html"
+                class="text-sm font-mono text-white/50 hover:text-white uppercase tracking-widest transition-colors">View
+                All Entries -></a>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <a href="blog-post-1.html" class="group cursor-pointer block">
+                <div class="aspect-[4/5] bg-white/5 mb-6 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-int-orange/0 group-hover:bg-int-orange/10 transition-colors z-10">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1566576912906-2531d0446738?q=80&w=1000&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        alt="Ship">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="font-mono text-xs text-int-orange">01. ANALYSIS</span>
+                    <h3 class="font-display text-xl text-white font-medium leading-tight group-hover:underline">The
+                        Future of Global Shipping: 2025 Outlook</h3>
+                </div>
+            </a>
+
+            <a href="blog-post-2.html" class="group cursor-pointer block">
+                <div class="aspect-[4/5] bg-white/5 mb-6 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-int-orange/0 group-hover:bg-int-orange/10 transition-colors z-10">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?q=80&w=1000&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        alt="Container">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="font-mono text-xs text-int-orange">02. GUIDE</span>
+                    <h3 class="font-display text-xl text-white font-medium leading-tight group-hover:underline">
+                        Preparing Heavy Machinery for International Export</h3>
+                </div>
+            </a>
+
+            <a href="blog-post-3.html" class="group cursor-pointer block">
+                <div class="aspect-[4/5] bg-white/5 mb-6 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-int-orange/0 group-hover:bg-int-orange/10 transition-colors z-10">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1517400508447-f8dd518b86db?q=80&w=1000&auto=format&fit=crop"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        alt="Tech">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <span class="font-mono text-xs text-int-orange">03. TECH</span>
+                    <h3 class="font-display text-xl text-white font-medium leading-tight group-hover:underline">Digital
+                        Transformation in Supply Chains</h3>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- BIG FOOTER CTA -->
+    <section class="py-32 px-6 md:px-12 bg-white text-void relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-12 opacity-10">
+            <i data-lucide="container" class="w-64 h-64"></i>
+        </div>
+        <div class="relative z-10 max-w-4xl">
+            <h2 class="font-display text-6xl md:text-9xl font-bold tracking-tighter mb-8 leading-[0.8]">
+                READY TO <br>MOVE?
+            </h2>
+            <div class="flex flex-col md:flex-row gap-6">
+                <button onclick="toggleModal()"
+                    class="bg-void text-white px-10 py-5 font-bold uppercase tracking-widest hover:bg-int-orange transition-colors duration-300">
+                    Get Competitive Quote
+                </button>
+                <a href="tel:+14165550199"
+                    class="px-10 py-5 border border-void/20 font-bold uppercase tracking-widest hover:border-void transition-colors">
+                    +1 (416) 555-0199
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-void text-white/40 pt-20 pb-10 px-6 md:px-12 border-t border-white/10">
+        <div class="grid md:grid-cols-4 gap-12 mb-20">
+            <div class="md:col-span-1">
+                <span class="font-display font-bold text-2xl text-white block mb-4">ADGOD.INC</span>
+                <p class="text-sm leading-relaxed">Redefining logistics through precision, speed, and global
+                    connectivity.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Company</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+                    <li><a href="services.html" class="hover:text-white transition-colors">Services</a></li>
+                    <li><a href="inventory.html" class="hover:text-white transition-colors">Inventory</a></li>
+                    <li><a href="process.html" class="hover:text-white transition-colors">Process</a></li>
+                    <li><a href="about.html" class="hover:text-white transition-colors">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Resources</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="blog.html" class="hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Cookies</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Connect</h4>
+                <ul class="space-y-2 text-sm">
+                    <li>96 Millwick Drive, Toronto, ON</li>
+                    <li>export@adgodinc.com</li>
+                    <li class="flex gap-4 mt-4">
+                        <a href="#" class="hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                        <a href="#" class="hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="flex justify-between items-center text-xs font-mono uppercase border-t border-white/10 pt-8">
+            <span>© 2025 Adgod Inc.</span>
+            <span>Toronto • Lagos • Dubai</span>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="quote-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-void/90 backdrop-blur-sm" onclick="toggleModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-concrete border border-white/10 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-display text-2xl font-bold text-white">START REQUEST</h3>
+                <button onclick="toggleModal()" class="text-white/50 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form class="space-y-6">
+                <div class="space-y-2">
+                    <label class="font-mono text-xs uppercase text-white/50">Company / Name</label>
+                    <input type="text"
+                        class="w-full bg-void border border-white/10 p-4 text-white focus:border-int-orange outline-none transition-colors">
+                </div>
+                <div class="space-y-2">
+                    <label class="font-mono text-xs uppercase text-white/50">Email</label>
+                    <input type="email"
+                        class="w-full bg-void border border-white/10 p-4 text-white focus:border-int-orange outline-none transition-colors">
+                </div>
+                <div class="space-y-2">
+                    <label class="font-mono text-xs uppercase text-white/50">Cargo Sector</label>
+                    <select
+                        class="w-full bg-void border border-white/10 p-4 text-white focus:border-int-orange outline-none transition-colors">
+                        <option>Heavy Equipment</option>
+                        <option>Vehicle Fleet</option>
+                        <option>Freight Forwarding</option>
+                    </select>
+                </div>
+                <button type="button"
+                    class="w-full bg-white text-black py-4 font-bold uppercase tracking-widest hover:bg-int-orange hover:text-white transition-colors"
+                    onclick="toggleModal()">
+                    Submit Inquiry
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Reveal Logic
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+
+            // Hide Loader
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.transform = 'translateY(-100%)';
+
+                // Trigger Text Reveals
+                setTimeout(() => {
+                    document.querySelectorAll('.reveal-text').forEach(el => {
+                        el.classList.remove('translate-y-full');
+                    });
+                }, 500);
+            }, 1500);
+        });
+
+        // Simple Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-0', 'translate-y-12');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-12', 'transition-all', 'duration-1000', 'ease-out');
+            observer.observe(el);
+        });
+
+        // Interaction Logic
+        function toggleModal() {
+            const modal = document.getElementById('quote-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('translate-x-full');
+        }
+
+        // GSAP Parallax (If Loaded)
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Parallax
+            gsap.to("[data-scroll-speed]", {
+                y: (i, target) => -100 * target.dataset.scrollSpeed,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "header",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

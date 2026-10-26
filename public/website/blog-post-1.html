@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigating Global Logistics in 2025 — ADGOD Insights</title>
+    <meta name="description"
+        content="A strategic outlook on global shipping trends, customs regulations, and technology for 2025.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="/storage/website-images/favicon.png">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Manrope', 'sans-serif'],
+                        'display': ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        'void': '#050505',
+                        'concrete': '#141414',
+                        'mist': '#E0E0E0',
+                        'int-orange': '#FF3300',
+                    },
+                    letterSpacing: {
+                        'tighter': '-0.04em',
+                        'loose': '0.15em'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #E0E0E0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.04;
+            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+    </style>
+</head>
+
+<body class="antialiased overflow-x-hidden selection:bg-int-orange selection:text-white">
+
+    <div class="noise"></div>
+
+    <!-- Navigation -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 mix-blend-difference px-6 py-6 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="z-50 relative group">
+            <img src="/storage/website-images/logo.png" alt="ADGOD Inc." class="h-8 md:h-10 w-auto object-contain">
+        </a>
+
+        <div class="hidden md:flex gap-8 items-center">
+            <a href="index.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Home</a>
+            <a href="services.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Services</a>
+            <a href="inventory.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Inventory</a>
+            <a href="process.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Process</a>
+            <a href="blog.html"
+                class="text-sm font-medium uppercase tracking-widest text-int-orange transition-colors">Blog</a>
+            <a href="about.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">About</a>
+            <a href="contact.html"
+                class="text-sm font-medium uppercase tracking-widest hover:text-int-orange transition-colors">Contact</a>
+            <button onclick="toggleModal()"
+                class="border border-white/20 px-6 py-2 text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300">
+                Get Quote
+            </button>
+        </div>
+
+        <button class="md:hidden text-white z-50" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" class="w-8 h-8"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu"
+        class="fixed inset-0 bg-int-orange z-40 translate-x-full transition-transform duration-500 ease-expo flex flex-col justify-center px-12">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-black">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        <div class="flex flex-col gap-2">
+            <a href="index.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">HOME</a>
+            <a href="services.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">SERVICES</a>
+            <a href="inventory.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">INVENTORY</a>
+            <a href="process.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">PROCESS</a>
+            <a href="blog.html" class="font-display text-5xl font-bold text-white transition-colors">BLOG</a>
+            <a href="about.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">ABOUT</a>
+            <a href="contact.html"
+                class="font-display text-5xl font-bold text-black hover:text-white transition-colors">CONTACT</a>
+        </div>
+    </div>
+
+
+    <article class="pt-40 pb-20 px-6 md:px-12 max-w-4xl mx-auto">
+        <a href="blog.html"
+            class="inline-flex items-center text-int-orange mb-8 font-mono text-xs uppercase tracking-widest hover:underline">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Return to Intel
+        </a>
+
+        <h1 class="font-display font-bold text-4xl md:text-6xl text-white mb-8 leading-tight">
+            Navigating Global Logistics in 2025: A Strategic Outlook
+        </h1>
+
+        <div
+            class="flex items-center gap-6 text-xs font-mono text-white/50 uppercase tracking-widest mb-12 border-b border-white/10 pb-8">
+            <span>By Alex Chen</span>
+            <span>Jan 15, 2025</span>
+            <span>Strategist</span>
+        </div>
+
+        <div class="prose prose-invert max-w-none prose-lg">
+            <p class="text-xl text-white leading-relaxed mb-10 font-light">
+                The logistics industry is standing on the precipice of a major transformation. As we look towards 2025,
+                the convergence of AI technology, stricter environmental regulations, and shifting geopolitical
+                alliances is rewriting the playbook for global trade.
+            </p>
+
+            <h2 class="font-display text-3xl font-bold text-white mt-12 mb-6">1. The Rise of "Smart" Ports</h2>
+            <p class="text-white/70 mb-6">
+                Gone are the days of manual tracking and paper logs. Ports in major hubs like Rotterdam, Singapore, and
+                increasingly Lagos, are adopting digital-first infrastructures. Automated Guided Vehicles (AGVs) and IoT
+                sensors are streamlining container movement, reducing dwell times by up to 30%.
+            </p>
+            <blockquote class="border-l-4 border-int-orange pl-6 my-8 italic text-xl text-white">
+                "Efficiency isn't just about speed anymore; it's about predictability. Clients need to know where their
+                cargo is, down to the meter."
+            </blockquote>
+            <p class="text-white/70 mb-6">
+                For our clients exporting heavy equipment, this means faster turnaround times but also requires stricter
+                adherence to digital documentation standards. ADGOD is ahead of the curve, fully integrated with these
+                new digital port systems.
+            </p>
+
+            <h2 class="font-display text-3xl font-bold text-white mt-12 mb-6">2. Sustainability as a Service</h2>
+            <p class="text-white/70 mb-6">
+                IMO 2025 regulations are pushing shipping lines to adopt cleaner fuels. While this is a win for the
+                planet, it leads to cost fluctuations. We are seeing:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-white/70 mb-6 marker:text-int-orange">
+                <li><strong>Fuel Adjustment Factors (FAF)</strong> becoming more dynamic.</li>
+                <li>A preference for "Slow Steaming" to save fuel, slightly extending transit times.</li>
+                <li>Rise of carbon-neutral shipping options for premium cargo.</li>
+            </ul>
+
+            <h2 class="font-display text-3xl font-bold text-white mt-12 mb-6">3. The African Market Expansion</h2>
+            <p class="text-white/70 mb-6">
+                West Africa remains a critical destination for North American exports. Nigeria's chaotic but booming
+                port ecosystem is stabilizing with the Lekki Deep Sea Port becoming fully operational. This opens up
+                direct routes for larger vessels, reducing transshipment costs for vehicles and machinery.
+            </p>
+        </div>
+
+        <div class="mt-16 bg-concrete p-8 border border-white/10">
+            <h3 class="font-display text-2xl font-bold text-white mb-4">Exporting to West Africa?</h3>
+            <p class="text-white/60 mb-6">Get a quote for your vehicle or equipment today. We have weekly sailings from
+                Toronto and Montreal.</p>
+            <button onclick="toggleModal()"
+                class="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest hover:bg-int-orange hover:text-white transition-colors">Start
+                Request</button>
+        </div>
+
+    </article>
+
+    <!-- FOOTER -->
+    <footer class="bg-void text-white/40 pt-20 pb-10 px-6 md:px-12 border-t border-white/10">
+        <div class="grid md:grid-cols-4 gap-12 mb-20">
+            <div class="md:col-span-1">
+                <span class="font-display font-bold text-2xl text-white block mb-4">ADGOD.INC</span>
+                <p class="text-sm leading-relaxed">Redefining logistics through precision, speed, and global
+                    connectivity.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Company</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="index.html" class="hover:text-white transition-colors">Home</a></li>
+                    <li><a href="services.html" class="hover:text-white transition-colors">Services</a></li>
+                    <li><a href="inventory.html" class="hover:text-white transition-colors">Inventory</a></li>
+                    <li><a href="process.html" class="hover:text-white transition-colors">Process</a></li>
+                    <li><a href="about.html" class="hover:text-white transition-colors">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Resources</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="blog.html" class="hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="contact.html" class="hover:text-white transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-mono text-xs uppercase tracking-widest mb-6">Connect</h4>
+                <ul class="space-y-2 text-sm">
+                    <li>96 Millwick Drive, Toronto, ON</li>
+                    <li>export@adgodinc.com</li>
+                    <li class="flex gap-4 mt-4">
+                        <a href="#" class="hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                        <a href="#" class="hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="flex justify-between items-center text-xs font-mono uppercase border-t border-white/10 pt-8">
+            <span>© 2025 Adgod Inc.</span>
+            <span>Toronto • Lagos • Dubai</span>
+        </div>
+    </footer>
+
+
+    <!-- MODAL -->
+    <div id="quote-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-void/90 backdrop-blur-sm" onclick="toggleModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-concrete border border-white/10 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-display text-2xl font-bold text-white">START REQUEST</h3>
+                <button onclick="toggleModal()" class="text-white/50 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form class="space-y-6">
+                <div class="space-y-2">
+                    <label class="font-mono text-xs uppercase text-white/50">Company / Name</label>
+                    <input type="text"
+                        class="w-full bg-void border border-white/10 p-4 text-white focus:border-int-orange outline-none transition-colors">
+                </div>
+                <div class="space-y-2">
+                    <label class="font-mono text-xs uppercase text-white/50">Email</label>
+                    <img src="/storage/website-images/blog-future.png"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105">
+                </div>
+                <button type="button"
+                    class="w-full bg-white text-black py-4 font-bold uppercase tracking-widest hover:bg-int-orange hover:text-white transition-colors"
+                    onclick="toggleModal()">
+                    Submit Inquiry
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        window.addEventListener('load', () => { document.body.style.opacity = '1'; });
+        function toggleModal() {
+            document.getElementById('quote-modal').classList.toggle('hidden');
+        }
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('translate-x-full');
+        }
+    </script>
+</body>
+
+</html>

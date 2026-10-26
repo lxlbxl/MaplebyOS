@@ -1,0 +1,11 @@
+{
+    "name": "Quoting",
+    "alias": "quoting",
+    "description": "Quoting and Estimating module for ADGOD OS",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Quoting\\Providers\\QuotingServiceProvider"
+    ],
+    "files": []
+}
