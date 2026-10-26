@@ -42,26 +42,14 @@
             backdrop-filter: blur(10px);
         }
     </style>
+    @include('website.partials.head')
 </head>
 
 <body class="selection:bg-[var(--maple-crimson)] selection:text-white min-h-screen flex flex-col">
     <div class="fixed inset-0 blueprint-bg opacity-30 pointer-events-none z-0"></div>
 
-    <nav
-        class="fixed w-full z-50 px-6 md:px-16 py-8 flex justify-between items-center bg-black/80 backdrop-blur-xl border-b border-white/5">
-        <a href="index.html" class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-[var(--maple-crimson)]"></div>
-            <span class="font-heading text-3xl tracking-tighter font-black">MAPLEBY</span>
-        </a>
-        <div class="hidden lg:flex gap-12 font-tech text-[10px] uppercase tracking-widest text-gray-400">
-            <a href="process.html" class="hover:text-white transition-colors">Logistics</a>
-            <a href="inventory.html" class="hover:text-white transition-colors">Inventory</a>
-            <a href="services.html" class="hover:text-white transition-colors">Clearance</a>
-            <a href="contact.html" class="hover:text-white transition-colors">Network</a>
-        </div>
-    </nav>
-
-    <main class="flex-grow pt-40 px-6 md:px-16 relative z-10 max-w-4xl mx-auto">
+    @include('website.partials.nav')
+    <main id="main" class="flex-grow pt-40 px-6 md:px-16 relative z-10 max-w-4xl mx-auto">
         <h1 class="font-heading text-6xl md:text-8xl uppercase font-black mb-12">Security <span
                 class="text-[var(--maple-crimson)]">Protocol</span></h1>
 
@@ -86,10 +74,7 @@
         </div>
     </main>
 
-    <footer
-        class="mt-20 py-8 border-t border-white/5 text-center font-tech text-[10px] uppercase text-gray-600 tracking-widest relative z-10">
-        &copy; 2026 MAPLEBY LOGISTICS
-    </footer>
+    @include('website.partials.footer')
     <script>lucide.createIcons();</script>
 </body>
 

@@ -18,63 +18,17 @@
   <!-- Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/website/styles.css">
+    @include('website.partials.head')
 </head>
 
 <body class="bg-[#0A0F14] text-white overflow-x-hidden selection:bg-[#D43F3A] selection:text-white font-['Archivo']">
 
-  <!-- Navigation -->
-  <nav id="navbar"
-    class="fixed w-full z-[90] px-6 md:px-16 py-6 flex justify-between items-start transition-all duration-700 bg-black/80 backdrop-blur-xl border-b border-white/5">
-    <div class="flex flex-col">
-      <div class="flex items-center gap-3 mb-1">
-        <div class="w-2 h-2 bg-[var(--maple-crimson)]"></div>
-        <a href="index.html"
-          class="font-['Oswald'] text-4xl leading-none tracking-tighter font-bold text-white decoration-0">MAPLEBY</a>
-      </div>
-      <span class="font-mono text-[9px] tracking-[0.5em] text-[var(--maple-crimson)] uppercase ml-5">Global
-        Procurement</span>
-    </div>
+    @include('website.partials.nav')
 
-    <div class="hidden lg:flex gap-16 items-center">
-      <div class="flex gap-12 font-mono text-[10px] uppercase tracking-widest text-gray-400">
-        <a href="process.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">01</span> Logistics</a>
-        <a href="inventory.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">02</span> Inventory</a>
-        <a href="services.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">03</span> Clearance</a>
-        <a href="about.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">04</span> About</a>
-        <a href="contact.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">05</span> Network</a>
-      </div>
-      <a href="/app/login" class="btn-command text-lg flex items-center justify-center">Staff Login</a>
-    </div>
-
-    <button class="lg:hidden text-white mt-2" onclick="toggleMobileMenu()">
-      <i data-lucide="menu" class="w-8 h-8"></i>
-    </button>
-  </nav>
-
-  <!-- Mobile Menu -->
-  <div id="mobile-menu"
-    class="fixed inset-0 bg-[#0A0F14] z-[100] translate-x-full transition-transform duration-500 flex flex-col justify-center px-8 border-l border-white/10">
-    <button onclick="toggleMobileMenu()" class="absolute top-6 right-6"><i data-lucide="x"
-        class="w-8 h-8 text-white"></i></button>
-    <div class="flex flex-col gap-8 font-['Oswald'] text-5xl uppercase text-white">
-      <a href="index.html" class="hover:text-[var(--maple-crimson)] transition-colors">Home</a>
-      <a href="process.html" class="hover:text-[var(--maple-crimson)] transition-colors">01. Logistics</a>
-      <a href="inventory.html" class="hover:text-[var(--maple-crimson)] transition-colors">02. Inventory</a>
-      <a href="services.html" class="hover:text-[var(--maple-crimson)] transition-colors">03. Clearance</a>
-      <a href="about.html" class="hover:text-[var(--maple-crimson)] transition-colors">04. About</a>
-      <a href="contact.html" class="hover:text-[var(--maple-crimson)] transition-colors">05. Network</a>
-      <a href="/app/login" class="text-[var(--maple-crimson)] mt-4 text-3xl">Staff Login</a>
-    </div>
-  </div>
 
   <!-- Header -->
-  <header class="pt-40 pb-20 px-6 md:px-20 border-b border-white/10 maple-grid">
+  <header id="main" class="pt-40 pb-20 px-6 md:px-20 border-b border-white/10 maple-grid">
     <div class="max-w-4xl">
       <span class="text-[#D43F3A] font-mono text-sm uppercase tracking-widest mb-4 block reveal-on-scroll">///
         End-to-End Solutions</span>
@@ -137,7 +91,7 @@
     <div class="grid md:grid-cols-2 gap-16 items-center">
       <div
         class="h-[400px] bg-white/5 relative group overflow-hidden border border-white/10 reveal-on-scroll parallax-container">
-        <img src="https://images.unsplash.com/photo-1577702312572-5b960b76a3a6?q=80&w=2670&auto=format&fit=crop"
+        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2670&auto=format&fit=crop"
           class="absolute inset-0 w-full h-[120%] object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale group-hover:grayscale-0">
         <div
           class="absolute bottom-6 right-6 bg-white px-4 py-1 text-xs font-bold uppercase tracking-widest text-[#0A0F14]">
@@ -209,47 +163,7 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-black text-white/50 pt-20 pb-8 px-6 md:px-20 border-t border-white/10">
-    <div class="grid md:grid-cols-4 gap-12 mb-20">
-      <div class="col-span-1 md:col-span-2">
-        <div class="flex items-center gap-2 mb-6">
-          <div class="w-6 h-6 bg-[#D43F3A] clip-corner"></div>
-          <span class="font-['Oswald'] text-xl font-bold text-white tracking-tight">MAPLEBY INC.</span>
-        </div>
-        <p class="max-w-md text-sm leading-relaxed">
-          Specialized logistics solutions connecting Canada and West Africa. We simplify the complexities of
-          international vehicle export and freight forwarding.
-        </p>
-      </div>
-      <div>
-        <h4 class="font-mono text-white text-xs uppercase tracking-widest mb-6">Quick Links</h4>
-        <ul class="space-y-3 text-sm">
-          <li><a href="index.html" class="hover:text-white">Home</a></li>
-          <li><a href="inventory.html" class="hover:text-white">Available Cars</a></li>
-          <li><a href="services.html" class="hover:text-white">Shipping Rates</a></li>
-          <li><a href="contact.html" class="hover:text-white">Contact Us</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-mono text-white text-xs uppercase tracking-widest mb-6">Contact</h4>
-        <ul class="space-y-3 text-sm">
-          <li><i data-lucide="map-pin" class="w-4 h-4 inline mr-2"></i> 96 Millwick Dr, Toronto, ON</li>
-          <li><i data-lucide="phone" class="w-4 h-4 inline mr-2"></i> +1 (416) 555-0199</li>
-          <li><i data-lucide="mail" class="w-4 h-4 inline mr-2"></i> export@maplebyinc.com</li>
-        </ul>
-      </div>
-    </div>
-    <div
-      class="flex flex-col md:flex-row justify-between items-center text-xs font-mono uppercase border-t border-white/10 pt-8">
-      <span>&copy; 2026 Mapleby Inc. All rights reserved.</span>
-      <div class="flex gap-6 mt-4 md:mt-0">
-        <a href="#" class="hover:text-white">Privacy</a>
-        <a href="#" class="hover:text-white">Terms</a>
-      </div>
-    </div>
-  </footer>
-
+    @include('website.partials.footer')
   <!-- Dynamic Terminal Modal -->
   <div id="terminal-modal" class="fixed inset-0 z-[100] hidden">
     <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeTerminal()"></div>
@@ -283,9 +197,9 @@
     </div>
   </div>
 
-  <script src="forms.js"></script>
+  <script src="/website/forms.js"></script>
 
-  <script src="script.js"></script>
+  <script src="/website/script.js"></script>
 </body>
 
 </html>
