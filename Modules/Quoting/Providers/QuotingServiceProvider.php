@@ -17,7 +17,7 @@ class QuotingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
     }
 
     public function register(): void

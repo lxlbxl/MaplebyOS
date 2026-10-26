@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        // Guard: older installs created this via SQL dumps before module migrations were loaded.
+        if (Schema::hasTable('quote_items')) {
+            return;
+        }
         Schema::create('quote_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('quote_id')->constrained('quotes')->cascadeOnDelete();

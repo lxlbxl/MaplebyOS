@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        // Guard: older installs created this via SQL dumps before module migrations were loaded.
+        if (Schema::hasTable('quotes')) {
+            return;
+        }
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->string('quote_number')->unique(); // Q-YYYYMMDD-XXX

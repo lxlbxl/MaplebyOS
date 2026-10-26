@@ -10,6 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        // Guard: older installs created this via SQL dumps before module migrations were loaded.
+        if (Schema::hasColumn('quotes', 'shipment_id')) {
+            return;
+        }
         Schema::table('quotes', function (Blueprint $table) {
             $table->foreignId('shipment_id')->nullable()->constrained('shipments')->nullOnDelete();
             $table->nullableMorphs('inventory');

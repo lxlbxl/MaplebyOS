@@ -1,244 +1,189 @@
 import { useEffect } from 'react';
-import { useForm, usePage } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/Components/ui/sheet";
 import { Textarea } from "@/Components/ui/textarea";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown, Search as SearchIcon } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/Components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
-import axios from 'axios';
-import { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import SmartInput from '@/Components/Smart/SmartInput';
+import VinInput from '@/Components/Smart/VinInput';
+import { todayIso } from '@/lib/operations';
 
-export default function ShipmentForm({ open, onOpenChange, shipment = null, clients = [], users = [] }) {
+const EMPTY = {
+    vin: '',
+    vehicle_year: '',
+    vehicle_make: '',
+    vehicle_model: '',
+    vehicle_color: '',
+    client_id: '',
+    status: 'added',
+    date_added: '',
+    destination_city: 'LAGOS',
+    purchase_platform: '',
+    lot_number: '',
+    purchase_date: '',
+    purchase_price: '',
+    assigned_to: '',
+    description: '',
+};
+
+async function canonical(type, q, context = {}) {
+    if (!q) return null;
+    try {
+        const res = await axios.get(route('operations.lookups.suggest', type), { params: { q, ...context, limit: 1 } });
+        const r = res.data.resolved;
+        return r && ['exact', 'alias', 'typo'].includes(r.confidence) ? r.value : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function Field({ label, error, children, className }) {
+    return (
+        <div className={`space-y-1.5 ${className || ''}`}>
+            <Label className="text-charcoal font-medium">{label}</Label>
+            {children}
+            {error && <span className="text-error text-xs">{error}</span>}
+        </div>
+    );
+}
+
+export default function ShipmentForm({ open, onOpenChange, shipment = null, statuses = {}, users = [] }) {
     const isEdit = !!shipment;
-    const { props } = usePage();
-    const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
-    const [clientOpen, setClientOpen] = useState(false);
-    const [clientsList, setClientsList] = useState(clients);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({ ...EMPTY, date_added: todayIso() });
 
     useEffect(() => {
-        if (!searchQuery) {
-            setClientsList(clients);
-            return;
-        }
-
-        const timer = setTimeout(() => {
-            axios.get(route('crm.clients.search'), { params: { query: searchQuery } })
-                .then(res => {
-                    setClientsList(res.data);
-                })
-                .catch(err => console.error(err));
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery, clients]);
-
-    const { data, setData, post, put, processing, errors, reset } = useForm({
-        title: '',
-        client_id: '',
-        status: 'received',
-        service_type: '',
-        origin: '',
-        destination: '',
-        estimated_completion: '',
-        total_value: '',
-        assigned_to: '',
-        description: '',
-        vin: '',
-    });
-
-    const selectedClient = clientsList.find(c => String(c.id) === data.client_id) || clients.find(c => String(c.id) === data.client_id);
-
-    useEffect(() => {
+        clearErrors();
         if (shipment) {
-            setData({
-                title: shipment.title || '',
-                client_id: shipment.client_id ? String(shipment.client_id) : '',
-                status: shipment.status || 'received',
-                service_type: shipment.service_type || '',
-                origin: shipment.origin || '',
-                destination: shipment.destination || '',
-                estimated_completion: shipment.estimated_completion ? shipment.estimated_completion.split('T')[0] : '',
-                total_value: shipment.total_value || '',
-                assigned_to: shipment.assigned_to ? String(shipment.assigned_to) : '',
-                description: shipment.description || '',
-                vin: shipment.vin || '',
-            });
+            setData(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, shipment[k] == null ? '' : String(shipment[k]).slice(0, k.endsWith('date') || k.startsWith('date') ? 10 : undefined)])));
         } else {
             reset();
+            setData((d) => ({ ...d, date_added: todayIso() }));
         }
     }, [shipment, open]);
 
+    const onDecoded = async ({ year, make, model }) => {
+        const updates = {};
+        if (year && !data.vehicle_year) updates.vehicle_year = String(year);
+        const canonicalMake = !data.vehicle_make && make ? await canonical('makes', make) : null;
+        if (canonicalMake) updates.vehicle_make = canonicalMake;
+        const theMake = canonicalMake || data.vehicle_make;
+        if (model && !data.vehicle_model && theMake) {
+            const canonicalModel = await canonical('models', model, { make: theMake });
+            if (canonicalModel) updates.vehicle_model = canonicalModel;
+        }
+        if (Object.keys(updates).length) setData((d) => ({ ...d, ...updates }));
+    };
+
     const submit = (e) => {
         e.preventDefault();
-
-        if (isEdit) {
-            put(route('operations.shipments.update', shipment.id), {
-                onSuccess: () => onOpenChange(false),
-            });
-        } else {
-            post(route('operations.shipments.store'), {
-                onSuccess: () => onOpenChange(false),
-            });
-        }
+        const options = { preserveScroll: true, onSuccess: () => onOpenChange(false) };
+        isEdit ? put(route('operations.shipments.update', shipment.id), options) : post(route('operations.shipments.store'), options);
     };
+
+    const customerLabel = shipment?.client ? (shipment.client.company_name || shipment.client.contact_person) : undefined;
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="overflow-y-auto bg-white border-l border-linen text-charcoal sm:max-w-md shadow-lg">
+            <SheetContent className="overflow-y-auto bg-white border-l border-linen text-charcoal sm:max-w-lg shadow-lg">
                 <SheetHeader>
-                    <SheetTitle className="text-display-sm text-void font-bold">{isEdit ? 'Edit Shipment' : 'Create New Shipment'}</SheetTitle>
+                    <SheetTitle className="text-display-sm text-void font-bold">
+                        {isEdit ? `Edit ${shipment.tracking_id}` : 'Add vehicle'}
+                    </SheetTitle>
                     <SheetDescription className="text-drift">
-                        {isEdit ? 'Update shipment details.' : 'Create a new operations shipment.'}
+                        {isEdit ? 'Update this car.' : 'A tracking ID (MAPYY-MM-NNN) is issued automatically.'} Make, model, platform and destination come from the catalog, so typos are corrected as you go.
                     </SheetDescription>
                 </SheetHeader>
 
-                <form onSubmit={submit} className="space-y-6 mt-6">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="title" className="text-charcoal font-medium">Shipment Title</Label>
-                            <Input id="title" value={data.title} onChange={e => setData('title', e.target.value)} required className="bg-cream border-linen text-charcoal h-11 rounded-lg" placeholder="e.g. Shipment #1234" />
-                            {errors.title && <span className="text-error text-sm">{errors.title}</span>}
-                        </div>
+                <form onSubmit={submit} className="space-y-5 mt-6">
+                    <Field label="VIN" error={null}>
+                        <VinInput value={data.vin} onChange={(v) => setData('vin', v)} onDecoded={onDecoded} ignoreId={shipment?.id} error={errors.vin} />
+                    </Field>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="vin" className="text-charcoal font-medium">VIN (Optional)</Label>
-                            <Input id="vin" value={data.vin} onChange={e => setData('vin', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg font-mono uppercase" placeholder="Vehicle Identification Number" />
-                            {errors.vin && <span className="text-error text-sm">{errors.vin}</span>}
-                        </div>
+                    <div className="grid grid-cols-3 gap-3">
+                        <Field label="Year" error={errors.vehicle_year}>
+                            <Input type="number" value={data.vehicle_year} onChange={(e) => setData('vehicle_year', e.target.value)} className="bg-cream border-linen h-11 rounded-lg" placeholder="2015" />
+                        </Field>
+                        <Field label="Make" className="col-span-2">
+                            <SmartInput type="makes" value={data.vehicle_make} error={errors.vehicle_make}
+                                onChange={(v) => setData((d) => ({ ...d, vehicle_make: v || '', vehicle_model: v !== d.vehicle_make ? '' : d.vehicle_model }))}
+                                placeholder="TOYOTA" />
+                        </Field>
+                    </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-charcoal font-medium">Client</Label>
-                            <Popover open={clientOpen} onOpenChange={setClientOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        aria-expanded={clientOpen}
-                                        className="w-full justify-between bg-cream border-linen text-charcoal h-11 rounded-lg hover:bg-cream/80"
-                                    >
-                                        {selectedClient
-                                            ? (selectedClient.company_name || selectedClient.contact_person)
-                                            : "Select a client..."}
-                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-pebble" />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[300px] p-0 bg-white border-linen text-charcoal shadow-float rounded-xl">
-                                    <Command className="bg-white text-charcoal" shouldFilter={false}>
-                                        <CommandInput placeholder="Search clients..." value={searchQuery} onValueChange={setSearchQuery} className="text-charcoal placeholder:text-pebble" />
-                                        <CommandList>
-                                            <CommandEmpty className="py-6 text-center text-sm text-pebble">No client found.</CommandEmpty>
-                                            <CommandGroup>
-                                                {clientsList.map((client) => (
-                                                    <CommandItem
-                                                        key={client.id}
-                                                        value={String(client.id)}
-                                                        onSelect={() => {
-                                                            setData('client_id', String(client.id));
-                                                            setClientOpen(false);
-                                                        }}
-                                                        className="cursor-pointer text-charcoal aria-selected:bg-cream aria-selected:text-void pl-8 relative"
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "absolute left-2 h-4 w-4 text-sage",
-                                                                data.client_id === String(client.id) ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                        {client.company_name || client.contact_person}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                            {errors.client_id && <span className="text-error text-sm">{errors.client_id}</span>}
-                        </div>
+                    <div className="grid grid-cols-3 gap-3">
+                        <Field label="Model" className="col-span-2">
+                            <SmartInput type="models" value={data.vehicle_model} context={data.vehicle_make ? { make: data.vehicle_make } : {}}
+                                onChange={(v) => setData('vehicle_model', v || '')} error={errors.vehicle_model}
+                                placeholder={data.vehicle_make ? 'Start typing…' : 'Pick a make first'} disabled={!data.vehicle_make} />
+                        </Field>
+                        <Field label="Colour" error={errors.vehicle_color}>
+                            <Input value={data.vehicle_color} onChange={(e) => setData('vehicle_color', e.target.value)} className="bg-cream border-linen h-11 rounded-lg" />
+                        </Field>
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Status</Label>
-                                <Select value={data.status} onValueChange={(val) => setData('status', val)}>
-                                    <SelectTrigger className="bg-cream border-linen text-charcoal h-11 rounded-lg">
-                                        <SelectValue placeholder="Status" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-linen text-charcoal shadow-float rounded-xl">
-                                        <SelectItem value="pending" className="focus:bg-cream cursor-pointer">Pending/Awaiting</SelectItem>
-                                        <SelectItem value="received" className="focus:bg-cream cursor-pointer">Received</SelectItem>
-                                        <SelectItem value="scheduled" className="focus:bg-cream cursor-pointer">Scheduled for Loading</SelectItem>
-                                        <SelectItem value="shipped" className="focus:bg-cream cursor-pointer">Shipped</SelectItem>
-                                        <SelectItem value="arrived" className="focus:bg-cream cursor-pointer">Arrived at Port</SelectItem>
-                                        <SelectItem value="delivered" className="focus:bg-cream cursor-pointer">Delivered</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Service Type</Label>
-                                <Input value={data.service_type} onChange={e => setData('service_type', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg" placeholder="e.g. Logistics" />
-                            </div>
-                        </div>
+                    <Field label="Customer">
+                        <SmartInput type="customers" value={data.client_id} displayValue={customerLabel}
+                            onChange={(v) => setData('client_id', v || '')} error={errors.client_id} placeholder="Search name, company or phone" />
+                    </Field>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Origin</Label>
-                                <Input value={data.origin} onChange={e => setData('origin', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Destination</Label>
-                                <Input value={data.destination} onChange={e => setData('destination', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Est. Completion</Label>
-                                <Input type="date" value={data.estimated_completion} onChange={e => setData('estimated_completion', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg [color-scheme:light]" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-charcoal font-medium">Value ({currency})</Label>
-                                <Input type="number" value={data.total_value} onChange={e => setData('total_value', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg" />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-charcoal font-medium">Assigned To</Label>
-                            <Select value={data.assigned_to} onValueChange={(val) => setData('assigned_to', val)}>
-                                <SelectTrigger className="bg-cream border-linen text-charcoal h-11 rounded-lg">
-                                    <SelectValue placeholder="Select staff member" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-white border-linen text-charcoal shadow-float rounded-xl">
-                                    {users.map(user => (
-                                        <SelectItem key={user.id} value={String(user.id)} className="focus:bg-cream cursor-pointer">
-                                            {user.name}
-                                        </SelectItem>
+                    <div className="grid grid-cols-2 gap-3">
+                        <Field label="Date added" error={errors.date_added}>
+                            <Input type="date" value={data.date_added} onChange={(e) => setData('date_added', e.target.value)} className="bg-cream border-linen h-11 rounded-lg [color-scheme:light]" />
+                        </Field>
+                        <Field label="Status" error={errors.status}>
+                            <Select value={data.status} onValueChange={(v) => setData('status', v)}>
+                                <SelectTrigger className="bg-cream border-linen h-11 rounded-lg"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-white border-linen shadow-float rounded-xl">
+                                    {Object.entries(statuses).map(([value, label]) => (
+                                        <SelectItem key={value} value={value} className="focus:bg-cream cursor-pointer">{label}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </Field>
+                    </div>
+
+                    <Field label="Destination">
+                        <SmartInput type="ports" value={data.destination_city} context={{ kind: 'destination' }} onChange={(v) => setData('destination_city', v || '')} error={errors.destination_city} />
+                    </Field>
+
+                    <div className="rounded-xl border border-linen p-4 space-y-4">
+                        <p className="text-sm font-semibold text-void">Purchase</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Field label="Platform">
+                                <SmartInput type="platforms" value={data.purchase_platform} onChange={(v) => setData('purchase_platform', v || '')} error={errors.purchase_platform} placeholder="COPART, IAA…" />
+                            </Field>
+                            <Field label="Lot / stock #" error={errors.lot_number}>
+                                <Input value={data.lot_number} onChange={(e) => setData('lot_number', e.target.value)} className="bg-cream border-linen h-11 rounded-lg" />
+                            </Field>
+                            <Field label="Purchase date" error={errors.purchase_date}>
+                                <Input type="date" value={data.purchase_date} onChange={(e) => setData('purchase_date', e.target.value)} className="bg-cream border-linen h-11 rounded-lg [color-scheme:light]" />
+                            </Field>
+                            <Field label="Purchase price" error={errors.purchase_price}>
+                                <Input type="number" step="0.01" value={data.purchase_price} onChange={(e) => setData('purchase_price', e.target.value)} className="bg-cream border-linen h-11 rounded-lg" />
+                            </Field>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="description" className="text-charcoal font-medium">Details / Notes</Label>
-                        <Textarea id="description" value={data.description} onChange={e => setData('description', e.target.value)} className="bg-cream border-linen text-charcoal min-h-[80px] rounded-lg" />
-                    </div>
+                    <Field label="Assigned to" error={errors.assigned_to}>
+                        <Select value={data.assigned_to || 'none'} onValueChange={(v) => setData('assigned_to', v === 'none' ? '' : v)}>
+                            <SelectTrigger className="bg-cream border-linen h-11 rounded-lg"><SelectValue placeholder="Nobody" /></SelectTrigger>
+                            <SelectContent className="bg-white border-linen shadow-float rounded-xl">
+                                <SelectItem value="none" className="focus:bg-cream cursor-pointer">Nobody</SelectItem>
+                                {users.map((u) => <SelectItem key={u.id} value={String(u.id)} className="focus:bg-cream cursor-pointer">{u.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </Field>
+
+                    <Field label="Notes" error={errors.description}>
+                        <Textarea value={data.description} onChange={(e) => setData('description', e.target.value)} className="bg-cream border-linen min-h-[80px] rounded-lg" />
+                    </Field>
 
                     <SheetFooter>
-                        <Button type="submit" className="w-full btn-sage shadow-soft hover:shadow-glow-sage" disabled={processing}>
-                            {isEdit ? 'Update Shipment' : 'Create Shipment'}
+                        <Button type="submit" className="w-full btn-sage shadow-soft" disabled={processing}>
+                            {isEdit ? 'Save changes' : 'Add vehicle'}
                         </Button>
                     </SheetFooter>
                 </form>

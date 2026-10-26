@@ -13,6 +13,7 @@ class Payment extends Model
 
     protected $fillable = [
         'quote_id',
+        'invoice_id',
         'amount',
         'payment_date',
         'payment_method',
@@ -40,6 +41,11 @@ class Payment extends Model
     public function quote()
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function creator()

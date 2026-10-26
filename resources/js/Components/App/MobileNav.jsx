@@ -12,8 +12,8 @@ import { motion } from 'framer-motion';
 const navItems = [
     { label: 'Home', route: 'dashboard', active: 'dashboard', icon: LayoutDashboard },
     { label: 'Clients', route: 'crm.clients.index', active: 'crm.clients.*', icon: Users },
-    { label: 'Ship', route: 'operations.shipments.index', active: 'operations.shipments.*', icon: Truck },
-    { label: 'Stock', route: 'inventory.vehicles.index', active: 'inventory.*', icon: Package },
+    { label: 'Cars', route: 'operations.shipments.index', active: 'operations.shipments.*', icon: Truck },
+    { label: 'Boxes', route: 'operations.containers.index', active: 'operations.containers.*', icon: Package },
     { label: 'Settings', route: 'settings.index', active: 'settings.*', icon: Settings },
 ];
 

@@ -112,23 +112,36 @@
             <h1 class="font-heading text-7xl md:text-9xl uppercase font-black mb-8 text-center">Vessel <span
                     class="text-[var(--maple-crimson)]">Telemetry</span></h1>
             <p class="text-center text-gray-400 text-lg mb-16 font-light max-w-xl mx-auto">
-                Real-time satellite tracking of all active RoRo and Container shipments. Enter your Booking ID or VIN to
-                access raw telemetry data.
+                Enter your Mapleby tracking ID (for example MAP26-10-023) or your car's full 17-character VIN to see where it is.
             </p>
 
             <div class="panel-steel p-10 border-l-4 border-l-[var(--maple-crimson)]">
-                <form class="flex flex-col md:flex-row gap-4">
-                    <input type="text" placeholder="ENTER TRACKING ID (e.g. MPL-8821)"
-                        class="flex-grow bg-white/5 border border-white/10 px-6 py-4 font-tech text-sm text-white focus:border-[var(--maple-crimson)] outline-none">
-                    <button class="btn-command">INITIATE SCAN</button>
+                <form id="track-form" class="flex flex-col md:flex-row gap-4">
+                    <input id="track-q" type="text" placeholder="TRACKING ID OR VIN" autocomplete="off" required minlength="6" maxlength="40"
+                        value="{{ request('q') }}"
+                        class="flex-grow bg-white/5 border border-white/10 px-6 py-4 font-tech text-sm text-white uppercase focus:border-[var(--maple-crimson)] outline-none">
+                    <button class="btn-command" type="submit">TRACK</button>
                 </form>
-                <div class="mt-8 pt-8 border-t border-white/5 flex justify-between items-center">
-                    <div
-                        class="flex items-center gap-2 font-tech text-[10px] uppercase tracking-widest text-[#D72638] animate-pulse">
-                        <div class="w-1.5 h-1.5 bg-[#D72638] rounded-full"></div>
-                        System Online
+                <p id="track-error" class="hidden mt-6 font-tech text-xs text-[#D72638]"></p>
+
+                <div id="track-result" class="hidden mt-8 pt-8 border-t border-white/5 space-y-6">
+                    <div class="flex flex-wrap justify-between gap-4">
+                        <div>
+                            <p class="font-tech text-[10px] uppercase tracking-widest text-gray-500">Vehicle</p>
+                            <p id="r-vehicle" class="font-heading text-3xl uppercase"></p>
+                            <p id="r-ids" class="font-tech text-xs text-gray-400"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-tech text-[10px] uppercase tracking-widest text-gray-500">Status</p>
+                            <p id="r-status" class="font-heading text-3xl uppercase text-[var(--maple-crimson)]"></p>
+                        </div>
                     </div>
-                    <span class="font-tech text-[10px] text-gray-600">LATENCY: 12ms</span>
+                    <ol id="r-steps" class="grid grid-cols-5 md:grid-cols-10 gap-1"></ol>
+                    <div id="r-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 font-tech text-xs"></div>
+                    <div>
+                        <p class="font-tech text-[10px] uppercase tracking-widest text-gray-500 mb-2">History</p>
+                        <ul id="r-timeline" class="space-y-1 font-tech text-xs text-gray-300"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,7 +153,57 @@
         &copy; 2026 MAPLEBY LOGISTICS [ SYSTEM ID: TRX-001 ]
     </footer>
 
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+        (function () {
+            const form = document.getElementById('track-form');
+            const input = document.getElementById('track-q');
+            const err = document.getElementById('track-error');
+            const box = document.getElementById('track-result');
+            const fmt = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+            const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            async function track(q) {
+                err.classList.add('hidden');
+                box.classList.add('hidden');
+                try {
+                    const res = await fetch('{{ route('website.tracking.lookup') }}?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' } });
+                    const data = await res.json();
+                    if (!res.ok || !data.found) {
+                        err.textContent = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Not found.');
+                        err.classList.remove('hidden');
+                        return;
+                    }
+                    document.getElementById('r-vehicle').textContent = data.vehicle || 'Vehicle';
+                    document.getElementById('r-ids').textContent = data.tracking_id + (data.vin_last6 ? ' · VIN …' + data.vin_last6 : '') + (data.destination ? ' · to ' + data.destination : '');
+                    document.getElementById('r-status').textContent = data.status_label;
+                    const reached = new Set(data.timeline.map((t) => t.status));
+                    const current = data.steps.findIndex((s) => s.key === data.status);
+                    document.getElementById('r-steps').innerHTML = data.steps.map((s, i) =>
+                        `<li class="text-center"><div class="h-1.5 ${i <= current || reached.has(s.key) ? 'bg-[#D72638]' : 'bg-white/10'}"></div><span class="font-tech text-[9px] uppercase text-gray-500">${esc(s.label)}</span></li>`).join('');
+                    const c = data.container;
+                    document.getElementById('r-container').innerHTML = c ? [
+                        ['Container', c.number], ['Shipping line', c.shipping_line], ['Loaded', fmt(c.loaded_on)], ['Sailed', fmt(c.sailed_on)],
+                        ['ETA', fmt(c.eta)], ['Arrived', fmt(c.arrived_on)], ['Offloaded', fmt(c.offloaded_on)], ['Vessel', c.vessel || '—'],
+                    ].map(([k, v]) => `<div><p class="text-[10px] uppercase tracking-widest text-gray-500">${k}</p><p class="text-white">${esc(v || '—')}</p></div>`).join('')
+                        : '<p class="col-span-4 text-gray-400">Not loaded into a container yet.</p>';
+                    document.getElementById('r-timeline').innerHTML = data.timeline.map((t) => `<li>${fmt(t.date)} — ${esc(t.label)}</li>`).join('') || '<li>No updates yet.</li>';
+                    box.classList.remove('hidden');
+                } catch (e) {
+                    err.textContent = 'Tracking is unavailable right now. Please try again shortly.';
+                    err.classList.remove('hidden');
+                }
+            }
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const q = input.value.trim();
+                history.replaceState(null, '', '?q=' + encodeURIComponent(q));
+                track(q);
+            });
+            if (input.value.trim()) track(input.value.trim());
+        })();
+    </script>
 </body>
 
 </html>
