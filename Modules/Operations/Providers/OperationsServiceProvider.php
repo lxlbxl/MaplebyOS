@@ -10,6 +10,17 @@ class OperationsServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
         $this->registerObservers();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Modules\Operations\Console\ImportTrackingSheet::class,
+            ]);
+        }
+    }
+
+    public function register(): void
+    {
+        $this->app->singleton(\Modules\Operations\Services\TrackingIdGenerator::class);
     }
 
     protected function registerObservers(): void
