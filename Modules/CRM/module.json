@@ -1,7 +1,7 @@
 {
     "name": "CRM",
     "alias": "crm",
-    "description": "CRM module for ADGOD OS",
+    "description": "CRM module for Mapleby OS",
     "keywords": [],
     "priority": 0,
     "providers": [

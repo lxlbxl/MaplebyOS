@@ -117,8 +117,8 @@
       </div>
 
       <div class="mt-12 pt-12 border-t border-white/10 reveal-on-scroll delay-500">
-        <a href="mailto:export@mapleby.com"
-          class="text-2xl font-['Oswald'] hover:text-[#D43F3A] transition-colors">export@mapleby.com</a>
+        <a href="mailto:export@maplebyinc.com"
+          class="text-2xl font-['Oswald'] hover:text-[#D43F3A] transition-colors">export@maplebyinc.com</a>
       </div>
     </div>
 

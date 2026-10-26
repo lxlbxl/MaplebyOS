@@ -8,7 +8,7 @@
 <body>
     <p>Dear {{ $quote->client->contact_person }},</p>
 
-    <p>Please find attached your quote #{{ $quote->quote_number }} from ADGOD OS.</p>
+    <p>Please find attached your quote #{{ $quote->quote_number }} from Mapleby OS.</p>
 
     <p>
         <strong>Total Amount:</strong> ${{ number_format($quote->total_amount, 2) }}<br>
@@ -18,7 +18,7 @@
     <p>If you have any questions, please feel free to contact us.</p>
 
     <p>Best regards,<br>
-        ADGOD OS Team</p>
+        Mapleby OS Team</p>
 </body>
 
 </html>

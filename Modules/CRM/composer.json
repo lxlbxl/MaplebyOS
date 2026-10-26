@@ -1,6 +1,6 @@
 {
     "name": "adgudos/crm",
-    "description": "CRM module for ADGOD OS",
+    "description": "CRM module for Mapleby OS",
     "extra": {
         "laravel": {
             "providers": [

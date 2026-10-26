@@ -107,7 +107,7 @@ export default function ShipmentRequest({ flash }) {
     };
 
     const shippingModes = [
-        { value: 'ADGOD', label: 'ADGOD', icon: Ship, description: 'Our standard shipping service' },
+        { value: 'MAPLEBY', label: 'Mapleby', icon: Ship, description: 'Our standard shipping service' },
         { value: 'CONTAINER', label: 'Container', icon: Package, description: 'Secure container shipping' },
         { value: 'RORO', label: 'RoRo', icon: Ship, description: 'Roll-on/Roll-off shipping' },
         { value: 'UNSURE', label: 'Not Sure', icon: HelpCircle, description: 'We\'ll help you decide' },

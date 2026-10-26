@@ -236,7 +236,7 @@
         <ul class="space-y-3 text-sm">
           <li><i data-lucide="map-pin" class="w-4 h-4 inline mr-2"></i> 96 Millwick Dr, Toronto, ON</li>
           <li><i data-lucide="phone" class="w-4 h-4 inline mr-2"></i> +1 (416) 555-0199</li>
-          <li><i data-lucide="mail" class="w-4 h-4 inline mr-2"></i> export@mapleby.com</li>
+          <li><i data-lucide="mail" class="w-4 h-4 inline mr-2"></i> export@maplebyinc.com</li>
         </ul>
       </div>
     </div>

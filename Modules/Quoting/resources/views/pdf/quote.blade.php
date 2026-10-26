@@ -69,8 +69,8 @@
             <tr>
                 <td style="border: none;">
                     <div class="company-info">
-                        <h1>ADGOD OS</h1>
-                        <p>123 Shipping Lane<br>Logistics City, LC 45678<br>contact@adgodos.com</p>
+                        <h1>Mapleby OS</h1>
+                        <p>123 Shipping Lane<br>Logistics City, LC 45678<br>contact@maplebyinc.com</p>
                     </div>
                 </td>
                 <td style="border: none; text-align: right;">

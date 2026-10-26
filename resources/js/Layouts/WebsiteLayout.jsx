@@ -23,7 +23,7 @@ export default function WebsiteLayout({ children }) {
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center">
                                 <Ship className="w-6 h-6 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900">ADGOD</span>
+                            <span className="text-xl font-bold text-gray-900">MAPLEBY</span>
                         </Link>
 
                         {/* Desktop Navigation */}
@@ -100,7 +100,7 @@ export default function WebsiteLayout({ children }) {
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
                                     <Ship className="w-6 h-6 text-white" />
                                 </div>
-                                <span className="text-xl font-bold">ADGOD</span>
+                                <span className="text-xl font-bold">MAPLEBY</span>
                             </div>
                             <p className="text-gray-400 text-sm">
                                 Professional vehicle shipping and logistics services. Your trusted partner for reliable auto transport.
@@ -150,14 +150,14 @@ export default function WebsiteLayout({ children }) {
                                 </li>
                                 <li className="flex items-center gap-2 text-gray-400">
                                     <Mail className="w-4 h-4" />
-                                    <span>info@adgod.com</span>
+                                    <span>info@maplebyinc.com</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400 text-sm">
-                        <p>&copy; {new Date().getFullYear()} ADGOD Shipping & Logistics. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} Mapleby Shipping & Logistics. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

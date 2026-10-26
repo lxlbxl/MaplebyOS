@@ -52,8 +52,8 @@ export default function Contact({ flash }) {
             icon: Mail,
             title: 'Email',
             content: 'Send us an email',
-            action: 'mailto:info@adgod.com',
-            actionText: 'info@adgod.com',
+            action: 'mailto:info@maplebyinc.com',
+            actionText: 'info@maplebyinc.com',
         },
         {
             icon: Clock,

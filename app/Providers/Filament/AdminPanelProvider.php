@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->brandName('ADGOD')
+            ->brandName('Mapleby')
             ->path('admin')
             ->login(\App\Filament\Pages\Auth\Login::class)
             ->profile()

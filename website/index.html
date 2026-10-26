@@ -492,7 +492,7 @@
                         HQ: 96 MILLWICK DR, TORONTO, ON<br>
                         OPS: TINCAN ISLAND, LAGOS, NG<br><br>
                         PH: +1 (416) 555-0199<br>
-                        EM: <span class="text-white">DISPATCH@MAPLEBY.COM</span>
+                        EM: <span class="text-white">DISPATCH@MAPLEBYINC.COM</span>
                     </div>
                 </div>
             </div>
