@@ -121,60 +121,10 @@ Route::middleware('auth')->prefix('app')->group(function () {
 
 // Backup download route
 Route::get('/app/backups/download/{file}', function ($file) {
-    $path = storage_path('app/backups/' . $file);
+    abort_unless(auth()->user()?->hasRole('Super Admin') || auth()->user()?->can('manage_settings'), 403);
+    $path = storage_path('app/backups/' . basename($file));
     if (!file_exists($path)) {
         abort(404);
     }
     return response()->download($path);
 })->middleware(['auth'])->name('backups.download');
-
-// Temporary route for data cleanup on shared hosting
-Route::get('/app/fix-duplicates', function () {
-    if (!Auth::check() || Auth::id() !== 1) { // Restrict to ID 1 (Alex/Admin) mostly
-        abort(403, 'Unauthorized');
-    }
-
-    // increase time limit
-    set_time_limit(300);
-
-    \Illuminate\Support\Facades\Artisan::call('crm:fix-duplicates');
-
-    return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
-})->middleware(['auth']);
-
-// Temporary route to recalculate payment statuses
-Route::get('/app/fix-payment-statuses', function () {
-    if (!Auth::check()) {
-        abort(403);
-    }
-
-    $shipments = \Modules\Operations\Entities\Shipment::with('quotes.payments')->get();
-    $count = 0;
-
-    foreach ($shipments as $shipment) {
-        $totalQuoted = $shipment->quotes->sum('total_amount');
-        $totalPaid = $shipment->quotes->flatMap->payments->sum('amount');
-
-        $status = 'unpaid';
-        if ($totalQuoted > 0) {
-            if ($totalPaid >= ($totalQuoted - 0.01)) {
-                $status = 'paid';
-            } elseif ($totalPaid > 0) {
-                $status = 'partial';
-            }
-        }
-
-        if ($shipment->payment_status !== $status) {
-            $shipment->update(['payment_status' => $status]);
-            $count++;
-        }
-    }
-
-    return "Fixed payment status for {$count} shipments.";
-})->middleware(['auth']);
-
-
-
-
-
-

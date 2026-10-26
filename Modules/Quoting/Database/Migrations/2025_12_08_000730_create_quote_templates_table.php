@@ -10,6 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        // Guard: older installs created this via SQL dumps before module migrations were loaded.
+        if (Schema::hasTable('quote_templates')) {
+            return;
+        }
         Schema::create('quote_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
