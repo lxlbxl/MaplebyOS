@@ -66,32 +66,29 @@ class ClientController extends Controller
             'shipments.assignee'
         ]);
 
-        // Calculate client-specific stats
-        $totalShipments = $client->shipments->count();
-        $totalValue = $client->shipments->sum('total_value');
-        $currentShipments = $client->shipments->whereIn('status', ['received', 'scheduled', 'shipped', 'arrived'])->count();
-        $deliveredShipments = $client->shipments->where('status', 'delivered')->count();
+        $statuses = \Modules\Operations\Entities\Shipment::getStatuses();
+        $inTransit = ['loaded', 'sailed', 'arrived', 'offloaded', 'cleared'];
+        $invoices = \Modules\Finance\Entities\Invoice::where('client_id', $client->id)->where('status', '!=', 'void')->orderByDesc('issue_date')->get();
 
         $stats = [
-            'total_shipments' => $totalShipments,
-            'total_value' => $totalValue,
-            'current_shipments' => $currentShipments,
-            'delivered_shipments' => $deliveredShipments,
+            'total_shipments' => $client->shipments->count(),
+            'total_value' => $client->shipments->sum('total_value'),
+            'current_shipments' => $client->shipments->whereIn('status', $inTransit)->count(),
+            'delivered_shipments' => $client->shipments->where('status', 'delivered')->count(),
+            'balance_due' => round((float) $invoices->sum(fn ($i) => $i->balance), 2),
         ];
 
-        // Shipment status breakdown for chart
-        $statusBreakdown = [
-            ['name' => 'Received', 'value' => $client->shipments->where('status', 'received')->count()],
-            ['name' => 'Scheduled', 'value' => $client->shipments->where('status', 'scheduled')->count()],
-            ['name' => 'Shipped', 'value' => $client->shipments->where('status', 'shipped')->count()],
-            ['name' => 'Arrived', 'value' => $client->shipments->where('status', 'arrived')->count()],
-            ['name' => 'Delivered', 'value' => $client->shipments->where('status', 'delivered')->count()],
-        ];
+        // Status breakdown for chart
+        $statusBreakdown = $client->shipments->groupBy('status')
+            ->map(fn ($group, $status) => ['name' => $statuses[$status] ?? $status, 'value' => $group->count()])
+            ->values();
 
         return Inertia::render('CRM/Clients/Show', [
             'client' => $client,
             'stats' => $stats,
             'statusBreakdown' => $statusBreakdown,
+            'statuses' => $statuses,
+            'invoices' => $invoices,
         ]);
     }
 

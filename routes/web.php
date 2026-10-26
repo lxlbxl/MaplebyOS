@@ -25,6 +25,8 @@ Route::get('/schedules', [WebsiteController::class, 'schedules'])->name('website
 Route::get('/valuation', [WebsiteController::class, 'valuation'])->name('website.valuation');
 Route::get('/security', [WebsiteController::class, 'security'])->name('website.security');
 Route::get('/terms', [WebsiteController::class, 'terms'])->name('website.terms');
+Route::get('/tracking/lookup', [\Modules\Operations\Http\Controllers\PublicTrackingController::class, 'lookup'])
+    ->middleware('throttle:30,1')->name('website.tracking.lookup');
 
 
 // Dashboard - moved to /app/dashboard
@@ -49,14 +51,34 @@ Route::middleware(['auth', 'verified'])->prefix('app/crm')->name('crm.')->group(
 
 use Modules\Operations\Http\Controllers\ShipmentController;
 use Modules\Operations\Http\Controllers\QuoteController;
+use Modules\Operations\Http\Controllers\ContainerController;
+use Modules\Operations\Http\Controllers\LookupController;
 
 Route::middleware(['auth', 'verified'])->prefix('app/operations')->name('operations.')->group(function () {
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
     Route::get('/shipments/{shipment}', [ShipmentController::class, 'show'])->name('shipments.show');
     Route::post('/shipments', [ShipmentController::class, 'store'])->name('shipments.store');
     Route::put('/shipments/{shipment}', [ShipmentController::class, 'update'])->name('shipments.update');
+    Route::post('/shipments/bulk', [ShipmentController::class, 'bulk'])->name('shipments.bulk');
+    Route::post('/shipments/import', [ShipmentController::class, 'import'])->name('shipments.import');
     Route::patch('/shipments/{shipment}/status', [ShipmentController::class, 'updateStatus'])->name('shipments.update-status');
     Route::delete('/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
+
+    Route::get('/containers', [ContainerController::class, 'index'])->name('containers.index');
+    Route::post('/containers', [ContainerController::class, 'store'])->name('containers.store');
+    Route::get('/containers/{container}', [ContainerController::class, 'show'])->name('containers.show');
+    Route::put('/containers/{container}', [ContainerController::class, 'update'])->name('containers.update');
+    Route::delete('/containers/{container}', [ContainerController::class, 'destroy'])->name('containers.destroy');
+    Route::patch('/containers/{container}/status', [ContainerController::class, 'updateStatus'])->name('containers.update-status');
+    Route::post('/containers/{container}/vehicles', [ContainerController::class, 'addVehicles'])->name('containers.add-vehicles');
+    Route::delete('/containers/{container}/vehicles/{shipment}', [ContainerController::class, 'removeVehicle'])->name('containers.remove-vehicle');
+
+    Route::get('/catalog', [LookupController::class, 'catalog'])->name('catalog.index');
+    Route::get('/lookups/{type}', [LookupController::class, 'suggest'])->name('lookups.suggest');
+    Route::post('/lookups/{type}', [LookupController::class, 'store'])->name('lookups.store');
+    Route::put('/lookups/{type}/{id}', [LookupController::class, 'update'])->name('lookups.update');
+    Route::delete('/lookups/{type}/{id}', [LookupController::class, 'destroy'])->name('lookups.destroy');
+    Route::get('/vin/{vin}', [LookupController::class, 'vin'])->name('vin.check');
 
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
     Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
@@ -116,6 +138,15 @@ Route::middleware('auth')->prefix('app')->group(function () {
         Route::post('/payments', [\Modules\Finance\Http\Controllers\PaymentController::class, 'store'])->name('payments.store');
         Route::put('/payments/{payment}', [\Modules\Finance\Http\Controllers\PaymentController::class, 'update'])->name('payments.update');
         Route::delete('/payments/{payment}', [\Modules\Finance\Http\Controllers\PaymentController::class, 'destroy'])->name('payments.destroy');
+
+        Route::get('/invoices', [\Modules\Finance\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::post('/invoices', [\Modules\Finance\Http\Controllers\InvoiceController::class, 'store'])->name('invoices.store');
+        Route::get('/invoices/{invoice}', [\Modules\Finance\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show');
+        Route::patch('/invoices/{invoice}/status', [\Modules\Finance\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.update-status');
+
+        Route::post('/shipments/{shipment}/charges', [\Modules\Finance\Http\Controllers\ShipmentChargeController::class, 'store'])->name('charges.store');
+        Route::put('/charges/{charge}', [\Modules\Finance\Http\Controllers\ShipmentChargeController::class, 'update'])->name('charges.update');
+        Route::delete('/charges/{charge}', [\Modules\Finance\Http\Controllers\ShipmentChargeController::class, 'destroy'])->name('charges.destroy');
     });
 });
 

@@ -13,25 +13,10 @@ import {
     DollarSign, TrendingUp, Ship, Calendar, Pencil, ExternalLink
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { VEHICLE_STATUS_COLORS } from '@/lib/operations';
 import { formatMoney } from '@/lib/utils';
 
-const STATUS_COLORS = {
-    received: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-    scheduled: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    shipped: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    arrived: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-    delivered: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-};
-
-const STATUS_LABELS = {
-    received: 'Received',
-    scheduled: 'Scheduled for Loading',
-    shipped: 'Shipped',
-    arrived: 'Arrived at Port',
-    delivered: 'Delivered',
-};
-
-export default function Show({ client, stats, statusBreakdown }) {
+export default function Show({ client, stats, statusBreakdown, statuses = {}, invoices = [] }) {
     const { props } = usePage();
     const settings = props.settings || {};
     const currency = settings.currency || 'USD';
@@ -201,7 +186,7 @@ export default function Show({ client, stats, statusBreakdown }) {
                                     <TableHead className="text-sage-400 font-medium">Shipment #</TableHead>
                                     <TableHead className="text-sage-400 font-medium">Title</TableHead>
                                     <TableHead className="text-sage-400 font-medium">Status</TableHead>
-                                    <TableHead className="text-sage-400 font-medium">Route</TableHead>
+                                    <TableHead className="text-sage-400 font-medium">VIN</TableHead>
                                     <TableHead className="text-sage-400 font-medium">Date</TableHead>
                                     <TableHead className="text-sage-400 font-medium">Value</TableHead>
                                 </TableRow>
@@ -214,7 +199,7 @@ export default function Show({ client, stats, statusBreakdown }) {
                                                 href={route('operations.shipments.show', shipment.id)}
                                                 className="block p-2 -m-2 touch-target hover:underline focus:outline-none"
                                             >
-                                                {shipment.shipment_number}
+                                                {shipment.tracking_id || shipment.shipment_number}
                                             </Link>
                                         </TableCell>
                                         <TableCell className="font-medium text-sage-600">
@@ -222,20 +207,14 @@ export default function Show({ client, stats, statusBreakdown }) {
                                                 href={route('operations.shipments.show', shipment.id)}
                                                 className="block p-2 -m-2 touch-target hover:text-coral-500 transition-colors focus:outline-none"
                                             >
-                                                {shipment.title}
+                                                {shipment.vehicle_label || shipment.title}
                                             </Link>
                                         </TableCell>
                                         <TableCell>
                                             <StatusSelect
                                                 status={shipment.status}
-                                                options={[
-                                                    { value: 'received', label: 'Received' },
-                                                    { value: 'scheduled', label: 'Scheduled for Loading' },
-                                                    { value: 'shipped', label: 'Shipped' },
-                                                    { value: 'arrived', label: 'Arrived at Port' },
-                                                    { value: 'delivered', label: 'Delivered' },
-                                                ]}
-                                                colorMap={STATUS_COLORS}
+                                                options={Object.entries(statuses).map(([value, label]) => ({ value, label }))}
+                                                colorMap={VEHICLE_STATUS_COLORS}
                                                 onStatusChange={(newStatus) => {
                                                     router.patch(route('operations.shipments.update-status', shipment.id), { status: newStatus }, {
                                                         preserveScroll: true,
@@ -244,13 +223,10 @@ export default function Show({ client, stats, statusBreakdown }) {
                                             />
                                         </TableCell>
                                         <TableCell className="text-sm text-sage-500">
-                                            {shipment.origin && shipment.destination
-                                                ? `${shipment.origin} → ${shipment.destination}`
-                                                : '-'
-                                            }
+                                            {shipment.vin || '-'}
                                         </TableCell>
                                         <TableCell className="text-sm text-sage-500">
-                                            {formatDate(shipment.created_at)}
+                                            {formatDate(shipment.date_added || shipment.created_at)}
                                         </TableCell>
                                         <TableCell className="font-medium text-sage-700">
                                             {shipment.total_value ? formatMoney(shipment.total_value, currency) : '-'}
@@ -262,6 +238,50 @@ export default function Show({ client, stats, statusBreakdown }) {
                                         <TableCell colSpan={6} className="h-24 text-center text-sage-400">
                                             No shipments yet for this client.
                                         </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-white border-sage-100 shadow-sm">
+                    <CardHeader className="border-b border-sage-100 bg-sage-50/30 flex flex-row items-center justify-between">
+                        <CardTitle className="text-sage-700 flex items-center gap-2">
+                            <DollarSign className="h-5 w-5" /> Invoices
+                        </CardTitle>
+                        <span className="text-sm text-sage-500">
+                            Balance due: <span className="font-semibold text-sage-700">{formatMoney(stats.balance_due || 0, currency)}</span>
+                        </span>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="border-sage-100">
+                                    <TableHead className="text-sage-400 font-medium">Invoice</TableHead>
+                                    <TableHead className="text-sage-400 font-medium">Issued</TableHead>
+                                    <TableHead className="text-sage-400 font-medium">Status</TableHead>
+                                    <TableHead className="text-sage-400 font-medium text-right">Total</TableHead>
+                                    <TableHead className="text-sage-400 font-medium text-right">Balance</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {invoices.map((invoice) => (
+                                    <TableRow key={invoice.id} className="border-sage-100">
+                                        <TableCell>
+                                            <Link href={route('finance.invoices.show', invoice.id)} className="font-medium text-sage-700 hover:underline">
+                                                {invoice.invoice_number}
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-sage-500">{formatDate(invoice.issue_date)}</TableCell>
+                                        <TableCell><Badge variant="outline" className="capitalize">{invoice.status}</Badge></TableCell>
+                                        <TableCell className="text-right">{formatMoney(invoice.total, invoice.currency)}</TableCell>
+                                        <TableCell className="text-right font-medium text-sage-700">{formatMoney(invoice.balance ?? (invoice.total - invoice.amount_paid), invoice.currency)}</TableCell>
+                                    </TableRow>
+                                ))}
+                                {invoices.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="h-16 text-center text-sage-400">No invoices yet.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

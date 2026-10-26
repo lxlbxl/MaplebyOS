@@ -11,7 +11,11 @@ import {
     DollarSign,
     Truck,
     Sparkles,
-    ShieldCheck
+    ShieldCheck,
+    Car,
+    Container,
+    BookOpen,
+    Receipt
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -32,7 +36,8 @@ const navSections = [
     {
         title: 'Operations',
         items: [
-            { label: 'Shipments', route: 'operations.shipments.index', active: 'operations.shipments.*', icon: Truck },
+            { label: 'Vehicles', route: 'operations.shipments.index', active: 'operations.shipments.*', icon: Car },
+            { label: 'Containers', route: 'operations.containers.index', active: 'operations.containers.*', icon: Container },
             { label: 'Quotes', route: 'operations.quotes.index', active: 'operations.quotes.*', icon: FileText },
             { label: 'Inventory', route: 'inventory.vehicles.index', active: 'inventory.*', icon: Package },
         ]
@@ -40,12 +45,14 @@ const navSections = [
     {
         title: 'Finance',
         items: [
-            { label: 'Payments', route: 'finance.payments.index', active: 'finance.*', icon: DollarSign },
+            { label: 'Invoices', route: 'finance.invoices.index', active: 'finance.invoices.*', icon: Receipt },
+            { label: 'Payments', route: 'finance.payments.index', active: 'finance.payments.*', icon: DollarSign },
         ]
     },
     {
         title: 'System',
         items: [
+            { label: 'Catalog', route: 'operations.catalog.index', active: 'operations.catalog.*', icon: BookOpen },
             { label: 'User Management', route: 'users.index', active: 'users.*', icon: ShieldCheck },
         ]
     },
