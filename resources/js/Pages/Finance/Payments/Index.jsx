@@ -30,7 +30,7 @@ import {
 import { format } from 'date-fns';
 import { formatMoney } from '@/lib/utils';
 
-export default function Index({ payments, filters, quotes }) {
+export default function Index({ payments, filters, quotes, invoices = [] }) {
     const { props } = usePage();
     const settings = props.settings || {};
     const currency = settings.currency || 'USD';
@@ -39,6 +39,7 @@ export default function Index({ payments, filters, quotes }) {
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         quote_id: '',
+        invoice_id: '',
         amount: '',
         payment_date: format(new Date(), 'yyyy-MM-dd'),
         payment_method: 'bank_transfer',
@@ -55,7 +56,8 @@ export default function Index({ payments, filters, quotes }) {
     const openEdit = (payment) => {
         setEditingPayment(payment);
         setData({
-            quote_id: String(payment.quote_id),
+            quote_id: payment.quote_id ? String(payment.quote_id) : '',
+            invoice_id: payment.invoice_id ? String(payment.invoice_id) : '',
             amount: payment.amount,
             payment_date: payment.payment_date,
             payment_method: payment.payment_method,
@@ -97,7 +99,7 @@ export default function Index({ payments, filters, quotes }) {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-display-md text-void">Payments</h1>
-                        <p className="text-drift mt-1">Track and record income from quotes.</p>
+                        <p className="text-drift mt-1">Record money received against invoices or quotes.</p>
                     </div>
                     <Button onClick={openCreate} className="btn-sage shadow-soft hover:shadow-glow-sage">
                         <Plus className="mr-2 h-4 w-4" /> Record Payment
@@ -130,12 +132,19 @@ export default function Index({ payments, filters, quotes }) {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                {payment.quote ? (
+                                                {payment.invoice ? (
+                                                    <Link href={route('finance.invoices.show', payment.invoice.id)} className="font-mono text-xs text-sage hover:underline">
+                                                        {payment.invoice.invoice_number}
+                                                    </Link>
+                                                ) : payment.quote ? (
                                                     <Link href={route('operations.quotes.show', payment.quote.id)} className="font-mono text-xs text-sage hover:underline hover:text-charcoal transition-colors">
                                                         {payment.quote.quote_number}
                                                     </Link>
                                                 ) : (
                                                     <span className="font-mono text-xs text-pebble">deleted</span>
+                                                )}
+                                                {payment.invoice?.client && (
+                                                    <span className="text-xs text-pebble">{payment.invoice.client.company_name || payment.invoice.client.contact_person}</span>
                                                 )}
                                                 {payment.quote?.client && (
                                                     <Link href={route('crm.clients.show', payment.quote.client.id)} className="text-xs text-pebble hover:text-charcoal hover:underline">
@@ -201,6 +210,24 @@ export default function Index({ payments, filters, quotes }) {
                         <form onSubmit={submit} className="space-y-6 mt-6">
                             <div className="space-y-4">
                                 <div className="space-y-2">
+                                    <Label className="text-charcoal font-medium">Invoice</Label>
+                                    <Select value={data.invoice_id || 'none'} onValueChange={(val) => setData((d) => ({ ...d, invoice_id: val === 'none' ? '' : val, quote_id: val === 'none' ? d.quote_id : '' }))}>
+                                        <SelectTrigger className="bg-cream border-linen text-charcoal h-11 rounded-lg">
+                                            <SelectValue placeholder="Select an invoice" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white border-linen text-charcoal shadow-float rounded-xl">
+                                            <SelectItem value="none" className="focus:bg-cream cursor-pointer">No invoice (pay against a quote)</SelectItem>
+                                            {invoices.map(inv => (
+                                                <SelectItem key={inv.id} value={String(inv.id)} className="focus:bg-cream cursor-pointer">
+                                                    {inv.invoice_number} (balance {formatMoney(inv.total - inv.amount_paid, currency)})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.invoice_id && <span className="text-error text-sm">{errors.invoice_id}</span>}
+                                </div>
+
+                                {!data.invoice_id && <div className="space-y-2">
                                     <Label className="text-charcoal font-medium">Select Quote</Label>
                                     <Select value={data.quote_id} onValueChange={(val) => setData('quote_id', val)}>
                                         <SelectTrigger className="bg-cream border-linen text-charcoal h-11 rounded-lg">
@@ -215,7 +242,7 @@ export default function Index({ payments, filters, quotes }) {
                                         </SelectContent>
                                     </Select>
                                     {errors.quote_id && <span className="text-error text-sm">{errors.quote_id}</span>}
-                                </div>
+                                </div>}
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">

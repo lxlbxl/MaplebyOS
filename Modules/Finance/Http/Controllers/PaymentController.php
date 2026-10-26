@@ -21,12 +21,13 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Payment::with(['quote', 'quote.client', 'creator']);
+        $query = Payment::with(['quote', 'quote.client', 'invoice.client', 'creator']);
 
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('transaction_reference', 'like', "%{$search}%")
+                    ->orWhereHas('invoice', fn ($i) => $i->where('invoice_number', 'like', "%{$search}%"))
                     ->orWhereHas('quote', function ($q2) use ($search) {
                         $q2->where('quote_number', 'like', "%{$search}%")
                             ->orWhereHas('client', function ($q3) use ($search) {
@@ -46,13 +47,16 @@ class PaymentController extends Controller
             'payments' => $payments,
             'filters' => $request->only(['search']),
             'quotes' => $quotes,
+            'invoices' => \Modules\Finance\Entities\Invoice::whereIn('status', ['draft', 'sent', 'partial'])
+                ->orderByDesc('id')->get(['id', 'invoice_number', 'total', 'amount_paid']),
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'quote_id' => 'required|exists:quotes,id',
+            'quote_id' => 'required_without:invoice_id|nullable|exists:quotes,id',
+            'invoice_id' => 'required_without:quote_id|nullable|exists:invoices,id',
             'amount' => 'required|numeric|min:0.01',
             'payment_date' => 'required|date',
             'payment_method' => 'required|string',
@@ -63,6 +67,7 @@ class PaymentController extends Controller
         $validated['created_by'] = Auth::id();
 
         $payment = Payment::create($validated);
+        $payment->invoice?->recalculate();
 
         // Sync Status
         $quote = Quote::find($payment->quote_id);
@@ -80,7 +85,8 @@ class PaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         $validated = $request->validate([
-            'quote_id' => 'required|exists:quotes,id',
+            'quote_id' => 'required_without:invoice_id|nullable|exists:quotes,id',
+            'invoice_id' => 'required_without:quote_id|nullable|exists:invoices,id',
             'amount' => 'required|numeric|min:0.01',
             'payment_date' => 'required|date',
             'payment_method' => 'required|string',
@@ -88,7 +94,10 @@ class PaymentController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $previousInvoice = $payment->invoice;
         $payment->update($validated);
+        $previousInvoice?->recalculate();
+        $payment->refresh()->invoice?->recalculate();
 
         $quote = Quote::find($payment->quote_id);
         if ($quote) {
@@ -101,7 +110,9 @@ class PaymentController extends Controller
     public function destroy(Payment $payment)
     {
         $quoteId = $payment->quote_id;
+        $invoice = $payment->invoice;
         $payment->delete();
+        $invoice?->recalculate();
 
         $quote = Quote::find($quoteId);
         if ($quote) {
