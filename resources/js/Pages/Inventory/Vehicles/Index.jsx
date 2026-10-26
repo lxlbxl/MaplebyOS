@@ -55,7 +55,7 @@ export default function Index({ vehicles, filters, clients, stats }) {
         <AppLayout>
             <Head title="Inventory" />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>

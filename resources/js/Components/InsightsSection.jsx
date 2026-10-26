@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { cn } from '@/lib/utils';
 import { TrendingUp, Activity } from 'lucide-react';
 
-const COLORS = ['#8BA896', '#EBCBAE', '#D18F84', '#6B7280', '#A5B4FC']; // Sage, Cream-Dark, Coral, Gray, Indigo
+const COLORS = ['#ED1722', '#242424', '#C5A46D', '#A80F1B', '#9A9CA0']; // Maple Red, Charcoal, Champagne Gold, Deep Maple, Slate
 
 export default function InsightsSection({
     stats = [], // Array of { name: 'Status', value: 10 }
@@ -79,7 +79,7 @@ export default function InsightsSection({
                                     stroke="none"
                                 >
                                     {data.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={isPlaceholder ? '#f3f4f6' : COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={isPlaceholder ? '#F3F3F1' : COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip

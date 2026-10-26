@@ -30,7 +30,7 @@
 
         <a href="{{ route('filament.admin.resources.quotes.create') }}"
             class="flex items-center gap-3 px-4 py-3 hover:bg-gray-100/50 dark:hover:bg-white/10 transition-colors text-sm text-gray-700 dark:text-gray-200">
-            <div class="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400">
+            <div class="p-1.5 bg-[#FCE7E8] rounded-lg text-[#ED1722]">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                     <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
                     <path
@@ -66,7 +66,8 @@
 
     <!-- Main Button -->
     <button @click="open = !open"
-        class="group w-14 h-14 flex items-center justify-center rounded-full shadow-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white hover:scale-110 active:scale-95 transition-all duration-300 relative overflow-hidden"
+        class="group w-14 h-14 flex items-center justify-center rounded-full shadow-xl text-white hover:scale-110 active:scale-95 transition-all duration-300 relative overflow-hidden"
+        style="background: linear-gradient(135deg, #ED1722, #A80F1B);"
         :class="{ 'rotate-45': open }">
         <div
             class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300">

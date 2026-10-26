@@ -16,10 +16,10 @@ export default function Show({ invoice, statuses }) {
     return (
         <AppLayout>
             <Head title={`Invoice ${invoice.invoice_number}`} />
-            <div className="max-w-4xl mx-auto flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto flex flex-col gap-5">
                 <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
                     <Link href={route('finance.invoices.index')}><Button variant="outline" className="border-linen"><ArrowLeft className="h-4 w-4 mr-2" /> Invoices</Button></Link>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {invoice.status === 'draft' && <Button onClick={() => setStatus('sent')} className="btn-sage">Mark as sent</Button>}
                         {invoice.status !== 'void' && invoice.status !== 'paid' && <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Void this invoice? Its lines become billable again.') && setStatus('void')}>Void</Button>}
                         <Button variant="outline" className="border-linen" onClick={() => window.print()}><Printer className="h-4 w-4 mr-2" /> Print / PDF</Button>

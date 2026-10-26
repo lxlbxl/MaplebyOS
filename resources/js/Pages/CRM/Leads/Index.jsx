@@ -72,7 +72,7 @@ export default function Index({ leads, filters, clients, users, stats }) {
         <AppLayout>
             <Head title="Leads" />
 
-            <div className="flex flex-col gap-6 h-full">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 h-full">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>

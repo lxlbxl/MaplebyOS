@@ -33,7 +33,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
     return (
         <AppLayout>
             <Head title={`Container ${container.container_number}`} />
-            <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Link href={route('operations.containers.index')}><Button variant="outline" size="icon" className="border-linen"><ArrowLeft className="h-4 w-4" /></Button></Link>
@@ -46,7 +46,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                             <p className="text-drift text-sm mt-1">{container.shipping_line?.name || 'Line unknown'} · {container.shipments.length}/{container.capacity} cars</p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {trackingUrl && <a href={trackingUrl} target="_blank" rel="noreferrer"><Button variant="outline" className="border-linen">Carrier tracking <ExternalLink className="ml-2 h-4 w-4" /></Button></a>}
                         <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>
                         <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this container? Its cars will be unassigned.') && router.delete(route('operations.containers.destroy', container.id))}><Trash2 className="h-4 w-4" /></Button>

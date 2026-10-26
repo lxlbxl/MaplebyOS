@@ -107,7 +107,7 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
         <AppLayout>
             <Head title={`${shipment.tracking_id} · ${shipment.vehicle_label}`} />
 
-            <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Link href={route('operations.shipments.index')}><Button variant="outline" size="icon" className="border-linen"><ArrowLeft className="h-4 w-4" /></Button></Link>
@@ -120,7 +120,7 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                             <p className="text-drift text-sm mt-1 font-mono">{shipment.vin || 'No VIN yet'}</p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>
                         <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this vehicle?') && router.delete(route('operations.shipments.destroy', shipment.id), { onSuccess: () => router.visit(route('operations.shipments.index')) })}><Trash2 className="h-4 w-4" /></Button>
                     </div>

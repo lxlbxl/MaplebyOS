@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   QUIET LUXURY — Serene Sophistication Design System
-   Japanese minimalism meets Scandinavian calm with editorial grace
+   MAPLEBY — Modern Canadian Heritage Design System
+   Maple Red, Heritage Charcoal and Warm Ivory with restrained gold
    ═══════════════════════════════════════════════════════════════ */
 
 @theme {
@@ -11,36 +11,62 @@
     --font-sans: 'DM Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
-    /* Quiet Luxury Palette */
-    --color-void: #1a1915;
-    --color-charcoal: #2d2b26;
-    --color-stone: #4a4640;
-    --color-drift: #7a756c;
-    --color-pebble: #a39e94;
-    --color-sand: #c9c4b8;
-    --color-linen: #e8e4db;
-    --color-cream: #f4f2ec;
-    --color-ivory: #faf9f6;
+    /* ── Mapleby brand palette (Modern Canadian Heritage) ──
+       Legacy token names are kept so existing classes pick up the brand:
+       sage → Maple Red (primary accent), terracotta → Champagne Gold. */
+    --color-maple: #ED1722;
+    --color-maple-deep: #A80F1B;
+    --color-maple-soft: #FCE7E8;
+    --color-gold: #C5A46D;
+    --color-gold-soft: #F6EFE2;
+    --color-midnight: #171819;
+    --color-graphite: #393B3E;
+    --color-slate-grey: #62656A;
+    --color-silver: #DDDEDF;
+    --color-pearl: #F3F3F1;
+
+    /* Neutrals */
+    --color-void: #171819;      /* Midnight */
+    --color-charcoal: #242424;  /* Heritage Charcoal */
+    --color-stone: #393B3E;     /* Graphite */
+    --color-drift: #62656A;     /* Slate Grey */
+    --color-pebble: #8C8F94;
+    --color-sand: #C9CACB;
+    --color-linen: #DDDEDF;     /* Silver Mist */
+    --color-cream: #F3F3F1;     /* Pearl Grey */
+    --color-ivory: #FAF7F2;     /* Warm Ivory */
     --color-white: #ffffff;
 
-    /* Accent - Sage & Eucalyptus (calming, natural) */
-    --color-sage: #7d9181;
-    --color-sage-light: #a8bfab;
-    --color-sage-soft: #dce5dd;
-    --color-sage-mist: #eff3f0;
+    /* Primary accent - Maple Red */
+    --color-sage: #ED1722;
+    --color-sage-light: #F4555C;
+    --color-sage-soft: #FCE7E8;
+    --color-sage-mist: #FEF4F4;
 
-    /* Warm Accent - Terracotta (subtle warmth) */
-    --color-terracotta: #c4907a;
-    --color-terracotta-light: #dbb8a8;
-    --color-terracotta-soft: #f5ebe6;
+    /* Secondary accent - Champagne Gold (use sparingly) */
+    --color-terracotta: #C5A46D;
+    --color-terracotta-light: #DCC59C;
+    --color-terracotta-soft: #F6EFE2;
 
-    /* Semantic Colors - Softened */
-    --color-success: #6b9b76;
-    --color-success-soft: #e3f0e5;
-    --color-warning: #c9a86c;
-    --color-warning-soft: #f7f0e0;
-    --color-error: #c27171;
-    --color-error-soft: #f5e6e6;
+    /* Semantic */
+    --color-success: #2E7D4F;
+    --color-success-soft: #E3F1E8;
+    --color-warning: #A9771F;
+    --color-warning-soft: #FBF1DD;
+    --color-error: #A80F1B;
+    --color-error-soft: #FCE7E8;
+
+    /* Tailwind gray scale re-tuned to the brand neutrals */
+    --color-gray-50: #FAFAF8;
+    --color-gray-100: #F3F3F1;
+    --color-gray-200: #DDDEDF;
+    --color-gray-300: #C9CACB;
+    --color-gray-400: #9A9CA0;
+    --color-gray-500: #62656A;
+    --color-gray-600: #4B4E52;
+    --color-gray-700: #393B3E;
+    --color-gray-800: #242424;
+    --color-gray-900: #171819;
 
     /* Spacing */
     --spacing-section: 4rem;
@@ -56,12 +82,12 @@
     --radius-full: 9999px;
 
     /* Shadows - Whisper Soft */
-    --shadow-whisper: 0 1px 2px rgba(26, 25, 21, 0.03);
-    --shadow-soft: 0 2px 8px rgba(26, 25, 21, 0.04), 0 1px 2px rgba(26, 25, 21, 0.02);
-    --shadow-gentle: 0 4px 16px rgba(26, 25, 21, 0.05), 0 2px 4px rgba(26, 25, 21, 0.02);
-    --shadow-float: 0 8px 32px rgba(26, 25, 21, 0.06), 0 4px 8px rgba(26, 25, 21, 0.03);
-    --shadow-lift: 0 16px 48px rgba(26, 25, 21, 0.08), 0 8px 16px rgba(26, 25, 21, 0.04);
-    --shadow-glow-sage: 0 0 0 1px rgba(125, 145, 129, 0.1), 0 4px 16px rgba(125, 145, 129, 0.12);
+    --shadow-whisper: 0 1px 2px rgba(23, 24, 25, 0.03);
+    --shadow-soft: 0 2px 8px rgba(23, 24, 25, 0.04), 0 1px 2px rgba(23, 24, 25, 0.02);
+    --shadow-gentle: 0 4px 16px rgba(23, 24, 25, 0.05), 0 2px 4px rgba(23, 24, 25, 0.02);
+    --shadow-float: 0 8px 32px rgba(23, 24, 25, 0.06), 0 4px 8px rgba(23, 24, 25, 0.03);
+    --shadow-lift: 0 16px 48px rgba(23, 24, 25, 0.08), 0 8px 16px rgba(23, 24, 25, 0.04);
+    --shadow-glow-sage: 0 0 0 1px rgba(237, 23, 34, 0.12), 0 6px 18px rgba(237, 23, 34, 0.22);
 }
 
 /* Import Google Fonts */
@@ -320,8 +346,8 @@ body {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at 20% 20%, rgba(125, 145, 129, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(196, 144, 122, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 20%, rgba(237, 23, 34, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(197, 164, 109, 0.1) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -493,8 +519,7 @@ body {
 .mobile-nav-item.active {
     background: var(--color-sage-mist);
     color: var(--color-sage);
-    box-shadow: 0 0 12px rgba(125, 145, 129, 0.2);
-    /* Soft sage glow */
+    box-shadow: 0 0 12px rgba(237, 23, 34, 0.2);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -539,7 +564,7 @@ body {
 }
 
 .btn-sage:hover {
-    background: var(--color-sage-light);
+    background: var(--color-maple-deep);
     transform: translateY(-1px);
     box-shadow: var(--shadow-glow-sage);
 }
@@ -1098,5 +1123,230 @@ body {
         display: flex;
         align-items: center;
         gap: 0.25rem;
+    }
+}
+/* ═══════════════════════════════════════════════════════════════
+   Mapleby brand layer — shell, navigation and sign-in
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dark heritage sidebar */
+.sidebar-float {
+    background:
+        radial-gradient(120% 60% at 0% 0%, rgba(237, 23, 34, 0.14), transparent 55%),
+        linear-gradient(180deg, var(--color-charcoal) 0%, var(--color-midnight) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 48px rgba(23, 24, 25, 0.28);
+    color: var(--color-silver);
+}
+
+.sidebar-float::after {
+    /* faint maple leaf watermark at the foot of the sidebar */
+    content: '';
+    position: absolute;
+    left: -40px;
+    bottom: 70px;
+    width: 300px;
+    height: 180px;
+    background: url('/brand/leaf.svg') no-repeat center / contain;
+    opacity: 0.035;
+    filter: invert(1);
+    pointer-events: none;
+}
+
+.sidebar-float .nav-section-label {
+    color: var(--color-gold);
+    opacity: 0.85;
+    letter-spacing: 0.2em;
+}
+
+.sidebar-float .nav-item {
+    position: relative;
+    color: #B9BBBE;
+    margin: 0.125rem 0.75rem;
+    padding: 0.65rem 0.9rem;
+}
+
+.sidebar-float .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-white);
+}
+
+.sidebar-float .nav-item.active {
+    background: linear-gradient(90deg, rgba(237, 23, 34, 0.22), rgba(237, 23, 34, 0.04));
+    color: var(--color-white);
+}
+
+.sidebar-float .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -0.75rem;
+    top: 22%;
+    bottom: 22%;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--color-maple);
+    box-shadow: 0 0 12px rgba(237, 23, 34, 0.6);
+}
+
+.sidebar-float .nav-item .nav-icon,
+.sidebar-float .nav-item svg {
+    color: #8C8F94;
+}
+
+.sidebar-float .nav-item:hover svg,
+.sidebar-float .nav-item.active svg {
+    color: var(--color-maple);
+}
+
+.sidebar-float .nav-item.active svg {
+    color: #FF4D55;
+}
+
+.sidebar-divider {
+    height: 1px;
+    margin: 0 1.25rem;
+    background: linear-gradient(90deg, rgba(197, 164, 109, 0.5), rgba(255, 255, 255, 0.06) 60%, transparent);
+}
+
+/* Brand lockup (badge + wordmark) */
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.brand-badge {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--color-white);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 6px 18px rgba(0, 0, 0, 0.35);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-lockup:hover .brand-badge {
+    transform: rotate(-10deg) scale(1.05);
+}
+
+.brand-wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.brand-tagline {
+    margin-top: 0.3rem;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+}
+
+/* Mobile top bar (the floating sidebar is hidden below lg) */
+.mobile-topbar {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .mobile-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: calc(0.65rem + env(safe-area-inset-top)) 1rem 0.65rem;
+        background: linear-gradient(180deg, var(--color-charcoal), var(--color-midnight));
+        color: var(--color-white);
+        box-shadow: 0 6px 20px rgba(23, 24, 25, 0.25);
+    }
+
+    .mobile-topbar::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--color-maple) 0%, var(--color-maple) 35%, var(--color-gold) 35%, var(--color-gold) 40%, transparent 40%);
+    }
+
+    .app-container {
+        flex-direction: column;
+    }
+}
+
+/* Mobile dock */
+.mobile-nav-float {
+    border-top: 1px solid var(--color-linen);
+}
+
+.mobile-nav-item.active {
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Sign-in */
+.auth-panel {
+    background:
+        radial-gradient(90% 70% at 85% 10%, rgba(237, 23, 34, 0.28), transparent 60%),
+        radial-gradient(70% 60% at 0% 100%, rgba(197, 164, 109, 0.12), transparent 60%),
+        linear-gradient(160deg, var(--color-charcoal) 0%, var(--color-midnight) 70%);
+}
+
+.auth-leaf {
+    position: absolute;
+    right: -12%;
+    bottom: -6%;
+    width: 85%;
+    aspect-ratio: 760 / 450;
+    background: url('/brand/leaf.svg') no-repeat center / contain;
+    filter: invert(1);
+    opacity: 0.05;
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+
+.auth-seal {
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+.auth-seal::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 9999px;
+    border: 1px solid rgba(197, 164, 109, 0.45);
+}
+
+.auth-seal::after {
+    content: '';
+    position: absolute;
+    inset: -28px;
+    border-radius: 9999px;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    animation: auth-spin 40s linear infinite;
+}
+
+@keyframes auth-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.gold-rule {
+    height: 1px;
+    width: 64px;
+    background: var(--color-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-seal::after {
+        animation: none;
     }
 }

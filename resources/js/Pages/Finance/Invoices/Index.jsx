@@ -43,7 +43,7 @@ export default function Index({ invoices, filters, statuses, summary, billable }
     return (
         <AppLayout>
             <Head title="Invoices" />
-            <div className="flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5">
                 <div>
                     <h1 className="text-display-md text-void">Invoices</h1>
                     <p className="text-drift mt-1">Bill customers for the charges on their cars. Add charges on each vehicle's page.</p>

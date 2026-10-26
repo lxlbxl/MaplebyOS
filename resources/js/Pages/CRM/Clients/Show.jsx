@@ -31,7 +31,7 @@ export default function Show({ client, stats, statusBreakdown, statuses = {}, in
         <AppLayout>
             <Head title={`Client - ${client.company_name || client.contact_person}`} />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 {/* Header with Back Button */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">

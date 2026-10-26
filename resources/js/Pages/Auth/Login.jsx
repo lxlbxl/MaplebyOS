@@ -30,36 +30,42 @@ export default function Login({ status }) {
         <div className="flex min-h-screen bg-ivory">
             <Head title="Sign in" />
 
-            {/* Left Panel - Decorative */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-sage via-sage-light to-terracotta-light opacity-90" />
-                <div className="absolute inset-0 texture-grain" />
+            {/* Left Panel - Brand */}
+            <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden auth-panel text-white">
+                <div className="auth-leaf" />
 
-                {/* Ambient shapes */}
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-
-                {/* Content */}
-                <div className="relative z-10 flex flex-col justify-between p-16 text-white">
-                    <div>
-                        <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-                            <span className="font-display text-2xl font-semibold">M</span>
-                        </div>
-                        <h1 className="font-display text-5xl font-medium tracking-tight leading-tight">
-                            {appName}
-                        </h1>
-                        <p className="mt-2 text-white/70 text-sm uppercase tracking-[0.2em]">
-                            Logistics Platform
+                <div className="relative z-10 flex flex-col justify-between w-full p-14 xl:p-20">
+                    <div className="flex items-center justify-between">
+                        <p className="brand-wordmark text-sm text-white/80">Mapleby Inc.</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">
+                            Toronto <span className="text-maple">&rarr;</span> Lagos
                         </p>
                     </div>
 
-                    <div className="max-w-sm">
-                        <p className="font-display text-2xl leading-relaxed text-white/90">
-                            "Simplicity is the ultimate sophistication."
-                        </p>
-                        <p className="mt-4 text-white/60 text-sm">
-                            — Leonardo da Vinci
-                        </p>
+                    <div className="flex flex-col items-start gap-12">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, rotate: -8 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                            className="auth-seal ml-7"
+                        >
+                            <img src="/brand/badge-256.webp" alt="Mapleby" width={168} height={168} className="rounded-full shadow-[0_24px_60px_rgba(237,23,34,0.35)]" />
+                        </motion.div>
+
+                        <div>
+                            <div className="gold-rule mb-6" />
+                            <h1 className="font-display text-6xl xl:text-7xl font-semibold tracking-tight leading-[0.95]">
+                                Built on <span className="text-maple italic">Trust.</span>
+                            </h1>
+                            <p className="mt-6 max-w-md text-white/60 leading-relaxed">
+                                The operations platform behind every Mapleby vehicle, from Canadian auction lot to Lagos terminal.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">
+                        <span>{appName}</span>
+                        <span className="text-gold">Est. MMXXVI</span>
                     </div>
                 </div>
             </div>
@@ -73,15 +79,15 @@ export default function Login({ status }) {
                     className="w-full max-w-md"
                 >
                     {/* Mobile Logo */}
-                    <div className="lg:hidden mb-12 text-center">
-                        <div className="w-14 h-14 rounded-2xl bg-sage mx-auto flex items-center justify-center mb-4">
-                            <span className="font-display text-2xl font-semibold text-white">M</span>
-                        </div>
-                        <h1 className="font-display text-2xl text-void">{appName}</h1>
+                    <div className="lg:hidden mb-10 flex flex-col items-center text-center">
+                        <img src="/brand/badge-192.png" alt="Mapleby" width={96} height={96} className="rounded-full shadow-[0_14px_36px_rgba(237,23,34,0.25)] mb-5" />
+                        <p className="brand-wordmark text-xl text-charcoal">Mapleby</p>
+                        <p className="brand-tagline">Logistics OS</p>
                     </div>
 
                     {/* Welcome Text */}
                     <div className="mb-10">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-maple mb-3">Staff Portal</p>
                         <h2 className="text-display-lg mb-2">Welcome back</h2>
                         <p className="text-caption">Sign in to continue to your dashboard</p>
                     </div>
@@ -111,7 +117,7 @@ export default function Login({ status }) {
                                     placeholder="name@company.com"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="h-13 pl-12 bg-cream border-0 focus:bg-white"
+                                    className="h-13 pl-12 bg-white"
                                     autoComplete="username"
                                     required
                                 />
@@ -135,7 +141,7 @@ export default function Login({ status }) {
                                     placeholder="Enter your password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="h-13 pl-12 bg-cream border-0 focus:bg-white"
+                                    className="h-13 pl-12 bg-white"
                                     autoComplete="current-password"
                                     required
                                 />
@@ -151,7 +157,7 @@ export default function Login({ status }) {
                                     type="checkbox"
                                     checked={data.remember}
                                     onChange={(e) => setData('remember', e.target.checked)}
-                                    className="w-4 h-4 rounded border-linen text-sage focus:ring-sage focus:ring-offset-0"
+                                    className="w-4 h-4 rounded border-linen accent-maple focus:ring-sage focus:ring-offset-0"
                                 />
                                 <span className="text-sm text-stone group-hover:text-charcoal transition-colors">
                                     Remember me
@@ -172,7 +178,7 @@ export default function Login({ status }) {
 
                     {/* Footer */}
                     <p className="mt-10 text-center text-caption">
-                        Secure login powered by <span className="text-sage font-medium">Mapleby</span>
+                        Secure staff access &middot; <a href="/" className="text-maple font-medium hover:underline">maplebyinc.com</a>
                     </p>
                 </motion.div>
             </div>

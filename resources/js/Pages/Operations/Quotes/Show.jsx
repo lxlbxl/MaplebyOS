@@ -25,7 +25,7 @@ export default function Show({ quote, paid_amount, payment_status, settings, aut
         <AppLayout>
             <Head title={`Quote ${quote.quote_number}`} />
 
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
                 {/* Header Actions */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 print:hidden">
                     <Link
@@ -35,7 +35,7 @@ export default function Show({ quote, paid_amount, payment_status, settings, aut
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Quotes
                     </Link>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button variant="outline" onClick={handlePrint}>
                             <Printer className="mr-2 h-4 w-4" />
                             Print / PDF
