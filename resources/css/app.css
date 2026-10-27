@@ -68,6 +68,31 @@
     --color-gray-800: #242424;
     --color-gray-900: #171819;
 
+
+    /* Off-palette Tailwind hues folded into the brand: blues -> graphite,
+       reds/purples -> maple, ambers -> champagne gold, greens -> success. */
+    --color-blue-50: #F5F5F3; --color-blue-100: #ECECEA; --color-blue-200: #DDDEDF; --color-blue-300: #C9CACB; --color-blue-400: #8C8F94; --color-blue-500: #62656A; --color-blue-600: #4B4E52; --color-blue-700: #393B3E; --color-blue-800: #242424; --color-blue-900: #171819;
+    --color-sky-50: #F5F5F3; --color-sky-100: #ECECEA; --color-sky-200: #DDDEDF; --color-sky-300: #C9CACB; --color-sky-400: #8C8F94; --color-sky-500: #62656A; --color-sky-600: #4B4E52; --color-sky-700: #393B3E; --color-sky-800: #242424; --color-sky-900: #171819;
+    --color-cyan-50: #F5F5F3; --color-cyan-100: #ECECEA; --color-cyan-200: #DDDEDF; --color-cyan-300: #C9CACB; --color-cyan-400: #8C8F94; --color-cyan-500: #62656A; --color-cyan-600: #4B4E52; --color-cyan-700: #393B3E; --color-cyan-800: #242424; --color-cyan-900: #171819;
+    --color-indigo-50: #F5F5F3; --color-indigo-100: #ECECEA; --color-indigo-200: #DDDEDF; --color-indigo-300: #C9CACB; --color-indigo-400: #8C8F94; --color-indigo-500: #62656A; --color-indigo-600: #4B4E52; --color-indigo-700: #393B3E; --color-indigo-800: #242424; --color-indigo-900: #171819;
+    --color-slate-50: #F5F5F3; --color-slate-100: #ECECEA; --color-slate-200: #DDDEDF; --color-slate-300: #C9CACB; --color-slate-400: #8C8F94; --color-slate-500: #62656A; --color-slate-600: #4B4E52; --color-slate-700: #393B3E; --color-slate-800: #242424; --color-slate-900: #171819;
+    --color-zinc-50: #F5F5F3; --color-zinc-100: #ECECEA; --color-zinc-200: #DDDEDF; --color-zinc-300: #C9CACB; --color-zinc-400: #8C8F94; --color-zinc-500: #62656A; --color-zinc-600: #4B4E52; --color-zinc-700: #393B3E; --color-zinc-800: #242424; --color-zinc-900: #171819;
+    --color-neutral-50: #F5F5F3; --color-neutral-100: #ECECEA; --color-neutral-200: #DDDEDF; --color-neutral-300: #C9CACB; --color-neutral-400: #8C8F94; --color-neutral-500: #62656A; --color-neutral-600: #4B4E52; --color-neutral-700: #393B3E; --color-neutral-800: #242424; --color-neutral-900: #171819;
+    --color-stone-50: #F5F5F3; --color-stone-100: #ECECEA; --color-stone-200: #DDDEDF; --color-stone-300: #C9CACB; --color-stone-400: #8C8F94; --color-stone-500: #62656A; --color-stone-600: #4B4E52; --color-stone-700: #393B3E; --color-stone-800: #242424; --color-stone-900: #171819;
+    --color-red-50: #FEF4F4; --color-red-100: #FCE7E8; --color-red-200: #F9C5C8; --color-red-300: #F4959A; --color-red-400: #F4555C; --color-red-500: #ED1722; --color-red-600: #D0121D; --color-red-700: #A80F1B; --color-red-800: #860C16; --color-red-900: #5E0A10;
+    --color-rose-50: #FEF4F4; --color-rose-100: #FCE7E8; --color-rose-200: #F9C5C8; --color-rose-300: #F4959A; --color-rose-400: #F4555C; --color-rose-500: #ED1722; --color-rose-600: #D0121D; --color-rose-700: #A80F1B; --color-rose-800: #860C16; --color-rose-900: #5E0A10;
+    --color-pink-50: #FEF4F4; --color-pink-100: #FCE7E8; --color-pink-200: #F9C5C8; --color-pink-300: #F4959A; --color-pink-400: #F4555C; --color-pink-500: #ED1722; --color-pink-600: #D0121D; --color-pink-700: #A80F1B; --color-pink-800: #860C16; --color-pink-900: #5E0A10;
+    --color-fuchsia-50: #FEF4F4; --color-fuchsia-100: #FCE7E8; --color-fuchsia-200: #F9C5C8; --color-fuchsia-300: #F4959A; --color-fuchsia-400: #F4555C; --color-fuchsia-500: #ED1722; --color-fuchsia-600: #D0121D; --color-fuchsia-700: #A80F1B; --color-fuchsia-800: #860C16; --color-fuchsia-900: #5E0A10;
+    --color-purple-50: #FEF4F4; --color-purple-100: #FCE7E8; --color-purple-200: #F9C5C8; --color-purple-300: #F4959A; --color-purple-400: #F4555C; --color-purple-500: #ED1722; --color-purple-600: #D0121D; --color-purple-700: #A80F1B; --color-purple-800: #860C16; --color-purple-900: #5E0A10;
+    --color-violet-50: #FEF4F4; --color-violet-100: #FCE7E8; --color-violet-200: #F9C5C8; --color-violet-300: #F4959A; --color-violet-400: #F4555C; --color-violet-500: #ED1722; --color-violet-600: #D0121D; --color-violet-700: #A80F1B; --color-violet-800: #860C16; --color-violet-900: #5E0A10;
+    --color-amber-50: #FAF6EE; --color-amber-100: #F4ECDD; --color-amber-200: #E9D9BC; --color-amber-300: #DCC499; --color-amber-400: #C5A46D; --color-amber-500: #B08D55; --color-amber-600: #977543; --color-amber-700: #7A5E35; --color-amber-800: #5E482A; --color-amber-900: #43331E;
+    --color-yellow-50: #FAF6EE; --color-yellow-100: #F4ECDD; --color-yellow-200: #E9D9BC; --color-yellow-300: #DCC499; --color-yellow-400: #C5A46D; --color-yellow-500: #B08D55; --color-yellow-600: #977543; --color-yellow-700: #7A5E35; --color-yellow-800: #5E482A; --color-yellow-900: #43331E;
+    --color-orange-50: #FAF6EE; --color-orange-100: #F4ECDD; --color-orange-200: #E9D9BC; --color-orange-300: #DCC499; --color-orange-400: #C5A46D; --color-orange-500: #B08D55; --color-orange-600: #977543; --color-orange-700: #7A5E35; --color-orange-800: #5E482A; --color-orange-900: #43331E;
+    --color-green-50: #F1F8F3; --color-green-100: #E3F1E8; --color-green-200: #C4E1CF; --color-green-300: #9CCCAE; --color-green-400: #5FA97C; --color-green-500: #3E8E5E; --color-green-600: #2E7D4F; --color-green-700: #256641; --color-green-800: #1D5034; --color-green-900: #163D28;
+    --color-emerald-50: #F1F8F3; --color-emerald-100: #E3F1E8; --color-emerald-200: #C4E1CF; --color-emerald-300: #9CCCAE; --color-emerald-400: #5FA97C; --color-emerald-500: #3E8E5E; --color-emerald-600: #2E7D4F; --color-emerald-700: #256641; --color-emerald-800: #1D5034; --color-emerald-900: #163D28;
+    --color-teal-50: #F1F8F3; --color-teal-100: #E3F1E8; --color-teal-200: #C4E1CF; --color-teal-300: #9CCCAE; --color-teal-400: #5FA97C; --color-teal-500: #3E8E5E; --color-teal-600: #2E7D4F; --color-teal-700: #256641; --color-teal-800: #1D5034; --color-teal-900: #163D28;
+    --color-lime-50: #F1F8F3; --color-lime-100: #E3F1E8; --color-lime-200: #C4E1CF; --color-lime-300: #9CCCAE; --color-lime-400: #5FA97C; --color-lime-500: #3E8E5E; --color-lime-600: #2E7D4F; --color-lime-700: #256641; --color-lime-800: #1D5034; --color-lime-900: #163D28;
+
     /* Spacing */
     --spacing-section: 4rem;
 

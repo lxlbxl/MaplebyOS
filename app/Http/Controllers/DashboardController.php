@@ -37,7 +37,7 @@ class DashboardController extends Controller
                 count(*) as total,
                 sum(total_value) as revenue,
                 sum(case when status = 'delivered' then 1 else 0 end) as delivered,
-                sum(case when status in ('received', 'scheduled', 'shipped', 'arrived') then 1 else 0 end) as active,
+                sum(case when status not in ('delivered', 'on_hold', 'issue') then 1 else 0 end) as active,
                 sum(case when status = 'pending' then 1 else 0 end) as pending_requests
             ")->first();
 

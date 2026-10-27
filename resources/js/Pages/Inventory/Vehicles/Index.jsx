@@ -69,6 +69,7 @@ export default function Index({ vehicles, filters, clients, stats }) {
 
                 {/* Insights & Filters */}
                 <InsightsSection
+                    icon={Car}
                     stats={stats}
                     title="Inventory Status"
                     description="Current vehicle stock status"

@@ -49,10 +49,11 @@ function Money({ shipment, money, categories, currency }) {
         <Card className="bg-white border-linen shadow-sm">
             <CardHeader className="border-b border-linen"><CardTitle className="text-void flex items-center gap-2"><DollarSign className="h-5 w-5" /> Money</CardTitle></CardHeader>
             <CardContent className="p-5 space-y-4">
-                <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="rounded-lg bg-cream p-3"><p className="text-xs text-pebble">Costs</p><p className="font-semibold">{formatMoney(money.total_cost, currency)}</p></div>
-                    <div className="rounded-lg bg-cream p-3"><p className="text-xs text-pebble">Charged</p><p className="font-semibold">{formatMoney(money.total_charges, currency)}</p></div>
-                    <div className={cn('rounded-lg p-3', money.profit >= 0 ? 'bg-emerald-50' : 'bg-red-50')}><p className="text-xs text-pebble">Profit</p><p className={cn('font-semibold', money.profit >= 0 ? 'text-emerald-700' : 'text-red-700')}>{formatMoney(money.profit, currency)}</p></div>
+                {/* Same mini-tiles as the dashboard's Shipments card */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="bg-cream rounded-xl p-4"><p className="font-display text-xl text-void truncate">{formatMoney(money.total_cost, currency)}</p><p className="text-label mt-1">Costs</p></div>
+                    <div className="bg-cream rounded-xl p-4"><p className="font-display text-xl text-void truncate">{formatMoney(money.total_charges, currency)}</p><p className="text-label mt-1">Charged</p></div>
+                    <div className={cn('rounded-xl p-4', money.profit >= 0 ? 'bg-success-soft' : 'bg-sage-soft')}><p className={cn('font-display text-xl truncate', money.profit >= 0 ? 'text-success' : 'text-maple-deep')}>{formatMoney(money.profit, currency)}</p><p className={cn('text-label mt-1', money.profit >= 0 ? '!text-success/70' : '!text-maple-deep/70')}>Profit</p></div>
                 </div>
 
                 <div className="divide-y divide-linen text-sm">

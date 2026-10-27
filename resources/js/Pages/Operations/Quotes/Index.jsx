@@ -76,6 +76,7 @@ export default function Index({ quotes, filters, clients, shipments, vehicles, s
 
                 {/* Insights & Filters */}
                 <InsightsSection
+                    icon={FileText}
                     stats={stats}
                     title="Quote Status"
                     description="Distribution of quotes by status"

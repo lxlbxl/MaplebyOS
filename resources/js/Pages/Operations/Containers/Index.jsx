@@ -4,8 +4,9 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import ContainerForm from '@/Components/Operations/ContainerForm';
-import { Plus, Search, Ship, Anchor, Car, ExternalLink } from 'lucide-react';
+import { Plus, Search, Ship, Anchor, Car, ExternalLink, Timer } from 'lucide-react';
 import { CONTAINER_STATUS_COLORS, formatDate } from '@/lib/operations';
+import StatCard from '@/Components/StatCard';
 import { cn } from '@/lib/utils';
 
 function daysUntil(date) {
@@ -67,16 +68,22 @@ export default function Index({ containers, statuses, shippingLines, filters, su
                     <Button onClick={() => setFormOpen(true)} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> New container</Button>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble flex items-center gap-1"><Ship className="h-3.5 w-3.5" /> On the water</p><p className="text-2xl font-semibold text-void">{summary.in_transit}</p></div>
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble flex items-center gap-1"><Anchor className="h-3.5 w-3.5" /> At Lagos, not released</p><p className="text-2xl font-semibold text-void">{summary.arrived}</p></div>
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble flex items-center gap-1"><Car className="h-3.5 w-3.5" /> Cars in transit</p><p className="text-2xl font-semibold text-void">{summary.cars_in_transit}</p></div>
-                    <div className="rounded-xl bg-white border border-linen p-4">
-                        <p className="text-xs text-pebble">Average transit (loaded → offloaded)</p>
-                        {summary.transit_by_line.length ? summary.transit_by_line.map((l) => (
-                            <p key={l.line} className="text-sm text-charcoal flex justify-between"><span>{l.line}</span><span className="font-semibold">{l.avg_days} days</span></p>
-                        )) : <p className="text-sm text-pebble">Not enough data yet</p>}
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                    <StatCard dark icon={Ship} label="On the water" value={summary.in_transit} hint="Containers sailing now" />
+                    <StatCard icon={Anchor} label="At Lagos" value={summary.arrived} hint="Arrived, not yet released" />
+                    <StatCard icon={Car} label="Cars in transit" value={summary.cars_in_transit} hint="Inside containers at sea" />
+                    <StatCard icon={Timer} label="Avg. transit">
+                        {summary.transit_by_line.length ? (
+                            <div className="space-y-1.5">
+                                {summary.transit_by_line.slice(0, 4).map((l) => (
+                                    <div key={l.line} className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-cream text-sm">
+                                        <span className="text-charcoal truncate">{l.line}</span>
+                                        <span className="font-semibold text-void shrink-0">{l.avg_days} days</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : <p className="text-sm text-pebble">Not enough data yet</p>}
+                    </StatCard>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-3 bg-white p-3 rounded-xl border border-linen">

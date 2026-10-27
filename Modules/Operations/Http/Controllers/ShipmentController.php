@@ -83,7 +83,9 @@ class ShipmentController extends Controller
             ->paginate((int) min(200, max(10, (int) $request->input('per_page', 50))))
             ->withQueryString();
 
+        $order = array_flip(array_keys(Shipment::getStatuses()));
         $stats = Shipment::selectRaw('status, count(*) as value')->groupBy('status')->get()
+            ->sortBy(fn ($item) => $order[$item->status] ?? 99)->values()
             ->map(fn ($item) => ['name' => Shipment::getStatuses()[$item->status] ?? $item->status, 'value' => $item->value]);
 
         return Inertia::render('Operations/Shipments/Index', [
