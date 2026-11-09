@@ -203,7 +203,7 @@ class CargoTest extends TestCase
 
         // A car charge in USD for the same client can't share an invoice with naira lines.
         $car = $this->car(['client_id' => $client->id]);
-        $this->post(route('finance.charges.store', $car), ['kind' => 'charge', 'category' => 'Shipping', 'amount' => 1800])->assertSessionHasNoErrors();
+        $this->post(route('finance.charges.store', $car), ['kind' => 'charge', 'category' => 'Shipping', 'amount' => 1800, 'currency' => 'USD'])->assertSessionHasNoErrors();
         $this->post(route('finance.charges.store', $car), ['kind' => 'charge', 'category' => 'Agency fee', 'amount' => 1])->assertSessionHasErrors('category');
 
         $charges = ShipmentCharge::where('kind', 'charge')->pluck('id')->all();
@@ -247,19 +247,23 @@ class CargoTest extends TestCase
         $this->assertStringStartsWith('BOX', $box->tracking_id);
     }
 
-    public function test_dashboard_counts_cars_and_dollars_only(): void
+    public function test_dashboard_counts_cars_and_sums_only_the_default_currency(): void
     {
         $client = Client::create(['company_name' => 'Okafor Imports', 'contact_person' => 'Emeka Okafor']);
         // No VIN and not in a container, but neither is a car.
         Shipment::create(['cargo_type' => Shipment::CARGO_BOX, 'cargo_description' => 'Clothes', 'date_added' => now()->subDays(60)]);
         $job = Shipment::create(['cargo_type' => Shipment::CARGO_GENERAL, 'cargo_description' => 'Tiles', 'client_id' => $client->id]);
         $job->charges()->create(['kind' => 'charge', 'category' => 'Agency fee', 'amount' => 350000, 'currency' => 'NGN']);
+        $car = $this->car(['client_id' => $client->id, 'vin' => '1HGCM82633A004352', 'container_id' => $this->carContainer()->id]);
+        $car->charges()->create(['kind' => 'charge', 'category' => 'Shipping', 'amount' => 1800, 'currency' => 'USD']);
         $this->actingAs($this->staff(Access::ROLE_CEO));
         $this->post(route('finance.invoices.store'), ['client_id' => $client->id, 'charge_ids' => $job->charges()->pluck('id')->all()])->assertSessionHasNoErrors();
-        Invoice::sole()->update(['status' => 'sent']);
+        $this->post(route('finance.invoices.store'), ['client_id' => $client->id, 'charge_ids' => $car->charges()->pluck('id')->all()])->assertSessionHasNoErrors();
+        Invoice::query()->update(['status' => 'sent']);
 
+        // Naira is the default currency: the naira invoice counts, the dollar one is never added to it.
         $this->get(route('dashboard'))->assertOk()->assertInertia(fn ($page) => $page
-            ->where('data.money.outstanding', 0)
+            ->where('data.money.outstanding', 350000)
             ->where('data.alerts', fn ($alerts) => collect($alerts)->every(fn ($a) => !str_contains($a['text'], 'car(s)'))));
     }
 }
