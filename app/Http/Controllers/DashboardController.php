@@ -232,7 +232,8 @@ class DashboardController extends Controller
 
     private function outstanding(): float
     {
-        return (float) Invoice::where('currency', self::MONEY_CURRENCY)->whereIn('status', ['sent', 'partial'])
+        // toBase(): the model's computed `balance` accessor would otherwise shadow the aggregate.
+        return (float) Invoice::where('currency', self::MONEY_CURRENCY)->whereIn('status', ['sent', 'partial'])->toBase()
             ->selectRaw('COALESCE(SUM(total - COALESCE(amount_paid, 0)), 0) as balance')->value('balance');
     }
 
