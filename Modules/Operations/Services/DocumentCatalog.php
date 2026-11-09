@@ -62,6 +62,19 @@ final class DocumentCatalog
         'released', 'delivered', 'empty_returned',
     ];
 
+    /** Small cargo / boxes for other clients riding in car containers (cargo_type = box). */
+    public const BOX = [
+        'packing_list' => ['Packing list / inventory', 'added', false, true],
+        'owner_id' => ['Owner ID', 'added', false, true],
+        'commercial_invoice' => ['Commercial invoice / receipt', 'added', true, false],
+        'box_photos' => ['Photos', 'at_yard', false, false],
+        'customs_release' => ['Customs release', 'cleared', false, true],
+        'proof_of_delivery' => ['Proof of delivery', 'delivered', false, true],
+        'other' => ['Other document', null, false, false],
+    ];
+
+    public const BOX_ORDER = ['added', 'at_yard', 'loaded', 'sailed', 'arrived', 'offloaded', 'cleared', 'delivered'];
+
     public const VEHICLE_ORDER = [
         Shipment::STATUS_ADDED, Shipment::STATUS_PURCHASED, Shipment::STATUS_PICKED_UP, Shipment::STATUS_AT_YARD,
         Shipment::STATUS_LOADED, Shipment::STATUS_SAILED, Shipment::STATUS_ARRIVED, Shipment::STATUS_OFFLOADED,
@@ -78,6 +91,7 @@ final class DocumentCatalog
         return match ($kind) {
             'container' => self::CONTAINER,
             'cargo' => self::CARGO,
+            'box' => self::BOX,
             default => self::VEHICLE,
         };
     }
@@ -89,7 +103,11 @@ final class DocumentCatalog
             return 'container';
         }
 
-        return ($owner->cargo_type ?? 'vehicle') === 'general_cargo' ? 'cargo' : 'vehicle';
+        return match ($owner->cargo_type ?? 'vehicle') {
+            'general_cargo' => 'cargo',
+            'box' => 'box',
+            default => 'vehicle',
+        };
     }
 
     private static function orderFor(string $kind): array
@@ -97,6 +115,7 @@ final class DocumentCatalog
         return match ($kind) {
             'container' => self::CONTAINER_ORDER,
             'cargo' => self::CARGO_ORDER,
+            'box' => self::BOX_ORDER,
             default => self::VEHICLE_ORDER,
         };
     }
@@ -106,13 +125,14 @@ final class DocumentCatalog
         return match ($kind) {
             'container' => Container::getStatuses(),
             'cargo' => defined(Shipment::class . '::CLEARING_STATUSES') ? Shipment::CLEARING_STATUSES : [],
+            'box' => defined(Shipment::class . '::BOX_STATUSES') ? Shipment::BOX_STATUSES : [],
             default => Shipment::getStatuses(),
         };
     }
 
     public static function label(string $type): string
     {
-        return self::VEHICLE[$type][0] ?? self::CONTAINER[$type][0] ?? self::CARGO[$type][0] ?? ucfirst(str_replace('_', ' ', $type));
+        return self::VEHICLE[$type][0] ?? self::CONTAINER[$type][0] ?? self::CARGO[$type][0] ?? self::BOX[$type][0] ?? ucfirst(str_replace('_', ' ', $type));
     }
 
     /** Picklist for the upload form, without the price-bearing types for roles that can't see money. */

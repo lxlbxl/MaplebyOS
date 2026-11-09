@@ -26,7 +26,7 @@ class DocumentController extends Controller
         $isContainer = $request->input('documentable') === 'container';
 
         $request->validate([
-            'documentable' => 'required|in:vehicle,cargo,container',
+            'documentable' => 'required|in:vehicle,cargo,box,container',
             'documentable_id' => ['required', 'integer', Rule::exists($isContainer ? 'containers' : 'shipments', 'id')],
         ]);
         $owner = $isContainer
@@ -100,7 +100,7 @@ class DocumentController extends Controller
     {
         return match ($kind) {
             'container' => 'containers.view',
-            'cargo' => 'cargo.view',
+            'cargo', 'box' => 'cargo.view',
             default => 'vehicles.view',
         };
     }

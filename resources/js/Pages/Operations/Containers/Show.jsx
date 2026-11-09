@@ -6,6 +6,8 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import ContainerForm from '@/Components/Operations/ContainerForm';
+import DocumentsPanel from '@/Components/Operations/DocumentsPanel';
+import { useCan } from '@/lib/access';
 import { ArrowLeft, Pencil, Trash2, ExternalLink, X, Plus, AlertTriangle, History } from 'lucide-react';
 import { CONTAINER_STATUS_COLORS, VEHICLE_STATUS_COLORS, formatDate, todayIso } from '@/lib/operations';
 import { formatMoney, cn } from '@/lib/utils';
@@ -14,8 +16,10 @@ function Row({ label, children }) {
     return <div className="flex justify-between gap-4 py-1.5 text-sm"><span className="text-pebble">{label}</span><span className="text-charcoal text-right">{children || '—'}</span></div>;
 }
 
-export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned }) {
+export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned, documents }) {
     const { props } = usePage();
+    const can = useCan();
+    const manage = can('containers.manage');
     const currency = props.settings?.currency || 'USD';
     const [formOpen, setFormOpen] = useState(false);
     const [picking, setPicking] = useState([]);
@@ -48,12 +52,12 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                     </div>
                     <div className="flex gap-2">
                         {trackingUrl && <a href={trackingUrl} target="_blank" rel="noreferrer"><Button variant="outline" className="border-linen">Carrier tracking <ExternalLink className="ml-2 h-4 w-4" /></Button></a>}
-                        <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>
-                        <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this container? Its cars will be unassigned.') && router.delete(route('operations.containers.destroy', container.id))}><Trash2 className="h-4 w-4" /></Button>
+                        {manage && <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>}
+                        {can('records.delete') && <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this container? Its cars will be unassigned.') && router.delete(route('operations.containers.destroy', container.id))}><Trash2 className="h-4 w-4" /></Button>}
                     </div>
                 </div>
 
-                <Card className="bg-white border-linen shadow-sm">
+                {manage && <Card className="bg-white border-linen shadow-sm">
                     <CardContent className="p-5">
                         <form onSubmit={(e) => { e.preventDefault(); statusForm.patch(route('operations.containers.update-status', container.id), { preserveScroll: true }); }} className="flex flex-wrap items-end gap-2">
                             <div className="text-sm text-stone mr-2">Move container <span className="text-pebble">(all {container.shipments.length} cars follow)</span></div>
@@ -66,7 +70,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                             <Button type="submit" disabled={statusForm.processing} className="btn-sage">Update</Button>
                         </form>
                     </CardContent>
-                </Card>
+                </Card>}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 flex flex-col gap-6">
@@ -82,7 +86,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                             <p className="text-xs text-stone">{s.client ? (s.client.company_name || s.client.contact_person) : 'No customer'}</p>
                                             <span className={cn('inline-block mt-1 text-[11px] px-1.5 py-0.5 rounded', VEHICLE_STATUS_COLORS[s.status])}>{s.status_label}</span>
                                         </div>
-                                        <button type="button" title="Remove from container" onClick={() => confirm(`Remove ${s.tracking_id} from this container?`) && router.delete(route('operations.containers.remove-vehicle', [container.id, s.id]), { preserveScroll: true })} className="text-pebble hover:text-red-600 self-start"><X className="h-4 w-4" /></button>
+                                        {manage && <button type="button" title="Remove from container" onClick={() => confirm(`Remove ${s.tracking_id} from this container?`) && router.delete(route('operations.containers.remove-vehicle', [container.id, s.id]), { preserveScroll: true })} className="text-pebble hover:text-red-600 self-start"><X className="h-4 w-4" /></button>}
                                     </div>
                                 ))}
                                 {Array.from({ length: Math.max(0, free) }).map((_, i) => (
@@ -92,7 +96,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                             </CardContent>
                         </Card>
 
-                        {free > 0 && (
+                        {free > 0 && manage && (
                             <Card className="bg-white border-linen shadow-sm">
                                 <CardHeader className="border-b border-linen"><CardTitle className="text-void">Load cars ({free} free slot{free === 1 ? '' : 's'})</CardTitle></CardHeader>
                                 <CardContent className="p-5 space-y-3">
@@ -116,6 +120,8 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 </CardContent>
                             </Card>
                         )}
+
+                        <DocumentsPanel panel={documents} />
 
                         <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void flex items-center gap-2"><History className="h-5 w-5" /> History</CardTitle></CardHeader>
@@ -160,14 +166,14 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 <Row label="Transit">{transitDays != null ? `${transitDays} days` : null}</Row>
                             </CardContent>
                         </Card>
-                        <Card className="bg-white border-linen shadow-sm">
+                        {can('money.view') && <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void">Freight</CardTitle></CardHeader>
                             <CardContent className="p-5">
                                 <Row label="Freight cost">{container.freight_cost ? formatMoney(container.freight_cost, container.freight_currency || currency) : null}</Row>
                                 <Row label="Per car">{freightShare ? formatMoney(freightShare, container.freight_currency || currency) : null}</Row>
                                 <p className="text-xs text-pebble mt-2">The per-car share is counted as a cost on each car's profit.</p>
                             </CardContent>
-                        </Card>
+                        </Card>}
                         {container.notes && <Card className="bg-white border-linen shadow-sm"><CardContent className="p-5 text-sm whitespace-pre-wrap">{container.notes}</CardContent></Card>}
                     </div>
                 </div>
