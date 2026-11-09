@@ -111,7 +111,7 @@ export default function Index({ deposits, filters, views, summary, formOptions }
     return (
         <AppLayout>
             <Head title="Container deposits" />
-            <div className="flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-display-md text-void">Container deposits</h1>

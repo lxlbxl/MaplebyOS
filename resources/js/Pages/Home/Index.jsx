@@ -374,7 +374,7 @@ export default function Index({ home, greeting, roleLabel, data }) {
     return (
         <AppLayout>
             <Head title="Home" />
-            <div className="flex flex-col gap-4 max-w-6xl mx-auto pb-24">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-4 max-w-6xl mx-auto pb-24">
                 <div>
                     <h1 className="text-display-sm text-void font-bold">{greeting}, {props.auth?.user?.name?.split(' ')[0]}</h1>
                     <p className="text-sm text-pebble">{roleLabel}</p>

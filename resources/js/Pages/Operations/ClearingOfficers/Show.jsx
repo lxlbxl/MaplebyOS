@@ -35,7 +35,7 @@ export default function Show({ officer, assignments, work, movedAway, counts, ac
     return (
         <AppLayout>
             <Head title={`${officer.name} · Clearing officer`} />
-            <div className="flex flex-col gap-6 max-w-6xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-6xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Link href={route('operations.clearing-officers.index')}><Button variant="outline" size="icon" className="border-linen"><ArrowLeft className="h-4 w-4" /></Button></Link>

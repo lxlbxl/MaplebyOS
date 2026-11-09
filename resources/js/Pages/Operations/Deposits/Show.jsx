@@ -177,7 +177,7 @@ export default function Show({ deposit, clearingOfficer, audit, statuses, channe
     return (
         <AppLayout>
             <Head title={`Deposit · ${deposit.container_number}`} />
-            <div className="flex flex-col gap-6 max-w-6xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-6xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Link href={route('operations.deposits.index')}><Button variant="outline" size="icon" className="border-linen"><ArrowLeft className="h-4 w-4" /></Button></Link>
