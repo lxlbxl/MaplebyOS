@@ -246,4 +246,20 @@ class CargoTest extends TestCase
             ->assertJsonCount(8, 'steps');
         $this->assertStringStartsWith('BOX', $box->tracking_id);
     }
+
+    public function test_dashboard_counts_cars_and_dollars_only(): void
+    {
+        $client = Client::create(['company_name' => 'Okafor Imports', 'contact_person' => 'Emeka Okafor']);
+        // No VIN and not in a container, but neither is a car.
+        Shipment::create(['cargo_type' => Shipment::CARGO_BOX, 'cargo_description' => 'Clothes', 'date_added' => now()->subDays(60)]);
+        $job = Shipment::create(['cargo_type' => Shipment::CARGO_GENERAL, 'cargo_description' => 'Tiles', 'client_id' => $client->id]);
+        $job->charges()->create(['kind' => 'charge', 'category' => 'Agency fee', 'amount' => 350000, 'currency' => 'NGN']);
+        $this->actingAs($this->staff(Access::ROLE_CEO));
+        $this->post(route('finance.invoices.store'), ['client_id' => $client->id, 'charge_ids' => $job->charges()->pluck('id')->all()])->assertSessionHasNoErrors();
+        Invoice::sole()->update(['status' => 'sent']);
+
+        $this->get(route('dashboard'))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('data.money.outstanding', 0)
+            ->where('data.alerts', fn ($alerts) => collect($alerts)->every(fn ($a) => !str_contains($a['text'], 'car(s)'))));
+    }
 }
