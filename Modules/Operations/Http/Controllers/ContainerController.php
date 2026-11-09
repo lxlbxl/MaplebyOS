@@ -82,6 +82,8 @@ class ContainerController extends Controller
             'transitDays' => $container->transitDays(),
             'trackingUrl' => $container->shippingLine?->trackingUrlFor($container->container_number),
             'documents' => DocumentController::panel($container, request()->user()),
+            'clearing' => app(\Modules\Operations\Services\ClearingLedger::class)->panel($container, request()->user()),
+            'deposits' => DepositController::panelFor([$container->id], request()->user()),
             'unassigned' => Shipment::whereNull('container_id')->whereIn('cargo_type', [Shipment::CARGO_VEHICLE, Shipment::CARGO_BOX])
                 ->whereNotIn('status', [Shipment::STATUS_DELIVERED, Shipment::STATUS_CLEARED])
                 ->orderByDesc('date_added')->limit(200)

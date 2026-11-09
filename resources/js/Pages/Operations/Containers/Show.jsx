@@ -7,6 +7,8 @@ import { Input } from "@/Components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import ContainerForm from '@/Components/Operations/ContainerForm';
 import DocumentsPanel from '@/Components/Operations/DocumentsPanel';
+import ClearingOfficerPanel from '@/Components/Operations/ClearingOfficerPanel';
+import DepositsPanel from '@/Components/Operations/DepositsPanel';
 import { useCan } from '@/lib/access';
 import { ArrowLeft, Pencil, Trash2, ExternalLink, X, Plus, AlertTriangle, History } from 'lucide-react';
 import { CONTAINER_STATUS_COLORS, VEHICLE_STATUS_COLORS, formatDate, todayIso, shipmentHref } from '@/lib/operations';
@@ -16,7 +18,7 @@ function Row({ label, children }) {
     return <div className="flex justify-between gap-4 py-1.5 text-sm"><span className="text-pebble">{label}</span><span className="text-charcoal text-right">{children || '—'}</span></div>;
 }
 
-export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned, documents }) {
+export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned, documents, clearing, deposits }) {
     const { props } = usePage();
     const can = useCan();
     const manage = can('containers.manage');
@@ -122,6 +124,10 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 </CardContent>
                             </Card>
                         )}
+
+                        <DepositsPanel panel={deposits} />
+
+                        <ClearingOfficerPanel panel={clearing} />
 
                         <DocumentsPanel panel={documents} />
 

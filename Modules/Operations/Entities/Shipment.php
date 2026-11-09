@@ -373,15 +373,24 @@ class Shipment extends Model
         if ($this->isGeneralCargo() && isset(self::CLEARING_CONTAINER_CASCADE[$status])) {
             [$column, $containerStatus] = self::CLEARING_CONTAINER_CASCADE[$status];
             $this->cargoContainers()->update([$column => $date->toDateString(), 'status' => $containerStatus]);
+            if ($column === 'empty_returned_on') {
+                DepositRefund::syncForContainers($this->cargoContainers()->pluck('id')->all());
+            }
         }
 
-        $this->milestones()->create([
+        $milestone = $this->milestones()->create([
             'status' => $status,
             'occurred_on' => $date,
             'note' => $note,
             'container_id' => $containerId,
             'user_id' => auth()->id(),
         ]);
+
+        if ($this->isGeneralCargo()) {
+            app(\Modules\Operations\Services\ClearingLedger::class)->record(
+                $this, 'status', "{$this->status_label}" . ($note ? " ({$note})" : ''), $milestone, null, $date
+            );
+        }
     }
 
     public function quotes()

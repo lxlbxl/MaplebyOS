@@ -1,6 +1,6 @@
 import {
     LayoutDashboard, Users, Sparkles, Car, Container, FileText, Package, Receipt, DollarSign,
-    BookOpen, ShieldCheck, Settings, User, PlusCircle, Boxes, Anchor,
+    BookOpen, ShieldCheck, Settings, User, PlusCircle, Boxes, Anchor, Landmark, UserCheck,
 } from 'lucide-react';
 
 /**
@@ -28,6 +28,8 @@ export const NAV_SECTIONS = [
             { label: 'Containers', route: 'operations.containers.index', active: 'operations.containers.*', icon: Container, perm: 'containers.view' },
             { label: 'Clearing', route: 'operations.clearing.index', active: 'operations.clearing.*', icon: Anchor, perm: 'cargo.view' },
             { label: 'Small cargo', route: 'operations.boxes.index', active: 'operations.boxes.*', icon: Boxes, perm: 'cargo.view' },
+            { label: 'Deposits', route: 'operations.deposits.index', active: 'operations.deposits.*', icon: Landmark, perm: 'deposits.view' },
+            { label: 'Clearing officers', route: 'operations.clearing-officers.index', active: 'operations.clearing-officers.*', icon: UserCheck, perm: 'clearing.view' },
         ],
     },
     {
@@ -62,7 +64,7 @@ export const MOBILE_TABS = {
     ceo: ['dashboard', 'operations.shipments.index', 'operations.containers.index', 'finance.invoices.index', 'users.index'],
     business: ['dashboard', 'crm.clients.index', 'operations.quotes.index', 'finance.invoices.index', 'finance.payments.index'],
     logistics: ['dashboard', 'operations.containers.index', 'operations.shipments.index', 'operations.clearing.index', 'profile.edit'],
-    puncher: ['dashboard', ADD_CAR, 'operations.shipments.index', 'profile.edit'],
+    puncher: ['dashboard', ADD_CAR, 'operations.shipments.index', 'operations.deposits.index', 'profile.edit'],
 };
 
 export function routeExists(name) {

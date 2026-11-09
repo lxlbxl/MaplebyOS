@@ -54,6 +54,8 @@ use Modules\Operations\Http\Controllers\QuoteController;
 use Modules\Operations\Http\Controllers\ContainerController;
 use Modules\Operations\Http\Controllers\LookupController;
 use Modules\Operations\Http\Controllers\ClearingJobController;
+use Modules\Operations\Http\Controllers\ClearingOfficerController;
+use Modules\Operations\Http\Controllers\DepositController;
 use Modules\Operations\Http\Controllers\BoxController;
 
 Route::middleware(['auth', 'verified'])->prefix('app/operations')->name('operations.')->group(function () {
@@ -84,6 +86,25 @@ Route::middleware(['auth', 'verified'])->prefix('app/operations')->name('operati
     Route::delete('/clearing/{job}', [ClearingJobController::class, 'destroy'])->name('clearing.destroy')->middleware('permission:records.delete');
     Route::post('/clearing/{job}/containers', [ClearingJobController::class, 'addContainer'])->name('clearing.add-container')->middleware('permission:cargo.manage');
     Route::delete('/clearing/{job}/containers/{container}', [ClearingJobController::class, 'removeContainer'])->name('clearing.remove-container')->middleware('permission:cargo.manage');
+
+    // Container deposits paid to shipping lines, and their refunds
+    Route::get('/deposits', [DepositController::class, 'index'])->name('deposits.index')->middleware('permission:deposits.view');
+    Route::post('/deposits', [DepositController::class, 'store'])->name('deposits.store')->middleware('permission:deposits.manage');
+    Route::get('/deposits/{deposit}', [DepositController::class, 'show'])->name('deposits.show')->middleware('permission:deposits.view');
+    Route::put('/deposits/{deposit}', [DepositController::class, 'update'])->name('deposits.update')->middleware('permission:deposits.manage|deposits.oversee');
+    Route::put('/deposits/{deposit}/refund', [DepositController::class, 'updateRefund'])->name('deposits.refund')->middleware('permission:deposits.manage|deposits.oversee');
+    Route::post('/deposits/{deposit}/follow-ups', [DepositController::class, 'storeFollowUp'])->name('deposits.follow-ups.store')->middleware('permission:deposits.manage|deposits.oversee');
+    Route::post('/deposits/{deposit}/review', [DepositController::class, 'review'])->name('deposits.review')->middleware('permission:deposits.oversee');
+    Route::delete('/deposits/{deposit}', [DepositController::class, 'destroy'])->name('deposits.destroy')->middleware('permission:records.delete');
+
+    // Clearing officers: who handles each clearing, reassignments and credit
+    Route::get('/clearing-officers', [ClearingOfficerController::class, 'index'])->name('clearing-officers.index')->middleware('permission:clearing.view');
+    Route::post('/clearing-officers', [ClearingOfficerController::class, 'store'])->name('clearing-officers.store')->middleware('permission:clearing.manage');
+    Route::post('/clearing-officers/assign', [ClearingOfficerController::class, 'assign'])->name('clearing-officers.assign')->middleware('permission:clearing.manage');
+    Route::post('/clearing-work', [ClearingOfficerController::class, 'logWork'])->name('clearing-work.store')->middleware('permission:clearing.manage');
+    Route::post('/clearing-work/override', [ClearingOfficerController::class, 'override'])->name('clearing-work.override')->middleware('permission:clearing.override');
+    Route::get('/clearing-officers/{officer}', [ClearingOfficerController::class, 'show'])->name('clearing-officers.show')->middleware('permission:clearing.view');
+    Route::put('/clearing-officers/{officer}', [ClearingOfficerController::class, 'update'])->name('clearing-officers.update')->middleware('permission:clearing.manage');
 
     // Boxes / lite cargo riding in car containers
     Route::get('/boxes', [BoxController::class, 'index'])->name('boxes.index')->middleware('permission:cargo.view');
