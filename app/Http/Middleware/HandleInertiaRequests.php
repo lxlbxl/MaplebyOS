@@ -55,6 +55,10 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
+                // What this person may see/do, so the app hides what the server already blocks.
+                'can' => fn () => \App\Support\Access::abilities($request->user()),
+                'role' => fn () => \App\Support\Access::roleLabel($request->user()),
+                'home' => fn () => $request->user() ? \App\Support\Access::home($request->user()) : null,
             ],
             'settings' => $settings,
             'flash' => [

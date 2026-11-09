@@ -38,7 +38,7 @@ export default function Index({ users, filters, stats, roles }) {
         email: '',
         password: '',
         password_confirmation: '',
-        role: 'sales',
+        role: 'Puncher',
         is_active: true,
     });
 
@@ -55,7 +55,7 @@ export default function Index({ users, filters, stats, roles }) {
             email: user.email,
             password: '',
             password_confirmation: '',
-            role: user.role || 'sales',
+            role: user.role || 'Puncher',
             is_active: user.is_active,
         });
         setActiveTab('add');
@@ -98,11 +98,10 @@ export default function Index({ users, filters, stats, roles }) {
     };
 
     const roleColors = {
-        super_admin: 'bg-purple-100 text-purple-700 border-purple-200',
-        admin: 'bg-blue-100 text-blue-700 border-blue-200',
-        sales: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-        operations: 'bg-orange-100 text-orange-700 border-orange-200',
-        finance: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+        'Super Admin': 'bg-purple-100 text-purple-700 border-purple-200',
+        'Head of Business': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        'Logistics Officer': 'bg-orange-100 text-orange-700 border-orange-200',
+        'Puncher': 'bg-cyan-100 text-cyan-700 border-cyan-200',
     };
 
     return (
@@ -159,10 +158,7 @@ export default function Index({ users, filters, stats, roles }) {
                             status={filters.role}
                             statusOptions={[
                                 { value: 'all', label: 'All Roles' },
-                                { value: 'admin', label: 'Admin' },
-                                { value: 'sales', label: 'Sales' },
-                                { value: 'operations', label: 'Operations' },
-                                { value: 'finance', label: 'Finance' },
+                                ...(roles || []).map((r) => ({ value: r.id, label: r.name })),
                             ]}
                         />
 
@@ -197,8 +193,8 @@ export default function Index({ users, filters, stats, roles }) {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant="outline" className={`${roleColors[user.role] || 'bg-gray-100 text-gray-600'} capitalize`}>
-                                                        {user.role?.replace('_', ' ') || 'User'}
+                                                    <Badge variant="outline" className={roleColors[user.role] || 'bg-gray-100 text-gray-600'}>
+                                                        {user.role_label || 'No role'}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell>
@@ -335,10 +331,9 @@ export default function Index({ users, filters, stats, roles }) {
                                                 <SelectValue placeholder="Select a role" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="admin">Admin - Full administrative access</SelectItem>
-                                                <SelectItem value="sales">Sales - Sales and CRM access</SelectItem>
-                                                <SelectItem value="operations">Operations - Shipping and logistics</SelectItem>
-                                                <SelectItem value="finance">Finance - Invoicing and payments</SelectItem>
+                                                {(roles || []).map((r) => (
+                                                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         {errors.role && <span className="text-red-500 text-sm">{errors.role}</span>}
@@ -375,12 +370,7 @@ export default function Index({ users, filters, stats, roles }) {
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-xl ${role.id === 'super_admin' ? 'bg-purple-100 text-purple-600' :
-                                                        role.id === 'admin' ? 'bg-blue-100 text-blue-600' :
-                                                            role.id === 'sales' ? 'bg-emerald-100 text-emerald-600' :
-                                                                role.id === 'operations' ? 'bg-orange-100 text-orange-600' :
-                                                                    'bg-cyan-100 text-cyan-600'
-                                                    }`}>
+                                                <div className={`p-2 rounded-xl ${roleColors[role.id] || 'bg-gray-100'}`}>
                                                     <Shield className="w-5 h-5" />
                                                 </div>
                                                 <div>
@@ -394,7 +384,7 @@ export default function Index({ users, filters, stats, roles }) {
                                                 <span className="font-semibold text-sage-700">{role.users_count}</span> users
                                             </div>
                                             <Badge variant="outline" className={roleColors[role.id] || 'bg-gray-100'}>
-                                                {role.id.replace('_', ' ')}
+                                                {role.users_count === 1 ? 'person' : 'people'}
                                             </Badge>
                                         </div>
                                     </CardContent>
@@ -409,8 +399,7 @@ export default function Index({ users, filters, stats, roles }) {
                                     <div>
                                         <h3 className="font-semibold">Role Permissions</h3>
                                         <p className="text-sm text-sage-500">
-                                            Roles define what actions users can perform. Super Admin has full access to all features.
-                                            Other roles have access to their designated modules only.
+                                            Each person has one role. The CEO / Super Admin sees everything. The other roles only see the screens and data their work needs, and the server enforces it, not just the menus.
                                         </p>
                                     </div>
                                 </div>

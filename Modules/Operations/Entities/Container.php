@@ -15,7 +15,12 @@ use Modules\Operations\Services\ContainerNumber;
  */
 class Container extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, \App\Models\Concerns\HidesRestrictedFields;
+
+    protected static function restrictedFields(): array
+    {
+        return ['money.view' => \App\Support\Access::CONTAINER_MONEY_FIELDS];
+    }
 
     protected $fillable = [
         'container_number', 'size_type', 'seal_number', 'shipping_line_id', 'booking_number', 'bl_number',
@@ -149,6 +154,11 @@ class Container extends Model
     public function shipments()
     {
         return $this->hasMany(Shipment::class)->orderBy('container_slot')->orderBy('id');
+    }
+
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable')->latest();
     }
 
     public function milestones()

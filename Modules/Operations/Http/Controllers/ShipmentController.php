@@ -113,22 +113,25 @@ class ShipmentController extends Controller
         $freightShare = $shipment->container?->freightSharePerVehicle();
         $costs = (float) $shipment->charges->where('kind', 'cost')->sum('amount') + (float) ($shipment->purchase_price ?? 0) + (float) ($freightShare ?? 0);
         $charges = (float) $shipment->charges->where('kind', 'charge')->sum('amount');
+        $seesMoney = (bool) request()->user()?->can('money.view');
 
         return Inertia::render('Operations/Shipments/Show', [
             'shipment' => $shipment,
             'statuses' => Shipment::getStatuses(),
             'users' => User::select('id', 'name')->limit(100)->get(),
-            'totalPaid' => $totalPaid,
-            'totalQuoted' => $totalQuoted,
+            'totalPaid' => $seesMoney ? $totalPaid : null,
+            'totalQuoted' => $seesMoney ? $totalQuoted : null,
+            'canEdit' => $shipment->editableBy(request()->user()),
             'vin' => $shipment->vin ? VinDecoder::decode($shipment->vin) : null,
             'trackingUrl' => $shipment->container?->shippingLine?->trackingUrlFor($shipment->container->container_number),
-            'money' => [
+            'money' => $seesMoney ? [
                 'freight_share' => $freightShare,
                 'total_cost' => round($costs, 2),
                 'total_charges' => round($charges, 2),
                 'profit' => round($charges - $costs, 2),
-            ],
+            ] : null,
             'chargeCategories' => \Modules\Finance\Entities\ShipmentCharge::CATEGORIES,
+            'documents' => DocumentController::panel($shipment, request()->user()),
         ]);
     }
 
@@ -136,6 +139,7 @@ class ShipmentController extends Controller
     {
         $data = $this->validated($request, $canonical);
         $data['service_type'] ??= 'Container shipping';
+        $data['created_by'] = $request->user()?->id;
 
         $shipment = Shipment::create($data);
         $shipment->milestones()->create([
@@ -150,6 +154,8 @@ class ShipmentController extends Controller
 
     public function update(Request $request, Shipment $shipment, CanonicalInput $canonical)
     {
+        abort_unless($shipment->editableBy($request->user()), 403, 'You can only edit cars you added, and only until they are loaded.');
+
         $data = $this->validated($request, $canonical, $shipment);
         $newStatus = $data['status'] ?? $shipment->status;
         unset($data['status']);
@@ -283,6 +289,18 @@ class ShipmentController extends Controller
         }
 
         $data['destination'] = $data['destination_city'] ?? null;
+
+        // Fields a role may not set are dropped, not rejected, so one shared form works for everyone.
+        $user = $request->user();
+        if (!$user?->can('money.edit_costs')) {
+            unset($data['purchase_price'], $data['total_value']);
+        }
+        if (!$user?->can('vehicles.status')) {
+            unset($data['status']);
+        }
+        if (!$user?->can('vehicles.edit')) {
+            unset($data['assigned_to']);
+        }
 
         if (!$shipment && empty($data['status'])) {
             $data['status'] = Shipment::STATUS_ADDED;

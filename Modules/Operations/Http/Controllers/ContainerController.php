@@ -73,9 +73,10 @@ class ContainerController extends Controller
             'container' => $container,
             'statuses' => Container::getStatuses(),
             'shippingLines' => ShippingLine::orderBy('name')->get(['id', 'name', 'container_prefixes']),
-            'freightShare' => $container->freightSharePerVehicle(),
+            'freightShare' => request()->user()?->can('money.view') ? $container->freightSharePerVehicle() : null,
             'transitDays' => $container->transitDays(),
             'trackingUrl' => $container->shippingLine?->trackingUrlFor($container->container_number),
+            'documents' => DocumentController::panel($container, request()->user()),
             'unassigned' => Shipment::whereNull('container_id')
                 ->whereNotIn('status', [Shipment::STATUS_DELIVERED, Shipment::STATUS_CLEARED])
                 ->orderByDesc('date_added')->limit(200)
@@ -230,6 +231,9 @@ class ContainerController extends Controller
             : ShippingLine::guessFromContainerNumber($data['container_number'])?->id;
         unset($data['shipping_line']);
         $data['capacity'] ??= 4;
+        if (!$request->user()?->can('money.edit_costs')) {
+            unset($data['freight_cost'], $data['freight_currency']);
+        }
 
         if ($container) {
             return array_filter($data, fn ($v, $k) => $request->has($k === 'shipping_line_id' ? 'shipping_line' : $k), ARRAY_FILTER_USE_BOTH);
