@@ -35,6 +35,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('shipments', function (Blueprint $table) {
+            $table->dropIndex(['created_by']);
             $table->dropColumn('created_by');
         });
     }
