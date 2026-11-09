@@ -103,7 +103,7 @@ function Money({ shipment, money, categories, currency }) {
 export default function Show({ shipment, statuses, users, vin, trackingUrl, money, chargeCategories, canEdit, documents }) {
     const { props } = usePage();
     const can = useCan();
-    const currency = props.settings?.currency || 'USD';
+    const currency = props.settings?.currency || 'NGN';
     const [formOpen, setFormOpen] = useState(false);
     const container = shipment.container;
     const reachedIndex = PIPELINE.indexOf(shipment.status);

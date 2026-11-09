@@ -31,7 +31,7 @@ const STATUS_COLORS = {
 export default function Index({ vehicles, filters, clients, stats }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingVehicle, setEditingVehicle] = useState(null);
 

@@ -33,7 +33,7 @@ import { formatMoney } from '@/lib/utils';
 export default function Index({ payments, filters, quotes, invoices = [] }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingPayment, setEditingPayment] = useState(null);
 

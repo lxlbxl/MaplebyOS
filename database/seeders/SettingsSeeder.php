@@ -16,7 +16,7 @@ class SettingsSeeder extends Seeder
             // General
             ['key' => 'app_name', 'value' => 'Mapleby OS', 'type' => 'string', 'group' => 'general'],
             ['key' => 'support_email', 'value' => 'support@maplebyinc.com', 'type' => 'string', 'group' => 'general'],
-            ['key' => 'default_currency', 'value' => 'USD', 'type' => 'string', 'group' => 'general'],
+            ['key' => 'default_currency', 'value' => 'NGN', 'type' => 'string', 'group' => 'general'],
             ['key' => 'timezone', 'value' => 'UTC', 'type' => 'string', 'group' => 'general'],
 
             // Email

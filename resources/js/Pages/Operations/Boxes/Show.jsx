@@ -13,7 +13,7 @@ import { formatMoney, cn } from '@/lib/utils';
 export default function Show({ box, statuses, trackingUrl, money, chargeCategories, documents, formOptions }) {
     const can = useCan();
     const { props } = usePage();
-    const currency = props.settings?.currency || 'USD';
+    const currency = props.settings?.currency || 'NGN';
     const [formOpen, setFormOpen] = useState(false);
     const container = box.container;
 
@@ -58,7 +58,7 @@ export default function Show({ box, statuses, trackingUrl, money, chargeCategori
                                     <Row label="Packages">{box.package_count ? `${box.package_count} ${box.package_type || ''}` : null}</Row>
                                     <Row label="Weight">{box.gross_weight_kg ? `${Number(box.gross_weight_kg)} kg` : null}</Row>
                                     <Row label="Volume">{box.volume_cbm ? `${Number(box.volume_cbm)} CBM` : null}</Row>
-                                    {'declared_value' in box && <Row label="Declared value">{box.declared_value ? formatMoney(box.declared_value, box.declared_currency || 'USD') : null}</Row>}
+                                    {'declared_value' in box && <Row label="Declared value">{box.declared_value ? formatMoney(box.declared_value, box.declared_currency || 'NGN') : null}</Row>}
                                     <Row label="Owner">{clientName(box.client)}</Row>
                                     <Row label="Receiver">{box.consignee}</Row>
                                     <Row label="Destination">{box.destination_city}</Row>

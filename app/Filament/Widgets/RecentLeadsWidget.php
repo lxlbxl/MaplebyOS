@@ -41,7 +41,7 @@ class RecentLeadsWidget extends BaseWidget
                         'danger' => 'lost',
                     ]),
                 Tables\Columns\TextColumn::make('estimated_value')
-                    ->money('USD')
+                    ->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))
                     ->label('Value'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 export default function CurrencyDisplay({
     amount,
-    currency = 'USD',
+    currency = 'NGN',
     locale = 'en-US',
     className,
     symbolClassName,

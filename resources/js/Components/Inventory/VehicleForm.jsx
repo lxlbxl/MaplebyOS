@@ -17,7 +17,7 @@ export default function VehicleForm({ open, onOpenChange, vehicle = null, client
     const isEdit = !!vehicle;
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         year: '',

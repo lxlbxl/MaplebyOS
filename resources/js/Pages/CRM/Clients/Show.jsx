@@ -20,7 +20,7 @@ import { formatMoney } from '@/lib/utils';
 export default function Show({ client, stats, statusBreakdown, statuses = {}, invoices = [] }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const formatDate = (dateString) => {

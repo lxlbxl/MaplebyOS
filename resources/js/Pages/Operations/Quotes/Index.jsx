@@ -33,7 +33,7 @@ const STATUS_COLORS = {
 export default function Index({ quotes, filters, clients, shipments, vehicles, stats }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingQuote, setEditingQuote] = useState(null);
 

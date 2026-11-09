@@ -22,7 +22,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
     const { props } = usePage();
     const can = useCan();
     const manage = can('containers.manage');
-    const currency = props.settings?.currency || 'USD';
+    const currency = props.settings?.currency || 'NGN';
     const [formOpen, setFormOpen] = useState(false);
     const [picking, setPicking] = useState([]);
     const [filter, setFilter] = useState('');

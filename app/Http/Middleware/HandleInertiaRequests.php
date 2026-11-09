@@ -42,14 +42,14 @@ class HandleInertiaRequests extends Middleware
 
                 $settings = [
                     'app_name' => $appName,
-                    'currency' => \Modules\Core\Entities\Setting::get('default_currency', 'USD'),
+                    'currency' => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'),
                     'logo' => \Modules\Core\Entities\Setting::get('site_logo') ? \Illuminate\Support\Facades\Storage::url(\Modules\Core\Entities\Setting::get('site_logo')) : null,
                     'favicon' => \Modules\Core\Entities\Setting::get('site_favicon') ? \Illuminate\Support\Facades\Storage::url(\Modules\Core\Entities\Setting::get('site_favicon')) : null,
                 ];
             }
         } catch (\Exception $e) {
             // Fallback defaults
-            $settings = ['currency' => 'USD'];
+            $settings = ['currency' => 'NGN'];
         }
 
         return array_merge(parent::share($request), [

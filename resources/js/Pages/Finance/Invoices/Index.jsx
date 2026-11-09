@@ -40,7 +40,7 @@ function Billable({ group, currency }) {
 }
 
 export default function Index({ invoices, filters, statuses, summary, billable }) {
-    const currency = usePage().props.settings?.currency || 'USD';
+    const currency = usePage().props.settings?.currency || 'NGN';
     return (
         <AppLayout>
             <Head title="Invoices" />

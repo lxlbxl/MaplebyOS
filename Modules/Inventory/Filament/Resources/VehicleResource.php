@@ -111,7 +111,7 @@ class VehicleResource extends Resource
                     ->toggleable()
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('sale_price')
-                    ->money('USD')
+                    ->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')

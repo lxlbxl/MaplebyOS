@@ -70,7 +70,7 @@ class PaymentResource extends Resource
                 Tables\Columns\TextColumn::make('quote.client.company_name')
                     ->label('Client'),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money('USD')
+                    ->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_date')
                     ->date()

@@ -368,7 +368,7 @@ const HOMES = { ceo: CeoHome, business: BusinessHome, logistics: LogisticsHome, 
 
 export default function Index({ home, greeting, roleLabel, data }) {
     const { props } = usePage();
-    const currency = props.settings?.currency || 'USD';
+    const currency = props.settings?.currency || 'NGN';
     const Home = HOMES[home] || PuncherHome;
 
     return (

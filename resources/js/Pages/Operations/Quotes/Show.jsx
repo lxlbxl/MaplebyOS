@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
@@ -9,7 +9,7 @@ import { formatMoney } from '@/lib/utils';
 import { Separator } from "@/Components/ui/separator";
 
 export default function Show({ quote, paid_amount, payment_status, settings, auth }) {
-    const currency = 'USD'; // Default currency
+    const currency = usePage().props.settings?.currency || 'NGN';
 
     const PAYMENT_STATUS_COLORS = {
         paid: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',

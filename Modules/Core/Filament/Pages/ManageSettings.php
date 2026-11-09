@@ -43,7 +43,7 @@ class ManageSettings extends Page implements HasForms
             'company_email' => Setting::get('company_email', ''),
             'company_phone' => Setting::get('company_phone', ''),
             'company_address' => Setting::get('company_address', ''),
-            'currency' => Setting::get('currency', 'USD'),
+            'currency' => Setting::get('currency', 'NGN'),
             'timezone' => Setting::get('timezone', 'UTC'),
 
             // Email

@@ -204,8 +204,8 @@ class QuoteResource extends Resource
                 Tables\Columns\TextColumn::make('quote_number')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('client.company_name')->label('Client')->searchable(),
                 Tables\Columns\TextColumn::make('issue_date')->date(),
-                Tables\Columns\TextColumn::make('total_amount')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('paid_amount')->money('USD')->label('Paid'),
+                Tables\Columns\TextColumn::make('total_amount')->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))->sortable(),
+                Tables\Columns\TextColumn::make('paid_amount')->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))->label('Paid'),
                 Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
                     ->colors([

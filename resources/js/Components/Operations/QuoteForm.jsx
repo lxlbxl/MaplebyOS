@@ -19,7 +19,7 @@ export default function QuoteForm({ open, onOpenChange, quote = null, clients = 
     const isEdit = !!quote;
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
 
     // Tax rate state local to calculate totals visually
     const [taxRate, setTaxRate] = useState(0);

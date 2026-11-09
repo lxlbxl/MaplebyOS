@@ -67,7 +67,7 @@ class EquipmentResource extends Resource
                 Tables\Columns\TextColumn::make('serial_number')->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
-                Tables\Columns\TextColumn::make('sale_price')->money('USD'),
+                Tables\Columns\TextColumn::make('sale_price')->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN')),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status'),

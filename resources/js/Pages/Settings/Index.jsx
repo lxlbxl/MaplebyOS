@@ -233,7 +233,7 @@ export default function Index({ settingsData }) {
                                                         value={data.settings.default_currency || ''}
                                                         onChange={(e) => updateSetting('default_currency', e.target.value)}
                                                         className="h-12 uppercase"
-                                                        placeholder="USD"
+                                                        placeholder="NGN"
                                                     />
                                                 </motion.div>
                                                 <motion.div variants={itemVariants} className="space-y-2">

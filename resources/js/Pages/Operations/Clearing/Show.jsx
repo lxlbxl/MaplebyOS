@@ -73,7 +73,7 @@ export default function Show({ job, statuses, money, chargeCategories, documents
                                     <Row label="Packages">{job.package_count ? `${job.package_count} ${job.package_type || ''}` : null}</Row>
                                     <Row label="Gross weight">{job.gross_weight_kg ? `${Number(job.gross_weight_kg).toLocaleString()} kg` : null}</Row>
                                     <Row label="Volume">{job.volume_cbm ? `${Number(job.volume_cbm)} CBM` : null}</Row>
-                                    {'declared_value' in job && <Row label="Declared value">{job.declared_value ? formatMoney(job.declared_value, job.declared_currency || 'USD') : null}</Row>}
+                                    {'declared_value' in job && <Row label="Declared value">{job.declared_value ? formatMoney(job.declared_value, job.declared_currency || 'NGN') : null}</Row>}
                                     <Row label="Client">{clientName(job.client)}</Row>
                                     <Row label="Consignee">{job.consignee}</Row>
                                     <Row label="Handled by">{job.assignee?.name}</Row>

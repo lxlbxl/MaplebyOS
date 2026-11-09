@@ -379,7 +379,7 @@ class DemoDataSeeder extends Seeder
                 'offloaded_on' => $reached('offloaded') ? $eta->copy()->addDays(5) : null,
                 'released_on' => $reached('released') ? $eta->copy()->addDays(12) : null,
                 'freight_cost' => $this->money(3800, 6200, 50),
-                'freight_currency' => 'USD',
+                'freight_currency' => 'NGN',
                 'notes' => $this->pick([null, 'Shared container — 4 units.', 'Customs exam requested at destination.']),
                 'created_by' => $this->staff['ops']->id,
             ]);
@@ -546,7 +546,7 @@ class DemoDataSeeder extends Seeder
                     ShipmentCharge::create([
                         'shipment_id' => $shipment->id, 'kind' => 'cost', 'category' => $category,
                         'description' => $category === 'Ocean freight' ? 'Share of container freight' : null,
-                        'amount' => $amount, 'currency' => 'USD', 'incurred_on' => $base->copy()->addDays($i * 6),
+                        'amount' => $amount, 'currency' => 'NGN', 'incurred_on' => $base->copy()->addDays($i * 6),
                         'created_by' => $finance->id,
                     ]);
                 }
@@ -563,7 +563,7 @@ class DemoDataSeeder extends Seeder
             foreach ($billable as [$category, $amount]) {
                 $charges[] = ShipmentCharge::create([
                     'shipment_id' => $shipment->id, 'kind' => 'charge', 'category' => $category,
-                    'amount' => $amount, 'currency' => 'USD', 'incurred_on' => $base,
+                    'amount' => $amount, 'currency' => 'NGN', 'incurred_on' => $base,
                     'created_by' => $finance->id,
                 ]);
             }
@@ -580,7 +580,7 @@ class DemoDataSeeder extends Seeder
                 'issue_date' => $issue,
                 'due_date' => $issue->copy()->addDays(14),
                 'status' => mt_rand(0, 8) === 0 ? 'draft' : 'sent',
-                'currency' => 'USD',
+                'currency' => 'NGN',
                 'notes' => "Vehicle: {$shipment->vehicle_label} — VIN {$shipment->vin}",
                 'created_by' => $finance->id,
             ]);
