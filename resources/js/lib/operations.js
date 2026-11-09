@@ -64,3 +64,24 @@ export function guessLine(number, shippingLines = []) {
     if (prefix.length < 4) return null;
     return shippingLines.find((l) => (l.container_prefixes || []).includes(prefix)) || null;
 }
+
+/** The detail page for any shipment row: a car, a box riding in a car container, or a clearing job. */
+export function shipmentHref(shipment) {
+    if (shipment?.cargo_type === 'general_cargo') return route('operations.clearing.show', shipment.id);
+    if (shipment?.cargo_type === 'box') return route('operations.boxes.show', shipment.id);
+    return route('operations.shipments.show', shipment.id);
+}
+
+export const CLEARING_STATUS_COLORS = {
+    awaiting_docs: 'bg-linen text-stone',
+    pre_arrival: 'bg-purple-50 text-purple-700',
+    arrived: 'bg-orange-50 text-orange-700',
+    duty_assessed: 'bg-amber-50 text-amber-700',
+    duty_paid: 'bg-sky-50 text-sky-700',
+    examination: 'bg-indigo-50 text-indigo-700',
+    released: 'bg-lime-50 text-lime-700',
+    delivered: 'bg-emerald-50 text-emerald-700',
+    empty_returned: 'bg-teal-50 text-teal-700',
+    on_hold: 'bg-gray-100 text-gray-600',
+    issue: 'bg-red-50 text-red-700',
+};

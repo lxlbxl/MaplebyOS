@@ -12,8 +12,11 @@ class ShipmentChargeController extends Controller
 {
     public function store(Request $request, Shipment $shipment)
     {
-        $data = $this->validated($request);
+        $data = $this->validated($request, $shipment->cargo_type);
         $data['created_by'] = $request->user()?->id;
+        if (empty($data['currency']) && $shipment->isGeneralCargo()) {
+            $data['currency'] = 'NGN'; // Clearing is paid and billed in naira unless stated.
+        }
         $shipment->charges()->create($data);
 
         return redirect()->back()->with('success', ($data['kind'] === 'cost' ? 'Cost' : 'Charge') . ' added.');
@@ -23,7 +26,7 @@ class ShipmentChargeController extends Controller
     {
         abort_if($charge->invoice_id && $charge->invoice?->status !== 'draft', 422, 'This line is on a sent invoice and can no longer be edited.');
         $this->authorizeKind($request, $charge->kind);
-        $charge->update($this->validated($request));
+        $charge->update($this->validated($request, $charge->shipment?->cargo_type));
         $charge->invoice?->recalculate();
 
         return redirect()->back()->with('success', 'Line updated.');
@@ -52,14 +55,14 @@ class ShipmentChargeController extends Controller
             : 'You cannot add or change customer charges.');
     }
 
-    private function validated(Request $request): array
+    private function validated(Request $request, ?string $cargoType = null): array
     {
         $kind = $request->input('kind');
         $this->authorizeKind($request, $kind);
 
         return $request->validate([
             'kind' => 'required|in:cost,charge',
-            'category' => ['required', Rule::in(ShipmentCharge::CATEGORIES[$kind] ?? [])],
+            'category' => ['required', Rule::in(ShipmentCharge::categoriesFor($cargoType)[$kind] ?? [])],
             'description' => 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'currency' => 'nullable|string|size:3',

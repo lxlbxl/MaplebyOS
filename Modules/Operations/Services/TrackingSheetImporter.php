@@ -258,7 +258,7 @@ class TrackingSheetImporter
         $this->matchedIds[$shipment->id] = true;
 
         if ($container && !$shipment->container_slot) {
-            $shipment->container_slot = $container->shipments()->where('id', '!=', $shipment->id)->count() + 1;
+            $shipment->container_slot = $container->vehicles()->where('id', '!=', $shipment->id)->count() + 1;
             $shipment->save();
             if ($shipment->container_slot > $container->capacity) {
                 $this->warn($ref, "Container {$container->container_number} now holds {$shipment->container_slot} cars (capacity {$container->capacity}). Check whether this is a later voyage or a data entry error.");

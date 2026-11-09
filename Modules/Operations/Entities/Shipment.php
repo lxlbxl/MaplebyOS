@@ -12,7 +12,9 @@ use Modules\Operations\Services\TrackingIdGenerator;
 use Modules\Operations\Services\VinDecoder;
 
 /**
- * One vehicle moving through the pipeline (one row of the tracking sheet).
+ * One unit of work moving through a pipeline. Either a vehicle (one row of the
+ * tracking sheet) or a general cargo clearing job (one Bill of Lading of a
+ * client's goods, in one or more containers). See cargo_type.
  */
 class Shipment extends Model
 {
@@ -63,6 +65,29 @@ class Shipment extends Model
         'purchase_price',
         'payment_status',
         'created_by',
+        'cargo_type',
+        'cargo_description',
+        'hs_code',
+        'package_count',
+        'package_type',
+        'gross_weight_kg',
+        'volume_cbm',
+        'declared_value',
+        'declared_currency',
+        'consignee',
+        'bl_number',
+        'form_m_number',
+        'paar_number',
+        'customs_entry_number',
+        'terminal',
+        'duty_assessed',
+        'eta',
+        'arrived_on',
+        'duty_assessed_on',
+        'duty_paid_on',
+        'examined_on',
+        'released_on',
+        'empty_returned_on',
     ];
 
     protected $casts = [
@@ -78,6 +103,18 @@ class Shipment extends Model
         'purchase_date' => 'date:Y-m-d',
         'total_value' => 'decimal:2',
         'purchase_price' => 'decimal:2',
+        'eta' => 'date:Y-m-d',
+        'arrived_on' => 'date:Y-m-d',
+        'duty_assessed_on' => 'date:Y-m-d',
+        'duty_paid_on' => 'date:Y-m-d',
+        'examined_on' => 'date:Y-m-d',
+        'released_on' => 'date:Y-m-d',
+        'empty_returned_on' => 'date:Y-m-d',
+        'package_count' => 'integer',
+        'gross_weight_kg' => 'decimal:2',
+        'volume_cbm' => 'decimal:3',
+        'declared_value' => 'decimal:2',
+        'duty_assessed' => 'decimal:2',
     ];
 
     protected $appends = ['vehicle_label', 'status_label'];
@@ -94,6 +131,82 @@ class Shipment extends Model
     const STATUS_DELIVERED = 'delivered';
     const STATUS_ON_HOLD = 'on_hold';
     const STATUS_ISSUE = 'issue';
+
+    /** What a shipment row carries. */
+    const CARGO_VEHICLE = 'vehicle';
+    const CARGO_GENERAL = 'general_cargo';
+    const CARGO_BOX = 'box';
+
+    public const CARGO_TYPES = [
+        self::CARGO_VEHICLE => 'Vehicle',
+        self::CARGO_BOX => 'Box / lite cargo (rides in a car container)',
+        self::CARGO_GENERAL => 'General cargo (clearing)',
+    ];
+
+    /**
+     * Boxes ride in car containers, so they share the car pipeline from the
+     * yard onward (container status changes cascade to them too).
+     */
+    public const BOX_STATUSES = [
+        self::STATUS_ADDED => 'Booked',
+        self::STATUS_AT_YARD => 'Received at yard',
+        self::STATUS_LOADED => 'Loaded',
+        self::STATUS_SAILED => 'Sailed',
+        self::STATUS_ARRIVED => 'Arrived Lagos',
+        self::STATUS_OFFLOADED => 'Offloaded',
+        self::STATUS_CLEARED => 'Cleared',
+        self::STATUS_DELIVERED => 'Delivered',
+        self::STATUS_ON_HOLD => 'On hold',
+        self::STATUS_ISSUE => 'Issue',
+    ];
+
+    /** Clearing pipeline for general cargo arriving in Nigeria. */
+    const STATUS_AWAITING_DOCS = 'awaiting_docs';
+    const STATUS_PRE_ARRIVAL = 'pre_arrival';
+    const STATUS_DUTY_ASSESSED = 'duty_assessed';
+    const STATUS_DUTY_PAID = 'duty_paid';
+    const STATUS_EXAMINATION = 'examination';
+    const STATUS_RELEASED = 'released';
+    const STATUS_EMPTY_RETURNED = 'empty_returned';
+
+    public const CLEARING_STATUSES = [
+        self::STATUS_AWAITING_DOCS => 'Awaiting documents',
+        self::STATUS_PRE_ARRIVAL => 'Form M / PAAR',
+        self::STATUS_ARRIVED => 'Arrived port',
+        self::STATUS_DUTY_ASSESSED => 'Duty assessed',
+        self::STATUS_DUTY_PAID => 'Duty paid',
+        self::STATUS_EXAMINATION => 'Examination',
+        self::STATUS_RELEASED => 'Customs released',
+        self::STATUS_DELIVERED => 'Delivered',
+        self::STATUS_EMPTY_RETURNED => 'Empty returned',
+        self::STATUS_ON_HOLD => 'On hold',
+        self::STATUS_ISSUE => 'Issue',
+    ];
+
+    /** Which date column a clearing status fills in when it is reached. */
+    public const CLEARING_STATUS_DATE_FIELDS = [
+        self::STATUS_ARRIVED => 'arrived_on',
+        self::STATUS_DUTY_ASSESSED => 'duty_assessed_on',
+        self::STATUS_DUTY_PAID => 'duty_paid_on',
+        self::STATUS_EXAMINATION => 'examined_on',
+        self::STATUS_RELEASED => 'released_on',
+        self::STATUS_DELIVERED => 'delivered_on',
+        self::STATUS_EMPTY_RETURNED => 'empty_returned_on',
+    ];
+
+    /** Clearing status => [container date column, container status] pushed to every container of the job. */
+    public const CLEARING_CONTAINER_CASCADE = [
+        self::STATUS_ARRIVED => ['arrived_on', Container::STATUS_ARRIVED],
+        self::STATUS_RELEASED => ['released_on', Container::STATUS_RELEASED],
+        self::STATUS_EMPTY_RETURNED => ['empty_returned_on', Container::STATUS_RELEASED],
+    ];
+
+    /** Tracking ID prefix per cargo type. */
+    public const TRACKING_PREFIXES = [
+        self::CARGO_VEHICLE => 'MAP',
+        self::CARGO_GENERAL => 'CLR',
+        self::CARGO_BOX => 'BOX',
+    ];
 
     /**
      * Pipeline order. On hold / issue are side states shown separately.
@@ -126,13 +239,58 @@ class Shipment extends Model
         self::STATUS_DELIVERED => 'delivered_on',
     ];
 
+    /** The status list for a cargo type (vehicles keep the original pipeline). */
+    public static function statusesFor(?string $cargoType): array
+    {
+        return match ($cargoType) {
+            self::CARGO_GENERAL => self::CLEARING_STATUSES,
+            self::CARGO_BOX => self::BOX_STATUSES,
+            default => self::getStatuses(),
+        };
+    }
+
+    public function isGeneralCargo(): bool
+    {
+        return $this->cargo_type === self::CARGO_GENERAL;
+    }
+
+    public function isBox(): bool
+    {
+        return $this->cargo_type === self::CARGO_BOX;
+    }
+
+    /** Boxes and clearing jobs are described by their contents, not make/model. */
+    public function isCargo(): bool
+    {
+        return $this->isGeneralCargo() || $this->isBox();
+    }
+
+    public function scopeBoxes($query)
+    {
+        return $query->where('cargo_type', self::CARGO_BOX);
+    }
+
+    public function scopeVehicles($query)
+    {
+        return $query->where('cargo_type', self::CARGO_VEHICLE);
+    }
+
+    public function scopeGeneralCargo($query)
+    {
+        return $query->where('cargo_type', self::CARGO_GENERAL);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (Shipment $shipment) {
+            $shipment->cargo_type ??= self::CARGO_VEHICLE;
             $shipment->date_added ??= Carbon::today();
-            $shipment->status ??= self::STATUS_ADDED;
+            $shipment->status ??= $shipment->isGeneralCargo() ? self::STATUS_AWAITING_DOCS : self::STATUS_ADDED;
             if (empty($shipment->tracking_id)) {
-                $shipment->tracking_id = app(TrackingIdGenerator::class)->next(Carbon::parse($shipment->date_added));
+                $shipment->tracking_id = app(TrackingIdGenerator::class)->next(
+                    Carbon::parse($shipment->date_added),
+                    self::TRACKING_PREFIXES[$shipment->cargo_type] ?? TrackingIdGenerator::PREFIX
+                );
             }
             if (empty($shipment->shipment_number)) {
                 $shipment->shipment_number = $shipment->tracking_id;
@@ -143,7 +301,14 @@ class Shipment extends Model
             if ($shipment->vin !== null) {
                 $shipment->vin = VinDecoder::clean($shipment->vin) ?: null;
             }
-            if (empty($shipment->title) || $shipment->isDirty(['vehicle_year', 'vehicle_make', 'vehicle_model'])) {
+            if ($shipment->isCargo()) {
+                if (empty($shipment->title) || $shipment->isDirty('cargo_description')) {
+                    $shipment->title = $shipment->cargo_description ?: ($shipment->title ?: $shipment->tracking_id);
+                }
+                if ($shipment->bl_number !== null) {
+                    $shipment->bl_number = strtoupper(preg_replace('/\s+/', '', $shipment->bl_number)) ?: null;
+                }
+            } elseif (empty($shipment->title) || $shipment->isDirty(['vehicle_year', 'vehicle_make', 'vehicle_model'])) {
                 $shipment->title = $shipment->buildVehicleLabel() ?: ($shipment->title ?: $shipment->tracking_id);
             }
         });
@@ -177,12 +342,16 @@ class Shipment extends Model
 
     public function getVehicleLabelAttribute(): string
     {
+        if ($this->isCargo()) {
+            return $this->cargo_description ?: ($this->title ?? '');
+        }
+
         return $this->buildVehicleLabel() ?: ($this->title ?? '');
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return self::getStatuses()[$this->status] ?? ucfirst(str_replace('_', ' ', (string) $this->status));
+        return self::statusesFor($this->cargo_type)[$this->status] ?? ucfirst(str_replace('_', ' ', (string) $this->status));
     }
 
     /**
@@ -193,11 +362,18 @@ class Shipment extends Model
         $date = $date ? Carbon::parse($date) : Carbon::today();
 
         $this->status = $status;
-        if (isset(self::STATUS_DATE_FIELDS[$status])) {
-            $field = self::STATUS_DATE_FIELDS[$status];
+        $dateFields = $this->isGeneralCargo() ? self::CLEARING_STATUS_DATE_FIELDS : self::STATUS_DATE_FIELDS;
+        if (isset($dateFields[$status])) {
+            $field = $dateFields[$status];
             $this->{$field} = $date;
         }
         $this->save();
+
+        // A clearing job moves all of its containers together.
+        if ($this->isGeneralCargo() && isset(self::CLEARING_CONTAINER_CASCADE[$status])) {
+            [$column, $containerStatus] = self::CLEARING_CONTAINER_CASCADE[$status];
+            $this->cargoContainers()->update([$column => $date->toDateString(), 'status' => $containerStatus]);
+        }
 
         $this->milestones()->create([
             'status' => $status,
@@ -226,6 +402,12 @@ class Shipment extends Model
     public function documents()
     {
         return $this->morphMany(Document::class, 'documentable')->latest();
+    }
+
+    /** Containers that carry this clearing job's general cargo. */
+    public function cargoContainers()
+    {
+        return $this->hasMany(Container::class, 'cargo_shipment_id')->orderBy('id');
     }
 
     public function milestones()

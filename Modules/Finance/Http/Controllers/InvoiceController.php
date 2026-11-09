@@ -44,7 +44,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['client', 'charges.shipment:id,tracking_id,vin,vehicle_year,vehicle_make,vehicle_model', 'payments', 'creator:id,name']);
+        $invoice->load(['client', 'charges.shipment:id,tracking_id,vin,vehicle_year,vehicle_make,vehicle_model,cargo_type,cargo_description,bl_number,title', 'payments', 'creator:id,name']);
 
         return Inertia::render('Finance/Invoices/Show', [
             'invoice' => $invoice,
@@ -71,6 +71,10 @@ class InvoiceController extends Controller
         $bad = $charges->first(fn ($c) => $c->kind !== 'charge' || $c->invoice_id || $c->shipment?->client_id !== (int) $data['client_id']);
         if ($bad) {
             throw ValidationException::withMessages(['charge_ids' => 'Only unbilled customer charges for vehicles belonging to this customer can be invoiced.']);
+        }
+        // Clearing is billed in naira and car exports in dollars; never add the two up on one invoice.
+        if ($charges->pluck('currency')->map(fn ($c) => strtoupper((string) $c))->unique()->count() > 1) {
+            throw ValidationException::withMessages(['charge_ids' => 'These charges are in different currencies. Invoice each currency separately.']);
         }
 
         $invoice = DB::transaction(function () use ($data, $charges, $request) {
@@ -107,7 +111,7 @@ class InvoiceController extends Controller
 
     private function billableByClient(): array
     {
-        return ShipmentCharge::with('shipment:id,client_id,tracking_id,vehicle_year,vehicle_make,vehicle_model')
+        return ShipmentCharge::with('shipment:id,client_id,tracking_id,vehicle_year,vehicle_make,vehicle_model,cargo_type,cargo_description,bl_number,title')
             ->where('kind', 'charge')->whereNull('invoice_id')
             ->whereHas('shipment', fn ($s) => $s->whereNotNull('client_id'))
             ->get()
