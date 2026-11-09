@@ -44,16 +44,22 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Money tiles add up dollar invoices only. Clearing is billed in naira and
+     * must not be summed into the same figure.
+     */
+    private const MONEY_CURRENCY = 'USD';
+
     private function ceo(): array
     {
         $monthStart = now()->startOfMonth();
 
         return [
             'money' => [
-                'invoiced_month' => (float) Invoice::where('status', '!=', 'void')->where('issue_date', '>=', $monthStart)->sum('total'),
-                'collected_month' => (float) Payment::whereNotNull('invoice_id')->where('payment_date', '>=', $monthStart)->sum('amount'),
+                'invoiced_month' => (float) Invoice::where('currency', self::MONEY_CURRENCY)->where('status', '!=', 'void')->where('issue_date', '>=', $monthStart)->sum('total'),
+                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::MONEY_CURRENCY))->where('payment_date', '>=', $monthStart)->sum('amount'),
                 'outstanding' => $this->outstanding(),
-                'profit_month' => $this->profitFor(Shipment::where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
+                'profit_month' => $this->profitFor(Shipment::vehicles()->where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
             ],
             'pipeline' => $this->pipeline(),
             'atSea' => $this->containersAtSea(),
@@ -69,8 +75,8 @@ class DashboardController extends Controller
         return [
             'money' => [
                 'outstanding' => $this->outstanding(),
-                'collected_month' => (float) Payment::whereNotNull('invoice_id')->where('payment_date', '>=', $monthStart)->sum('amount'),
-                'profit_month' => $this->profitFor(Shipment::where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
+                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::MONEY_CURRENCY))->where('payment_date', '>=', $monthStart)->sum('amount'),
+                'profit_month' => $this->profitFor(Shipment::vehicles()->where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
             ],
             'unpaidInvoices' => Invoice::with('client:id,company_name,contact_person')
                 ->whereIn('status', ['sent', 'partial'])
@@ -105,7 +111,7 @@ class DashboardController extends Controller
                 ->where('status', Shipment::STATUS_DELIVERED)
                 ->where(fn ($q) => $q->whereNull('payment_status')->orWhere('payment_status', '!=', 'paid'))
                 ->orderByDesc('delivered_on')->limit(8)
-                ->get(['id', 'tracking_id', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'client_id', 'delivered_on', 'payment_status'])
+                ->get(['id', 'tracking_id', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'cargo_type', 'cargo_description', 'title', 'client_id', 'delivered_on', 'payment_status'])
                 ->map(fn ($s) => [
                     'id' => $s->id,
                     'tracking_id' => $s->tracking_id,
@@ -120,7 +126,7 @@ class DashboardController extends Controller
 
     private function logistics(): array
     {
-        $byStatus = Container::selectRaw('status, count(*) as total')
+        $byStatus = Container::forVehicles()->selectRaw('status, count(*) as total')
             ->where(fn ($q) => $q->where('status', '!=', Container::STATUS_RELEASED)->orWhere('released_on', '>=', now()->subDays(14)))
             ->groupBy('status')->pluck('total', 'status');
 
@@ -130,19 +136,19 @@ class DashboardController extends Controller
             'count' => (int) ($byStatus[$status] ?? 0),
         ])->values();
 
-        $waiting = Shipment::whereNull('container_id')
+        $waiting = Shipment::vehicles()->whereNull('container_id')
             ->whereIn('status', Shipment::PRE_LOADING_STATUSES)
             ->orderBy('date_added')->limit(12)
             ->get(['id', 'tracking_id', 'vin', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'status', 'date_added', 'has_keys'])
             ->map(fn ($s) => $this->carRow($s) + ['days_waiting' => $s->date_added ? (int) $s->date_added->diffInDays(now()) : null]);
 
-        $arrivals = Container::with('shippingLine:id,name')->withCount('shipments')
+        $arrivals = Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
             ->whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])
             ->whereBetween('eta', [now()->subDays(3)->toDateString(), now()->addDays(7)->toDateString()])
             ->orderBy('eta')->get()
             ->map(fn ($c) => $this->containerRow($c));
 
-        $problems = Shipment::where(function ($q) {
+        $problems = Shipment::vehicles()->where(function ($q) {
             $q->whereNull('vin')->orWhere('vin', '')->orWhere('has_keys', false);
         })->whereNotIn('status', [Shipment::STATUS_DELIVERED, Shipment::STATUS_CLEARED])
             ->orderByDesc('date_added')->limit(10)
@@ -153,13 +159,13 @@ class DashboardController extends Controller
 
         return [
             'stages' => $stages,
-            'waitingCount' => Shipment::whereNull('container_id')->whereIn('status', Shipment::PRE_LOADING_STATUSES)->count(),
+            'waitingCount' => Shipment::vehicles()->whereNull('container_id')->whereIn('status', Shipment::PRE_LOADING_STATUSES)->count(),
             'waiting' => $waiting,
             'arrivals' => $arrivals,
             'atSea' => $this->containersAtSea(),
             'problems' => $problems,
             'missingDocs' => $this->containersMissingBillOfLading(),
-            'openContainers' => Container::with('shippingLine:id,name')->withCount('shipments')
+            'openContainers' => Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
                 ->whereIn('status', [Container::STATUS_PLANNED, Container::STATUS_LOADED])
                 ->orderByDesc('id')->limit(10)->get()
                 ->map(fn ($c) => $this->containerRow($c)),
@@ -168,7 +174,7 @@ class DashboardController extends Controller
 
     private function puncher(?User $user): array
     {
-        $mine = Shipment::where('created_by', $user?->id);
+        $mine = Shipment::vehicles()->where('created_by', $user?->id);
 
         $needsFixing = (clone $mine)
             ->whereIn('status', Shipment::PRE_LOADING_STATUSES)
@@ -204,7 +210,7 @@ class DashboardController extends Controller
 
     private function pipeline(): array
     {
-        $counts = Shipment::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        $counts = Shipment::vehicles()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
 
         return collect(Shipment::getStatuses())->map(fn ($label, $status) => [
             'status' => $status,
@@ -215,7 +221,7 @@ class DashboardController extends Controller
 
     private function outstanding(): float
     {
-        return (float) Invoice::whereIn('status', ['sent', 'partial'])
+        return (float) Invoice::where('currency', self::MONEY_CURRENCY)->whereIn('status', ['sent', 'partial'])
             ->selectRaw('COALESCE(SUM(total - COALESCE(amount_paid, 0)), 0) as balance')->value('balance');
     }
 
@@ -238,7 +244,7 @@ class DashboardController extends Controller
 
     private function containerProfit(): array
     {
-        return Container::with('shippingLine:id,name')->withCount('shipments')
+        return Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
             ->whereNotNull('loaded_on')->orderByDesc('loaded_on')->limit(6)->get()
             ->map(fn ($c) => $this->containerRow($c) + [
                 'profit' => $this->profitFor($c->shipments()->pluck('id')->all()),
@@ -247,7 +253,7 @@ class DashboardController extends Controller
 
     private function containersAtSea(): array
     {
-        return Container::with('shippingLine:id,name')->withCount('shipments')
+        return Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
             ->whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])
             ->orderByRaw('eta IS NULL, eta ASC')->limit(10)->get()
             ->map(fn ($c) => $this->containerRow($c))->all();
@@ -258,7 +264,7 @@ class DashboardController extends Controller
         $withBol = Document::where('documentable_type', Container::class)->where('type', 'bill_of_lading')
             ->pluck('documentable_id')->all();
 
-        return Container::withCount('shipments')
+        return Container::forVehicles()->withCount(['shipments' => fn ($q) => $q->vehicles()])
             ->whereIn('status', [Container::STATUS_SAILED, Container::STATUS_ARRIVED, Container::STATUS_OFFLOADED])
             ->whereNotIn('id', $withBol ?: [0])
             ->orderByDesc('id')->limit(8)->get()
@@ -269,19 +275,19 @@ class DashboardController extends Controller
     {
         $alerts = [];
 
-        $lateContainers = Container::whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])
+        $lateContainers = Container::forVehicles()->whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])
             ->whereNotNull('eta')->where('eta', '<', today()->toDateString())->count();
         if ($lateContainers) {
             $alerts[] = ['level' => 'warning', 'text' => "{$lateContainers} container(s) past their arrival date but not marked arrived", 'href' => route('operations.containers.index')];
         }
 
-        $stuck = Shipment::whereNull('container_id')->whereIn('status', Shipment::PRE_LOADING_STATUSES)
+        $stuck = Shipment::vehicles()->whereNull('container_id')->whereIn('status', Shipment::PRE_LOADING_STATUSES)
             ->where('date_added', '<', now()->subDays(30)->toDateString())->count();
         if ($stuck) {
             $alerts[] = ['level' => 'warning', 'text' => "{$stuck} car(s) waiting more than 30 days for a container", 'href' => route('operations.shipments.index', ['view' => 'unassigned'])];
         }
 
-        $noVin = Shipment::where(fn ($q) => $q->whereNull('vin')->orWhere('vin', ''))
+        $noVin = Shipment::vehicles()->where(fn ($q) => $q->whereNull('vin')->orWhere('vin', ''))
             ->whereNotIn('status', [Shipment::STATUS_DELIVERED])->count();
         if ($noVin) {
             $alerts[] = ['level' => 'info', 'text' => "{$noVin} car(s) without a VIN", 'href' => route('operations.shipments.index', ['view' => 'no_vin'])];

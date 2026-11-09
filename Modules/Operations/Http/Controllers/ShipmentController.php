@@ -33,7 +33,7 @@ class ShipmentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Shipment::with(['client:id,company_name,contact_person', 'container.shippingLine:id,name']);
+        $query = Shipment::vehicles()->with(['client:id,company_name,contact_person', 'container.shippingLine:id,name']);
 
         if ($request->filled('search')) {
             $search = trim($request->input('search'));
@@ -83,7 +83,7 @@ class ShipmentController extends Controller
             ->paginate((int) min(200, max(10, (int) $request->input('per_page', 50))))
             ->withQueryString();
 
-        $stats = Shipment::selectRaw('status, count(*) as value')->groupBy('status')->get()
+        $stats = Shipment::vehicles()->selectRaw('status, count(*) as value')->groupBy('status')->get()
             ->map(fn ($item) => ['name' => Shipment::getStatuses()[$item->status] ?? $item->status, 'value' => $item->value]);
 
         return Inertia::render('Operations/Shipments/Index', [
@@ -92,7 +92,7 @@ class ShipmentController extends Controller
             'statuses' => Shipment::getStatuses(),
             'views' => self::VIEWS,
             'shippingLines' => ShippingLine::orderBy('name')->get(['id', 'name']),
-            'openContainers' => Container::with('shippingLine:id,name')->withCount('shipments')
+            'openContainers' => Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
                 ->where('status', '!=', Container::STATUS_RELEASED)->orderByDesc('id')->limit(100)
                 ->get(['id', 'container_number', 'shipping_line_id', 'capacity', 'status']),
             'users' => User::select('id', 'name')->limit(100)->get(),
@@ -102,6 +102,14 @@ class ShipmentController extends Controller
 
     public function show(Shipment $shipment)
     {
+        // Boxes and clearing jobs have their own pages.
+        if ($shipment->isGeneralCargo()) {
+            return redirect()->route('operations.clearing.show', $shipment);
+        }
+        if ($shipment->isBox()) {
+            return redirect()->route('operations.boxes.show', $shipment);
+        }
+
         $shipment->load([
             'client', 'assignee', 'quotes.payments', 'container.shippingLine', 'milestones.user:id,name',
             'charges.invoice:id,invoice_number,status',

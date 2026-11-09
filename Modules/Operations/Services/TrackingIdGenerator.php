@@ -15,14 +15,15 @@ class TrackingIdGenerator
 
     public const PATTERN = '/^MAP\d{2}-\d{2}-\d{3,}$/';
 
-    public function prefixFor(Carbon $date): string
+    public function prefixFor(Carbon $date, string $prefix = self::PREFIX): string
     {
-        return self::PREFIX . $date->format('y') . '-' . $date->format('m') . '-';
+        return $prefix . $date->format('y') . '-' . $date->format('m') . '-';
     }
 
-    public function next(?Carbon $date = null): string
+    /** @param string $prefix MAP for vehicles, CLR for general cargo clearing jobs. */
+    public function next(?Carbon $date = null, string $prefix = self::PREFIX): string
     {
-        $prefix = $this->prefixFor($date ?? Carbon::today());
+        $prefix = $this->prefixFor($date ?? Carbon::today(), $prefix);
 
         $max = DB::table('shipments')
             ->where('tracking_id', 'like', $prefix . '%')

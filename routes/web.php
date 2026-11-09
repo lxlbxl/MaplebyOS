@@ -53,6 +53,8 @@ use Modules\Operations\Http\Controllers\ShipmentController;
 use Modules\Operations\Http\Controllers\QuoteController;
 use Modules\Operations\Http\Controllers\ContainerController;
 use Modules\Operations\Http\Controllers\LookupController;
+use Modules\Operations\Http\Controllers\ClearingJobController;
+use Modules\Operations\Http\Controllers\BoxController;
 
 Route::middleware(['auth', 'verified'])->prefix('app/operations')->name('operations.')->group(function () {
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index')->middleware('permission:vehicles.view');
@@ -72,6 +74,24 @@ Route::middleware(['auth', 'verified'])->prefix('app/operations')->name('operati
     Route::patch('/containers/{container}/status', [ContainerController::class, 'updateStatus'])->name('containers.update-status')->middleware('permission:containers.manage');
     Route::post('/containers/{container}/vehicles', [ContainerController::class, 'addVehicles'])->name('containers.add-vehicles')->middleware('permission:containers.manage');
     Route::delete('/containers/{container}/vehicles/{shipment}', [ContainerController::class, 'removeVehicle'])->name('containers.remove-vehicle')->middleware('permission:containers.manage');
+
+    // General cargo clearing jobs (a client's own containers cleared in Nigeria)
+    Route::get('/clearing', [ClearingJobController::class, 'index'])->name('clearing.index')->middleware('permission:cargo.view');
+    Route::post('/clearing', [ClearingJobController::class, 'store'])->name('clearing.store')->middleware('permission:cargo.manage');
+    Route::get('/clearing/{job}', [ClearingJobController::class, 'show'])->name('clearing.show')->middleware('permission:cargo.view');
+    Route::put('/clearing/{job}', [ClearingJobController::class, 'update'])->name('clearing.update')->middleware('permission:cargo.manage');
+    Route::patch('/clearing/{job}/status', [ClearingJobController::class, 'updateStatus'])->name('clearing.update-status')->middleware('permission:cargo.status');
+    Route::delete('/clearing/{job}', [ClearingJobController::class, 'destroy'])->name('clearing.destroy')->middleware('permission:records.delete');
+    Route::post('/clearing/{job}/containers', [ClearingJobController::class, 'addContainer'])->name('clearing.add-container')->middleware('permission:cargo.manage');
+    Route::delete('/clearing/{job}/containers/{container}', [ClearingJobController::class, 'removeContainer'])->name('clearing.remove-container')->middleware('permission:cargo.manage');
+
+    // Boxes / lite cargo riding in car containers
+    Route::get('/boxes', [BoxController::class, 'index'])->name('boxes.index')->middleware('permission:cargo.view');
+    Route::post('/boxes', [BoxController::class, 'store'])->name('boxes.store')->middleware('permission:cargo.manage');
+    Route::get('/boxes/{box}', [BoxController::class, 'show'])->name('boxes.show')->middleware('permission:cargo.view');
+    Route::put('/boxes/{box}', [BoxController::class, 'update'])->name('boxes.update')->middleware('permission:cargo.manage');
+    Route::patch('/boxes/{box}/status', [BoxController::class, 'updateStatus'])->name('boxes.update-status')->middleware('permission:cargo.status');
+    Route::delete('/boxes/{box}', [BoxController::class, 'destroy'])->name('boxes.destroy')->middleware('permission:records.delete');
 
     Route::get('/catalog', [LookupController::class, 'catalog'])->name('catalog.index')->middleware('permission:catalog.manage');
     Route::get('/lookups/{type}', [LookupController::class, 'suggest'])->name('lookups.suggest');

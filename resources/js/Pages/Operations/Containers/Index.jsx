@@ -17,7 +17,9 @@ function daysUntil(date) {
 
 function ContainerCard({ c }) {
     const eta = daysUntil(c.eta);
-    const slots = Array.from({ length: Math.max(c.capacity, c.shipments.length) }, (_, i) => c.shipments[i]);
+    const cars = c.shipments.filter((s) => (s.cargo_type || 'vehicle') === 'vehicle');
+    const boxCount = c.shipments.length - cars.length;
+    const slots = Array.from({ length: Math.max(c.capacity, cars.length) }, (_, i) => cars[i]);
     return (
         <Link href={route('operations.containers.show', c.id)} className="block rounded-xl border border-linen bg-white p-3 shadow-sm hover:shadow-md hover:border-sage/40 transition">
             <div className="flex items-start justify-between gap-2">
@@ -34,6 +36,7 @@ function ContainerCard({ c }) {
                     </div>
                 ))}
             </div>
+            {boxCount > 0 && <p className="mt-1 text-[11px] text-amber-700">+ {boxCount} box{boxCount > 1 ? 'es' : ''} of small cargo</p>}
             <div className="mt-2 flex justify-between text-[11px] text-stone">
                 <span>Loaded {formatDate(c.loaded_on)}</span>
                 {c.offloaded_on ? <span>Offloaded {formatDate(c.offloaded_on)}</span>
