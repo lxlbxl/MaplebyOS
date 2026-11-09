@@ -423,7 +423,7 @@ export default function Index({ settingsData }) {
                                                             onChange={(e) => updateSetting('handling_fee', e.target.value)}
                                                             className="h-12 pl-10 text-lg"
                                                         />
-                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-drift font-semibold">$</span>
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-drift font-semibold">₦</span>
                                                     </div>
                                                 </motion.div>
                                             </div>

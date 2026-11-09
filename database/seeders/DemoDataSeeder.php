@@ -78,9 +78,12 @@ class DemoDataSeeder extends Seeder
         return $items[array_rand($items)];
     }
 
+    /** Naira per dollar, used to turn realistic dollar ranges into naira demo amounts. */
+    private const NAIRA_PER_DOLLAR = 1500;
+
     private function money(int $min, int $max, int $step = 5): float
     {
-        return (float) (intdiv(mt_rand($min, $max), $step) * $step);
+        return (float) (intdiv(mt_rand($min, $max), $step) * $step * self::NAIRA_PER_DOLLAR);
     }
 
     private function backdate(Model $model, Carbon $at): void
@@ -279,7 +282,7 @@ class DemoDataSeeder extends Seeder
                 'priority' => $this->pick(['low', 'medium', 'medium', 'high', 'urgent']),
                 'title' => $title,
                 'description' => "Customer enquiry: {$title}. Wants an all-in quote including clearing and delivery to " . ($client?->city ?? 'Lagos') . '.',
-                'estimated_value' => $value,
+                'estimated_value' => $value * self::NAIRA_PER_DOLLAR,
                 'contact_name' => $name,
                 'contact_email' => $client?->email ?? Str::slug($name, '.') . '@example.com',
                 'contact_phone' => $client?->phone ?? $this->phoneNg(),
@@ -631,16 +634,16 @@ class DemoDataSeeder extends Seeder
     {
         $templates = [
             ['Standard vehicle export (Canada → Lagos)', 'vehicle_export', [
-                ['Ocean freight (shared 40HC)', 1, 1950], ['Loading & documentation', 1, 450], ['Clearing at Apapa/Tin Can', 1, 1850], ['Delivery within Lagos', 1, 200],
+                ['Ocean freight (shared 40HC)', 1, 2925000], ['Loading & documentation', 1, 675000], ['Clearing at Apapa/Tin Can', 1, 2775000], ['Delivery within Lagos', 1, 300000],
             ]],
             ['Auction purchase + shipping', 'vehicle_export', [
-                ['Auction bidding service', 1, 300], ['Towing to yard', 1, 280], ['Ocean freight (shared 40HC)', 1, 1950], ['Clearing', 1, 1850],
+                ['Auction bidding service', 1, 450000], ['Towing to yard', 1, 420000], ['Ocean freight (shared 40HC)', 1, 2925000], ['Clearing', 1, 2775000],
             ]],
             ['Equipment export (flat rack)', 'freight_forwarding', [
-                ['Flat rack freight', 1, 6800], ['Lashing & securing', 1, 900], ['Export documentation', 1, 350],
+                ['Flat rack freight', 1, 10200000], ['Lashing & securing', 1, 1350000], ['Export documentation', 1, 525000],
             ]],
             ['Inbound clearing only', 'inbound_clearing', [
-                ['Customs duty processing', 1, 650], ['Terminal charges', 1, 420], ['Agency fee', 1, 300],
+                ['Customs duty processing', 1, 975000], ['Terminal charges', 1, 630000], ['Agency fee', 1, 450000],
             ]],
         ];
         foreach ($templates as [$name, $service, $items]) {

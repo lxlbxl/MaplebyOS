@@ -16,7 +16,7 @@ class QuoteResource extends Resource
 {
     protected static ?string $model = Quote::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationGroup = 'Finance';
 
@@ -27,7 +27,7 @@ class QuoteResource extends Resource
         return [
             'Client' => $record->client?->company_name,
             'Status' => $record->status,
-            'Total' => '$' . number_format($record->total_amount, 2),
+            'Total' => '₦' . number_format($record->total_amount, 2),
         ];
     }
     public static function form(Form $form): Form
@@ -150,14 +150,14 @@ class QuoteResource extends Resource
                                         Forms\Components\TextInput::make('unit_price')
                                             ->numeric()
                                             ->required()
-                                            ->prefix('$')
+                                            ->prefix('₦')
                                             ->live(debounce: 500)
                                             ->afterStateUpdated(fn(Get $get, Set $set) => $set('amount', $get('quantity') * $get('unit_price')))
                                             ->columnSpan(1),
                                         Forms\Components\TextInput::make('amount')
                                             ->numeric()
                                             ->readOnly()
-                                            ->prefix('$')
+                                            ->prefix('₦')
                                             ->columnSpan(1),
                                     ])
                                     ->columns(6)
@@ -174,15 +174,15 @@ class QuoteResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('subtotal')
                                     ->numeric()
-                                    ->prefix('$'),
+                                    ->prefix('₦'),
                                 Forms\Components\TextInput::make('tax_total')
                                     ->label('Tax')
                                     ->numeric()
-                                    ->prefix('$'),
+                                    ->prefix('₦'),
                                 Forms\Components\TextInput::make('total_amount')
                                     ->label('Grand Total')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('₦')
                                     ->required(),
                             ]),
                         Forms\Components\Section::make('Terms & Notes')

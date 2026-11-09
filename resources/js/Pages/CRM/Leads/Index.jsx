@@ -177,7 +177,7 @@ export default function Index({ leads, filters, clients, users, stats }) {
                                                 />
                                             </TableCell>
                                             <TableCell className="text-void">
-                                                {lead.estimated_value ? `$${Number(lead.estimated_value).toLocaleString()}` : '-'}
+                                                {lead.estimated_value ? `₦${Number(lead.estimated_value).toLocaleString()}` : '-'}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="secondary" className={

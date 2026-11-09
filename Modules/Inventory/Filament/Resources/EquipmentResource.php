@@ -45,8 +45,8 @@ class EquipmentResource extends Resource
                                 'rented' => 'Rented',
                                 'sold' => 'Sold',
                             ])->default('in_stock')->required(),
-                        Forms\Components\TextInput::make('purchase_price')->numeric()->prefix('$'),
-                        Forms\Components\TextInput::make('sale_price')->numeric()->prefix('$'),
+                        Forms\Components\TextInput::make('purchase_price')->numeric()->prefix('₦'),
+                        Forms\Components\TextInput::make('sale_price')->numeric()->prefix('₦'),
                         Forms\Components\DatePicker::make('purchase_date'),
                     ])->columns(3),
 

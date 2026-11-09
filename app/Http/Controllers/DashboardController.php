@@ -56,8 +56,8 @@ class DashboardController extends Controller
     }
 
     /**
-     * Money tiles add up dollar invoices only. Clearing is billed in naira and
-     * must not be summed into the same figure.
+     * Money tiles add up invoices in the default currency (naira) only, so a
+     * rare foreign-currency invoice is never summed into the same figure.
      */
     private const MONEY_CURRENCY_FALLBACK = 'NGN';
 

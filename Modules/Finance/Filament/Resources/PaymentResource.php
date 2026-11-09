@@ -40,7 +40,7 @@ class PaymentResource extends Resource
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix('₦'),
                 Forms\Components\DatePicker::make('payment_date')
                     ->required()
                     ->default(now()),

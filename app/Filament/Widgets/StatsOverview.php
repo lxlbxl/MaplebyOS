@@ -39,7 +39,7 @@ class StatsOverview extends BaseWidget
         $revenueTrend = $lastMonthRevenue > 0 ? round((($currentRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100) : 100;
 
         return [
-            Stat::make('Monthly Revenue', '$' . number_format($currentRevenue, 0))
+            Stat::make('Monthly Revenue', '₦' . number_format($currentRevenue, 0))
                 ->extraAttributes([
                     'class' => 'fi-wi-stats-overview-stat-accent',
                 ])

@@ -11,7 +11,7 @@
     <p>Please find attached your quote #{{ $quote->quote_number }} from Mapleby OS.</p>
 
     <p>
-        <strong>Total Amount:</strong> ${{ number_format($quote->total_amount, 2) }}<br>
+        <strong>Total Amount:</strong> ₦{{ number_format($quote->total_amount, 2) }}<br>
         <strong>Valid Until:</strong> {{ $quote->expiry_date ? $quote->expiry_date->format('M d, Y') : 'N/A' }}
     </p>
 

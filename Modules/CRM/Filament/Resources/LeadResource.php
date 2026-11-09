@@ -99,7 +99,7 @@ class LeadResource extends Resource
                             ]),
                         Forms\Components\TextInput::make('estimated_value')
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix('₦'),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Assignment')

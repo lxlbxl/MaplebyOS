@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export default function CurrencyDisplay({
     amount,
     currency = 'NGN',
-    locale = 'en-US',
+    locale = 'en-NG',
     className,
     symbolClassName,
     amountClassName,
@@ -27,7 +27,7 @@ export default function CurrencyDisplay({
 
     // Extract the symbol and the rest of the string
     const symbolPart = parts.find(p => p.type === 'currency');
-    const symbol = symbolPart ? symbolPart.value : '$';
+    const symbol = symbolPart ? symbolPart.value : '₦';
 
     // We want to reconstruct the string WITHOUT the currency symbol, to style it separately.
     // However, we want to keep the "M" or "K" suffix attached to the number.
