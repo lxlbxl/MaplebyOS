@@ -6,26 +6,34 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import ContainerForm from '@/Components/Operations/ContainerForm';
+import DocumentsPanel from '@/Components/Operations/DocumentsPanel';
+import ClearingOfficerPanel from '@/Components/Operations/ClearingOfficerPanel';
+import DepositsPanel from '@/Components/Operations/DepositsPanel';
+import { useCan } from '@/lib/access';
 import { ArrowLeft, Pencil, Trash2, ExternalLink, X, Plus, AlertTriangle, History } from 'lucide-react';
-import { CONTAINER_STATUS_COLORS, VEHICLE_STATUS_COLORS, formatDate, todayIso } from '@/lib/operations';
+import { CONTAINER_STATUS_COLORS, VEHICLE_STATUS_COLORS, formatDate, todayIso, shipmentHref } from '@/lib/operations';
 import { formatMoney, cn } from '@/lib/utils';
 
 function Row({ label, children }) {
     return <div className="flex justify-between gap-4 py-1.5 text-sm"><span className="text-pebble">{label}</span><span className="text-charcoal text-right">{children || '—'}</span></div>;
 }
 
-export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned }) {
+export default function Show({ container, statuses, shippingLines, freightShare, transitDays, trackingUrl, unassigned, documents, clearing, deposits }) {
     const { props } = usePage();
+    const can = useCan();
+    const manage = can('containers.manage');
     const currency = props.settings?.currency || 'USD';
     const [formOpen, setFormOpen] = useState(false);
     const [picking, setPicking] = useState([]);
     const [filter, setFilter] = useState('');
     const statusForm = useForm({ status: container.status, date: todayIso(), note: '' });
-    const free = container.capacity - container.shipments.length;
+    const cars = container.shipments.filter((s) => (s.cargo_type || 'vehicle') === 'vehicle');
+    const boxCount = container.shipments.length - cars.length;
+    const free = container.capacity - cars.length;
 
     const candidates = useMemo(() => {
         const q = filter.trim().toUpperCase();
-        return unassigned.filter((s) => !q || [s.tracking_id, s.vin, s.vehicle_make, s.vehicle_model].some((v) => String(v || '').toUpperCase().includes(q)));
+        return unassigned.filter((s) => !q || [s.tracking_id, s.vin, s.vehicle_make, s.vehicle_model, s.cargo_description].some((v) => String(v || '').toUpperCase().includes(q)));
     }, [filter, unassigned]);
 
     const addSelected = () => router.post(route('operations.containers.add-vehicles', container.id), { shipment_ids: picking }, { preserveScroll: true, onSuccess: () => setPicking([]) });
@@ -43,20 +51,20 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 <span className={cn('text-xs px-2 py-1 rounded-full font-medium', CONTAINER_STATUS_COLORS[container.status])}>{container.status_label}</span>
                                 {!container.number_is_valid && <span className="text-xs text-amber-700 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> check digit mismatch</span>}
                             </div>
-                            <p className="text-drift text-sm mt-1">{container.shipping_line?.name || 'Line unknown'} · {container.shipments.length}/{container.capacity} cars</p>
+                            <p className="text-drift text-sm mt-1">{container.shipping_line?.name || 'Line unknown'} · {cars.length}/{container.capacity} cars{boxCount ? ` + ${boxCount} box${boxCount > 1 ? 'es' : ''}` : ''}</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {trackingUrl && <a href={trackingUrl} target="_blank" rel="noreferrer"><Button variant="outline" className="border-linen">Carrier tracking <ExternalLink className="ml-2 h-4 w-4" /></Button></a>}
-                        <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>
-                        <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this container? Its cars will be unassigned.') && router.delete(route('operations.containers.destroy', container.id))}><Trash2 className="h-4 w-4" /></Button>
+                        {manage && <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>}
+                        {can('records.delete') && <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this container? Its cars will be unassigned.') && router.delete(route('operations.containers.destroy', container.id))}><Trash2 className="h-4 w-4" /></Button>}
                     </div>
                 </div>
 
-                <Card className="bg-white border-linen shadow-sm">
+                {manage && <Card className="bg-white border-linen shadow-sm">
                     <CardContent className="p-5">
                         <form onSubmit={(e) => { e.preventDefault(); statusForm.patch(route('operations.containers.update-status', container.id), { preserveScroll: true }); }} className="flex flex-wrap items-end gap-2">
-                            <div className="text-sm text-stone mr-2">Move container <span className="text-pebble">(all {container.shipments.length} cars follow)</span></div>
+                            <div className="text-sm text-stone mr-2">Move container <span className="text-pebble">(all {cars.length} cars{boxCount ? ` and ${boxCount} box${boxCount > 1 ? 'es' : ''}` : ''} follow)</span></div>
                             <Select value={statusForm.data.status} onValueChange={(v) => statusForm.setData('status', v)}>
                                 <SelectTrigger className="w-48 bg-cream border-linen"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-white">{Object.entries(statuses).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
@@ -66,23 +74,23 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                             <Button type="submit" disabled={statusForm.processing} className="btn-sage">Update</Button>
                         </form>
                     </CardContent>
-                </Card>
+                </Card>}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 flex flex-col gap-6">
                         <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void">Cars in this container</CardTitle></CardHeader>
                             <CardContent className="p-5 grid sm:grid-cols-2 gap-3">
-                                {container.shipments.map((s) => (
+                                {[...cars, ...container.shipments.filter((s) => s.cargo_type === 'box')].map((s) => (
                                     <div key={s.id} className="rounded-xl border border-linen p-3 flex justify-between gap-2">
                                         <div className="min-w-0">
                                             <p className="text-[11px] text-pebble">Slot {s.container_slot || '—'}</p>
-                                            <Link href={route('operations.shipments.show', s.id)} className="font-medium text-void hover:text-sage">{s.vehicle_label || s.tracking_id}</Link>
+                                            <Link href={shipmentHref(s)} className="font-medium text-void hover:text-sage">{s.cargo_type === 'box' && <span className="mr-1 text-[10px] uppercase tracking-wide text-amber-700">box</span>}{s.vehicle_label || s.tracking_id}</Link>
                                             <p className="font-mono text-xs text-stone truncate">{s.tracking_id} · {s.vin || 'no VIN'}</p>
                                             <p className="text-xs text-stone">{s.client ? (s.client.company_name || s.client.contact_person) : 'No customer'}</p>
                                             <span className={cn('inline-block mt-1 text-[11px] px-1.5 py-0.5 rounded', VEHICLE_STATUS_COLORS[s.status])}>{s.status_label}</span>
                                         </div>
-                                        <button type="button" title="Remove from container" onClick={() => confirm(`Remove ${s.tracking_id} from this container?`) && router.delete(route('operations.containers.remove-vehicle', [container.id, s.id]), { preserveScroll: true })} className="text-pebble hover:text-red-600 self-start"><X className="h-4 w-4" /></button>
+                                        {manage && <button type="button" title="Remove from container" onClick={() => confirm(`Remove ${s.tracking_id} from this container?`) && router.delete(route('operations.containers.remove-vehicle', [container.id, s.id]), { preserveScroll: true })} className="text-pebble hover:text-red-600 self-start"><X className="h-4 w-4" /></button>}
                                     </div>
                                 ))}
                                 {Array.from({ length: Math.max(0, free) }).map((_, i) => (
@@ -92,7 +100,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                             </CardContent>
                         </Card>
 
-                        {free > 0 && (
+                        {free > 0 && manage && (
                             <Card className="bg-white border-linen shadow-sm">
                                 <CardHeader className="border-b border-linen"><CardTitle className="text-void">Load cars ({free} free slot{free === 1 ? '' : 's'})</CardTitle></CardHeader>
                                 <CardContent className="p-5 space-y-3">
@@ -105,7 +113,7 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                                 <label key={s.id} className={cn('flex items-center gap-3 py-2 text-sm', disabled ? 'opacity-50' : 'cursor-pointer')}>
                                                     <input type="checkbox" className="accent-sage" disabled={disabled} checked={checked} onChange={() => setPicking((p) => (checked ? p.filter((x) => x !== s.id) : [...p, s.id]))} />
                                                     <span className="font-mono text-xs w-28">{s.tracking_id}</span>
-                                                    <span className="flex-1">{[s.vehicle_year, s.vehicle_make, s.vehicle_model].filter(Boolean).join(' ')}</span>
+                                                    <span className="flex-1">{s.cargo_type === 'box' ? `Box · ${s.cargo_description || ''}` : [s.vehicle_year, s.vehicle_make, s.vehicle_model].filter(Boolean).join(' ')}</span>
                                                     <span className="font-mono text-xs text-stone">{s.vin || '—'}</span>
                                                 </label>
                                             );
@@ -116,6 +124,12 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 </CardContent>
                             </Card>
                         )}
+
+                        <DepositsPanel panel={deposits} />
+
+                        <ClearingOfficerPanel panel={clearing} />
+
+                        <DocumentsPanel panel={documents} />
 
                         <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void flex items-center gap-2"><History className="h-5 w-5" /> History</CardTitle></CardHeader>
@@ -160,14 +174,14 @@ export default function Show({ container, statuses, shippingLines, freightShare,
                                 <Row label="Transit">{transitDays != null ? `${transitDays} days` : null}</Row>
                             </CardContent>
                         </Card>
-                        <Card className="bg-white border-linen shadow-sm">
+                        {can('money.view') && <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void">Freight</CardTitle></CardHeader>
                             <CardContent className="p-5">
                                 <Row label="Freight cost">{container.freight_cost ? formatMoney(container.freight_cost, container.freight_currency || currency) : null}</Row>
                                 <Row label="Per car">{freightShare ? formatMoney(freightShare, container.freight_currency || currency) : null}</Row>
                                 <p className="text-xs text-pebble mt-2">The per-car share is counted as a cost on each car's profit.</p>
                             </CardContent>
-                        </Card>
+                        </Card>}
                         {container.notes && <Card className="bg-white border-linen shadow-sm"><CardContent className="p-5 text-sm whitespace-pre-wrap">{container.notes}</CardContent></Card>}
                     </div>
                 </div>

@@ -6,6 +6,8 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import ShipmentForm from '@/Components/Operations/ShipmentForm';
+import DocumentsPanel from '@/Components/Operations/DocumentsPanel';
+import { useCan } from '@/lib/access';
 import { ArrowLeft, Pencil, Ship, User, ExternalLink, AlertTriangle, CheckCircle2, Trash2, Container as ContainerIcon, DollarSign, History } from 'lucide-react';
 import { VEHICLE_STATUS_COLORS, formatDate, todayIso } from '@/lib/operations';
 import { formatMoney, cn } from '@/lib/utils';
@@ -38,7 +40,9 @@ function StatusChanger({ shipment, statuses }) {
 }
 
 function Money({ shipment, money, categories, currency }) {
-    const { data, setData, post, processing, errors, reset } = useForm({ kind: 'charge', category: '', description: '', amount: '', incurred_on: todayIso() });
+    const can = useCan();
+    const kinds = [can('finance.manage') && 'charge', can('money.edit_costs') && 'cost'].filter(Boolean);
+    const { data, setData, post, processing, errors, reset } = useForm({ kind: kinds[0] || 'charge', category: '', description: '', amount: '', incurred_on: todayIso() });
     const add = (e) => {
         e.preventDefault();
         post(route('finance.charges.store', shipment.id), { preserveScroll: true, onSuccess: () => reset('category', 'description', 'amount') });
@@ -68,7 +72,7 @@ function Money({ shipment, money, categories, currency }) {
                             </span>
                             <span className="flex items-center gap-2">
                                 {formatMoney(c.amount, c.currency || currency)}
-                                {!c.invoice_id && (
+                                {!c.invoice_id && kinds.includes(c.kind) && (
                                     <button type="button" onClick={() => confirm('Remove this line?') && router.delete(route('finance.charges.destroy', c.id), { preserveScroll: true })} className="text-pebble hover:text-red-600"><Trash2 className="h-3.5 w-3.5" /></button>
                                 )}
                             </span>
@@ -77,10 +81,10 @@ function Money({ shipment, money, categories, currency }) {
                     {lines.length === 0 && !shipment.purchase_price && money.freight_share == null && <p className="py-2 text-pebble">No costs or charges yet.</p>}
                 </div>
 
-                <form onSubmit={add} className="grid grid-cols-2 gap-2 pt-2 border-t border-linen">
+                {kinds.length > 0 && <form onSubmit={add} className="grid grid-cols-2 gap-2 pt-2 border-t border-linen">
                     <Select value={data.kind} onValueChange={(v) => setData((d) => ({ ...d, kind: v, category: '' }))}>
                         <SelectTrigger className="bg-cream border-linen"><SelectValue /></SelectTrigger>
-                        <SelectContent className="bg-white"><SelectItem value="charge">Charge to customer</SelectItem><SelectItem value="cost">Cost to Mapleby</SelectItem></SelectContent>
+                        <SelectContent className="bg-white">{kinds.includes('charge') && <SelectItem value="charge">Charge to customer</SelectItem>}{kinds.includes('cost') && <SelectItem value="cost">Cost to Mapleby</SelectItem>}</SelectContent>
                     </Select>
                     <Select value={data.category} onValueChange={(v) => setData('category', v)}>
                         <SelectTrigger className="bg-cream border-linen"><SelectValue placeholder="Category" /></SelectTrigger>
@@ -90,14 +94,15 @@ function Money({ shipment, money, categories, currency }) {
                     <Input type="number" step="0.01" value={data.amount} onChange={(e) => setData('amount', e.target.value)} placeholder="Amount" className="bg-cream border-linen" />
                     {(errors.category || errors.amount) && <p className="col-span-2 text-xs text-red-600">{errors.category || errors.amount}</p>}
                     <Button type="submit" disabled={processing} variant="outline" className="col-span-2 border-linen">Add line</Button>
-                </form>
+                </form>}
             </CardContent>
         </Card>
     );
 }
 
-export default function Show({ shipment, statuses, users, vin, trackingUrl, money, chargeCategories }) {
+export default function Show({ shipment, statuses, users, vin, trackingUrl, money, chargeCategories, canEdit, documents }) {
     const { props } = usePage();
+    const can = useCan();
     const currency = props.settings?.currency || 'USD';
     const [formOpen, setFormOpen] = useState(false);
     const container = shipment.container;
@@ -122,8 +127,8 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>
-                        <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this vehicle?') && router.delete(route('operations.shipments.destroy', shipment.id), { onSuccess: () => router.visit(route('operations.shipments.index')) })}><Trash2 className="h-4 w-4" /></Button>
+                        {canEdit && <Button onClick={() => setFormOpen(true)} className="btn-sage"><Pencil className="mr-2 h-4 w-4" /> Edit</Button>}
+                        {can('records.delete') && <Button variant="outline" className="border-linen text-red-600" onClick={() => confirm('Delete this vehicle?') && router.delete(route('operations.shipments.destroy', shipment.id), { onSuccess: () => router.visit(route('operations.shipments.index')) })}><Trash2 className="h-4 w-4" /></Button>}
                     </div>
                 </div>
 
@@ -147,7 +152,7 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                         {['on_hold', 'issue'].includes(shipment.status) && (
                             <p className="text-sm text-red-700 flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> This car is marked {shipment.status_label}.</p>
                         )}
-                        <StatusChanger shipment={shipment} statuses={statuses} />
+                        {can('vehicles.status') && <StatusChanger shipment={shipment} statuses={statuses} />}
                     </CardContent>
                 </Card>
 
@@ -188,7 +193,7 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                                     ) : (
                                         <div className="text-sm text-pebble space-y-2">
                                             <p>Not in a container yet.</p>
-                                            <Link href={route('operations.containers.index')} className="text-sage underline inline-flex items-center gap-1"><ContainerIcon className="h-4 w-4" /> Load it from the container board</Link>
+                                            {can('containers.manage') && <Link href={route('operations.containers.index')} className="text-sage underline inline-flex items-center gap-1"><ContainerIcon className="h-4 w-4" /> Load it from the container board</Link>}
                                         </div>
                                     )}
                                     <Row label="Delivered">{formatDate(shipment.delivered_on)}</Row>
@@ -196,7 +201,9 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                             </Card>
                         </div>
 
-                        <Money shipment={shipment} money={money} categories={chargeCategories} currency={currency} />
+                        {money && <Money shipment={shipment} money={money} categories={chargeCategories} currency={currency} />}
+
+                        <DocumentsPanel panel={documents} />
 
                         <Card className="bg-white border-linen shadow-sm">
                             <CardHeader className="border-b border-linen"><CardTitle className="text-void flex items-center gap-2"><History className="h-5 w-5" /> History</CardTitle></CardHeader>
@@ -221,15 +228,17 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                             <CardContent className="p-5">
                                 {shipment.client ? (
                                     <>
-                                        <Link href={route('crm.clients.show', shipment.client.id)} className="font-semibold text-void hover:text-sage">{shipment.client.company_name || shipment.client.contact_person}</Link>
+                                        {can('customers.view')
+                                            ? <Link href={route('crm.clients.show', shipment.client.id)} className="font-semibold text-void hover:text-sage">{shipment.client.company_name || shipment.client.contact_person}</Link>
+                                            : <p className="font-semibold text-void">{shipment.client.company_name || shipment.client.contact_person}</p>}
                                         {shipment.client.company_name && <p className="text-sm text-stone">{shipment.client.contact_person}</p>}
-                                        <Row label="Phone">{shipment.client.phone}</Row>
-                                        <Row label="Email">{shipment.client.email}</Row>
+                                        {can('customers.view') && <Row label="Phone">{shipment.client.phone}</Row>}
+                                        {can('customers.view') && <Row label="Email">{shipment.client.email}</Row>}
                                     </>
                                 ) : (
-                                    <p className="text-sm text-amber-700 flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> No customer yet. <button className="underline" onClick={() => setFormOpen(true)}>Add one</button></p>
+                                    <p className="text-sm text-amber-700 flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> No customer yet. {canEdit && <button className="underline" onClick={() => setFormOpen(true)}>Add one</button>}</p>
                                 )}
-                                <Row label="Payment">{shipment.payment_status}</Row>
+                                {can('money.view') && <Row label="Payment">{shipment.payment_status}</Row>}
                             </CardContent>
                         </Card>
 
@@ -239,7 +248,7 @@ export default function Show({ shipment, statuses, users, vin, trackingUrl, mone
                                 <Row label="Platform">{shipment.purchase_platform}</Row>
                                 <Row label="Lot / stock #">{shipment.lot_number}</Row>
                                 <Row label="Purchase date">{formatDate(shipment.purchase_date)}</Row>
-                                <Row label="Price">{shipment.purchase_price ? formatMoney(shipment.purchase_price, currency) : null}</Row>
+                                {can('money.view') && <Row label="Price">{shipment.purchase_price ? formatMoney(shipment.purchase_price, currency) : null}</Row>}
                             </CardContent>
                         </Card>
 

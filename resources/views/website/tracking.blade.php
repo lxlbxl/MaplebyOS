@@ -99,12 +99,12 @@
             <h1 class="font-heading text-7xl md:text-9xl uppercase font-black mb-8 text-center">Vessel <span
                     class="text-[var(--maple-crimson)]">Telemetry</span></h1>
             <p class="text-center text-gray-400 text-lg mb-16 font-light max-w-xl mx-auto">
-                Enter your Mapleby tracking ID (for example MAP26-10-023) or your car's full 17-character VIN to see where it is.
+                Enter your Mapleby tracking ID (for example MAP26-10-023 for a car, BOX26-11-004 for a box), your car's full 17-character VIN, or the Bill of Lading number of a container we are clearing for you.
             </p>
 
             <div class="panel-steel p-10 border-l-4 border-l-[var(--maple-crimson)]">
                 <form id="track-form" class="flex flex-col md:flex-row gap-4">
-                    <input id="track-q" type="text" placeholder="TRACKING ID OR VIN" autocomplete="off" required minlength="6" maxlength="40"
+                    <input id="track-q" type="text" placeholder="TRACKING ID, VIN OR B/L" autocomplete="off" required minlength="6" maxlength="40"
                         value="{{ request('q') }}"
                         class="flex-grow bg-white/5 border border-white/10 px-6 py-4 font-tech text-sm text-white uppercase focus:border-[var(--maple-crimson)] outline-none">
                     <button class="btn-command" type="submit">TRACK</button>
@@ -156,7 +156,7 @@
                         err.classList.remove('hidden');
                         return;
                     }
-                    document.getElementById('r-vehicle').textContent = data.vehicle || 'Vehicle';
+                    document.getElementById('r-vehicle').textContent = data.vehicle || (data.cargo_type === 'vehicle' ? 'Vehicle' : 'Cargo');
                     document.getElementById('r-ids').textContent = data.tracking_id + (data.vin_last6 ? ' · VIN …' + data.vin_last6 : '') + (data.destination ? ' · to ' + data.destination : '');
                     document.getElementById('r-status').textContent = data.status_label;
                     const reached = new Set(data.timeline.map((t) => t.status));

@@ -16,6 +16,28 @@ class ShipmentCharge extends Model
         'charge' => ['Vehicle price', 'Shipping', 'Clearing', 'Delivery', 'Service fee', 'Other'],
     ];
 
+    /** Customs clearing of a client's general cargo in Nigeria (usually in NGN). */
+    public const CLEARING_CATEGORIES = [
+        'cost' => ['Customs duty', 'VAT & levies', 'Terminal charges', 'Shipping line charges', 'Examination', 'Demurrage', 'Storage', 'Haulage', 'Documentation', 'Container deposit', 'Other'],
+        'charge' => ['Agency fee', 'Duty & taxes', 'Terminal & shipping line charges', 'Haulage', 'Demurrage', 'Storage', 'Documentation', 'Other'],
+    ];
+
+    /** Boxes / lite cargo riding in a car container. */
+    public const BOX_CATEGORIES = [
+        'cost' => ['Handling', 'Packing', 'Clearing', 'Delivery', 'Other'],
+        'charge' => ['Shipping', 'Handling', 'Clearing', 'Delivery', 'Service fee', 'Other'],
+    ];
+
+    /** Picklist for a shipment's cargo type. */
+    public static function categoriesFor(?string $cargoType): array
+    {
+        return match ($cargoType) {
+            Shipment::CARGO_GENERAL => self::CLEARING_CATEGORIES,
+            Shipment::CARGO_BOX => self::BOX_CATEGORIES,
+            default => self::CATEGORIES,
+        };
+    }
+
     protected $fillable = ['shipment_id', 'kind', 'category', 'description', 'amount', 'currency', 'incurred_on', 'invoice_id', 'created_by'];
 
     protected $casts = [

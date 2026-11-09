@@ -33,7 +33,7 @@ class ShipmentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Shipment::with(['client:id,company_name,contact_person', 'container.shippingLine:id,name']);
+        $query = Shipment::vehicles()->with(['client:id,company_name,contact_person', 'container.shippingLine:id,name']);
 
         if ($request->filled('search')) {
             $search = trim($request->input('search'));
@@ -84,7 +84,7 @@ class ShipmentController extends Controller
             ->withQueryString();
 
         $order = array_flip(array_keys(Shipment::getStatuses()));
-        $stats = Shipment::selectRaw('status, count(*) as value')->groupBy('status')->get()
+        $stats = Shipment::vehicles()->selectRaw('status, count(*) as value')->groupBy('status')->get()
             ->sortBy(fn ($item) => $order[$item->status] ?? 99)->values()
             ->map(fn ($item) => ['name' => Shipment::getStatuses()[$item->status] ?? $item->status, 'value' => $item->value]);
 
@@ -94,7 +94,7 @@ class ShipmentController extends Controller
             'statuses' => Shipment::getStatuses(),
             'views' => self::VIEWS,
             'shippingLines' => ShippingLine::orderBy('name')->get(['id', 'name']),
-            'openContainers' => Container::with('shippingLine:id,name')->withCount('shipments')
+            'openContainers' => Container::forVehicles()->with('shippingLine:id,name')->withCount(['shipments' => fn ($q) => $q->vehicles()])
                 ->where('status', '!=', Container::STATUS_RELEASED)->orderByDesc('id')->limit(100)
                 ->get(['id', 'container_number', 'shipping_line_id', 'capacity', 'status']),
             'users' => User::select('id', 'name')->limit(100)->get(),
@@ -104,6 +104,14 @@ class ShipmentController extends Controller
 
     public function show(Shipment $shipment)
     {
+        // Boxes and clearing jobs have their own pages.
+        if ($shipment->isGeneralCargo()) {
+            return redirect()->route('operations.clearing.show', $shipment);
+        }
+        if ($shipment->isBox()) {
+            return redirect()->route('operations.boxes.show', $shipment);
+        }
+
         $shipment->load([
             'client', 'assignee', 'quotes.payments', 'container.shippingLine', 'milestones.user:id,name',
             'charges.invoice:id,invoice_number,status',
@@ -115,22 +123,25 @@ class ShipmentController extends Controller
         $freightShare = $shipment->container?->freightSharePerVehicle();
         $costs = (float) $shipment->charges->where('kind', 'cost')->sum('amount') + (float) ($shipment->purchase_price ?? 0) + (float) ($freightShare ?? 0);
         $charges = (float) $shipment->charges->where('kind', 'charge')->sum('amount');
+        $seesMoney = (bool) request()->user()?->can('money.view');
 
         return Inertia::render('Operations/Shipments/Show', [
             'shipment' => $shipment,
             'statuses' => Shipment::getStatuses(),
             'users' => User::select('id', 'name')->limit(100)->get(),
-            'totalPaid' => $totalPaid,
-            'totalQuoted' => $totalQuoted,
+            'totalPaid' => $seesMoney ? $totalPaid : null,
+            'totalQuoted' => $seesMoney ? $totalQuoted : null,
+            'canEdit' => $shipment->editableBy(request()->user()),
             'vin' => $shipment->vin ? VinDecoder::decode($shipment->vin) : null,
             'trackingUrl' => $shipment->container?->shippingLine?->trackingUrlFor($shipment->container->container_number),
-            'money' => [
+            'money' => $seesMoney ? [
                 'freight_share' => $freightShare,
                 'total_cost' => round($costs, 2),
                 'total_charges' => round($charges, 2),
                 'profit' => round($charges - $costs, 2),
-            ],
+            ] : null,
             'chargeCategories' => \Modules\Finance\Entities\ShipmentCharge::CATEGORIES,
+            'documents' => DocumentController::panel($shipment, request()->user()),
         ]);
     }
 
@@ -138,6 +149,7 @@ class ShipmentController extends Controller
     {
         $data = $this->validated($request, $canonical);
         $data['service_type'] ??= 'Container shipping';
+        $data['created_by'] = $request->user()?->id;
 
         $shipment = Shipment::create($data);
         $shipment->milestones()->create([
@@ -152,6 +164,8 @@ class ShipmentController extends Controller
 
     public function update(Request $request, Shipment $shipment, CanonicalInput $canonical)
     {
+        abort_unless($shipment->editableBy($request->user()), 403, 'You can only edit cars you added, and only until they are loaded.');
+
         $data = $this->validated($request, $canonical, $shipment);
         $newStatus = $data['status'] ?? $shipment->status;
         unset($data['status']);
@@ -285,6 +299,18 @@ class ShipmentController extends Controller
         }
 
         $data['destination'] = $data['destination_city'] ?? null;
+
+        // Fields a role may not set are dropped, not rejected, so one shared form works for everyone.
+        $user = $request->user();
+        if (!$user?->can('money.edit_costs')) {
+            unset($data['purchase_price'], $data['total_value']);
+        }
+        if (!$user?->can('vehicles.status')) {
+            unset($data['status']);
+        }
+        if (!$user?->can('vehicles.edit')) {
+            unset($data['assigned_to']);
+        }
 
         if (!$shipment && empty($data['status'])) {
             $data['status'] = Shipment::STATUS_ADDED;

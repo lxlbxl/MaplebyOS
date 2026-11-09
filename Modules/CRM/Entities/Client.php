@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Client extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, \App\Models\Concerns\HidesRestrictedFields;
+
+    protected static function restrictedFields(): array
+    {
+        return ['customers.view' => \App\Support\Access::CLIENT_CONTACT_FIELDS];
+    }
 
     protected $fillable = [
         'type',

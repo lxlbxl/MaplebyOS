@@ -18,8 +18,9 @@ class ContainerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Container::with(['shippingLine:id,name,tracking_url', 'shipments:id,container_id,tracking_id,vehicle_year,vehicle_make,vehicle_model,vin,status,container_slot'])
-            ->withCount('shipments');
+        // Car containers only; clearing jobs list their own containers.
+        $query = Container::forVehicles()->with(['shippingLine:id,name,tracking_url', 'shipments:id,container_id,tracking_id,vehicle_year,vehicle_make,vehicle_model,vin,status,container_slot,cargo_type,cargo_description,title'])
+            ->withCount(['shipments' => fn ($q) => $q->vehicles()]);
 
         if ($request->filled('search')) {
             $search = strtoupper(preg_replace('/\W/', '', $request->input('search')));
@@ -57,9 +58,9 @@ class ContainerController extends Controller
             'shippingLines' => ShippingLine::orderBy('name')->get(['id', 'name', 'container_prefixes']),
             'filters' => $request->only(['search', 'shipping_line_id', 'include_released']),
             'summary' => [
-                'in_transit' => Container::whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])->count(),
-                'arrived' => Container::whereIn('status', [Container::STATUS_ARRIVED, Container::STATUS_OFFLOADED])->count(),
-                'cars_in_transit' => Shipment::whereIn('status', [Shipment::STATUS_LOADED, Shipment::STATUS_SAILED, Shipment::STATUS_ARRIVED])->count(),
+                'in_transit' => Container::forVehicles()->whereIn('status', [Container::STATUS_LOADED, Container::STATUS_SAILED])->count(),
+                'arrived' => Container::forVehicles()->whereIn('status', [Container::STATUS_ARRIVED, Container::STATUS_OFFLOADED])->count(),
+                'cars_in_transit' => Shipment::vehicles()->whereIn('status', [Shipment::STATUS_LOADED, Shipment::STATUS_SAILED, Shipment::STATUS_ARRIVED])->count(),
                 'transit_by_line' => $transitByLine,
             ],
         ]);
@@ -67,19 +68,26 @@ class ContainerController extends Controller
 
     public function show(Container $container)
     {
+        if ($container->carriesGeneralCargo()) {
+            return redirect()->route('operations.clearing.show', $container->cargo_shipment_id);
+        }
+
         $container->load(['shippingLine', 'shipments.client:id,company_name,contact_person', 'milestones.user:id,name']);
 
         return Inertia::render('Operations/Containers/Show', [
             'container' => $container,
             'statuses' => Container::getStatuses(),
             'shippingLines' => ShippingLine::orderBy('name')->get(['id', 'name', 'container_prefixes']),
-            'freightShare' => $container->freightSharePerVehicle(),
+            'freightShare' => request()->user()?->can('money.view') ? $container->freightSharePerVehicle() : null,
             'transitDays' => $container->transitDays(),
             'trackingUrl' => $container->shippingLine?->trackingUrlFor($container->container_number),
-            'unassigned' => Shipment::whereNull('container_id')
+            'documents' => DocumentController::panel($container, request()->user()),
+            'clearing' => app(\Modules\Operations\Services\ClearingLedger::class)->panel($container, request()->user()),
+            'deposits' => DepositController::panelFor([$container->id], request()->user()),
+            'unassigned' => Shipment::whereNull('container_id')->whereIn('cargo_type', [Shipment::CARGO_VEHICLE, Shipment::CARGO_BOX])
                 ->whereNotIn('status', [Shipment::STATUS_DELIVERED, Shipment::STATUS_CLEARED])
                 ->orderByDesc('date_added')->limit(200)
-                ->get(['id', 'tracking_id', 'vin', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'status']),
+                ->get(['id', 'tracking_id', 'vin', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'status', 'cargo_type', 'cargo_description', 'title']),
         ]);
     }
 
@@ -164,7 +172,28 @@ class ContainerController extends Controller
      */
     public function assign(Container $container, Collection $shipments): void
     {
+        if ($container->carriesGeneralCargo()) {
+            throw ValidationException::withMessages([
+                'shipment_ids' => "Container {$container->container_number} belongs to a clearing job and cannot take cars or boxes.",
+            ]);
+        }
+        if ($shipments->contains(fn ($s) => $s->isGeneralCargo())) {
+            throw ValidationException::withMessages([
+                'shipment_ids' => 'Clearing jobs are not loaded into car containers. Add the container on the clearing job instead.',
+            ]);
+        }
+
         $shipments = $shipments->reject(fn ($s) => $s->container_id === $container->id);
+
+        // Boxes ride alongside the cars and take no slot.
+        foreach ($shipments->filter(fn ($s) => $s->isBox()) as $box) {
+            $box->update(['container_id' => $container->id, 'container_slot' => null]);
+            if (isset(Container::CASCADE[$container->status])) {
+                $box->transitionTo(Container::CASCADE[$container->status][1], $container->{Container::CASCADE[$container->status][0]}, "Added to container {$container->container_number}", $container->id);
+            }
+        }
+        $shipments = $shipments->reject(fn ($s) => $s->isBox());
+
         $free = $container->freeSlots();
         if ($shipments->count() > $free) {
             throw ValidationException::withMessages([
@@ -172,7 +201,7 @@ class ContainerController extends Controller
             ]);
         }
 
-        $used = $container->shipments()->pluck('container_slot')->filter()->all();
+        $used = $container->vehicles()->pluck('container_slot')->filter()->all();
         $slot = 1;
         foreach ($shipments as $shipment) {
             while (in_array($slot, $used, true)) {
@@ -230,6 +259,9 @@ class ContainerController extends Controller
             : ShippingLine::guessFromContainerNumber($data['container_number'])?->id;
         unset($data['shipping_line']);
         $data['capacity'] ??= 4;
+        if (!$request->user()?->can('money.edit_costs')) {
+            unset($data['freight_cost'], $data['freight_currency']);
+        }
 
         if ($container) {
             return array_filter($data, fn ($v, $k) => $request->has($k === 'shipping_line_id' ? 'shipping_line' : $k), ARRAY_FILTER_USE_BOTH);

@@ -6,9 +6,13 @@ import MobileNav from '@/Components/App/MobileNav';
 import { Toaster } from "@/Components/ui/sonner";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from 'framer-motion';
+import { enableStaffApp } from '@/lib/pwa';
 
 export default function AppLayout({ children }) {
     const { flash, auth } = usePage().props;
+
+    // Only signed-in staff get the installable app (manifest + service worker).
+    useEffect(() => { enableStaffApp(); }, []);
 
     useEffect(() => {
         if (flash?.success) toast.success(flash.success);

@@ -30,7 +30,7 @@ function Billable({ group, currency }) {
                     <label key={c.id} className="flex items-center gap-2 py-1.5 cursor-pointer">
                         <input type="checkbox" className="accent-sage" checked={picked.includes(c.id)} onChange={() => setPicked((p) => (p.includes(c.id) ? p.filter((x) => x !== c.id) : [...p, c.id]))} />
                         <span className="font-mono text-xs w-28">{c.shipment.tracking_id}</span>
-                        <span className="flex-1 text-stone">{[c.shipment.vehicle_year, c.shipment.vehicle_make, c.shipment.vehicle_model].filter(Boolean).join(' ')} · {c.category}{c.description ? ` (${c.description})` : ''}</span>
+                        <span className="flex-1 text-stone">{c.shipment.vehicle_label} · {c.category}{c.description ? ` (${c.description})` : ''}</span>
                         <span>{formatMoney(c.amount, c.currency || currency)}</span>
                     </label>
                 ))}

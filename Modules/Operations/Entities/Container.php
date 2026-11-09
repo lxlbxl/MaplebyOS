@@ -10,18 +10,24 @@ use Illuminate\Support\Facades\DB;
 use Modules\Operations\Services\ContainerNumber;
 
 /**
- * A container (usually a 40ft holding 4 cars). Status changes cascade to
- * every vehicle inside it.
+ * A container. Either a car container (usually a 40ft holding 4 cars, whose
+ * status changes cascade to every vehicle inside it) or a box of a client's
+ * general cargo on a clearing job (cargo_shipment_id set).
  */
 class Container extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, \App\Models\Concerns\HidesRestrictedFields;
+
+    protected static function restrictedFields(): array
+    {
+        return ['money.view' => \App\Support\Access::CONTAINER_MONEY_FIELDS];
+    }
 
     protected $fillable = [
         'container_number', 'size_type', 'seal_number', 'shipping_line_id', 'booking_number', 'bl_number',
         'vessel', 'voyage', 'port_of_loading', 'port_of_discharge', 'status', 'capacity', 'loaded_on', 'etd',
         'sailed_on', 'eta', 'arrived_on', 'offloaded_on', 'released_on', 'freight_cost', 'freight_currency',
-        'notes', 'created_by',
+        'notes', 'created_by', 'cargo_shipment_id', 'empty_returned_on',
     ];
 
     protected $casts = [
@@ -32,6 +38,7 @@ class Container extends Model
         'arrived_on' => 'date:Y-m-d',
         'offloaded_on' => 'date:Y-m-d',
         'released_on' => 'date:Y-m-d',
+        'empty_returned_on' => 'date:Y-m-d',
         'freight_cost' => 'decimal:2',
         'capacity' => 'integer',
     ];
@@ -74,6 +81,12 @@ class Container extends Model
                 $container->shipping_line_id = $line->id;
             }
         });
+        // A returned empty is what makes a deposit refund claimable.
+        static::saved(function (Container $container) {
+            if ($container->wasChanged('empty_returned_on')) {
+                DepositRefund::syncForContainers([$container->id]);
+            }
+        });
     }
 
     public function getStatusLabelAttribute(): string
@@ -91,9 +104,10 @@ class Container extends Model
         return $this->status !== self::STATUS_RELEASED;
     }
 
+    /** Car slots left. Boxes ride alongside the cars and take no slot. */
     public function freeSlots(): int
     {
-        return max(0, $this->capacity - $this->shipments()->count());
+        return max(0, $this->capacity - $this->vehicles()->count());
     }
 
     /**
@@ -118,6 +132,11 @@ class Container extends Model
                 'user_id' => auth()->id(),
             ]);
 
+            app(\Modules\Operations\Services\ClearingLedger::class)->record(
+                \Modules\Operations\Services\ClearingLedger::clearableFor($this), 'status',
+                "Container {$this->container_number}: {$this->status_label}" . ($note ? " ({$note})" : ''), null, null, $date
+            );
+
             if (isset(self::CASCADE[$status])) {
                 foreach ($this->shipments as $shipment) {
                     $shipment->transitionTo(self::CASCADE[$status][1], $date, $note ?? "Container {$this->container_number}", $this->id);
@@ -128,7 +147,7 @@ class Container extends Model
 
     public function freightSharePerVehicle(): ?float
     {
-        $count = $this->shipments()->count();
+        $count = $this->vehicles()->count();
 
         return ($this->freight_cost && $count) ? round((float) $this->freight_cost / $count, 2) : null;
     }
@@ -151,9 +170,46 @@ class Container extends Model
         return $this->hasMany(Shipment::class)->orderBy('container_slot')->orderBy('id');
     }
 
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable')->latest();
+    }
+
+    /** Cars in the container (shipments() also includes any boxes riding along). */
+    public function vehicles()
+    {
+        return $this->shipments()->where('cargo_type', Shipment::CARGO_VEHICLE);
+    }
+
+    public function boxes()
+    {
+        return $this->shipments()->where('cargo_type', Shipment::CARGO_BOX);
+    }
+
     public function milestones()
     {
         return $this->hasMany(ShipmentMilestone::class)->whereNull('shipment_id')->orderByDesc('occurred_on');
+    }
+
+    /** The clearing job whose general cargo this container carries (null for car containers). */
+    public function cargoShipment()
+    {
+        return $this->belongsTo(Shipment::class, 'cargo_shipment_id');
+    }
+
+    public function carriesGeneralCargo(): bool
+    {
+        return $this->cargo_shipment_id !== null;
+    }
+
+    public function scopeForVehicles($query)
+    {
+        return $query->whereNull('cargo_shipment_id');
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(ContainerDeposit::class);
     }
 
     public function creator()

@@ -5,7 +5,7 @@ import { Input } from "@/Components/ui/input";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { ArrowLeft, Printer } from 'lucide-react';
-import { formatDate, todayIso } from '@/lib/operations';
+import { formatDate, todayIso, shipmentHref } from '@/lib/operations';
 import { formatMoney, cn } from '@/lib/utils';
 
 export default function Show({ invoice, statuses }) {
@@ -48,14 +48,14 @@ export default function Show({ invoice, statuses }) {
                             {invoice.client?.phone && <p>{invoice.client.phone}</p>}
                         </div>
                         <table className="w-full text-sm">
-                            <thead><tr className="border-b border-linen text-left text-pebble"><th className="py-2">Vehicle</th><th>Description</th><th className="text-right">Amount</th></tr></thead>
+                            <thead><tr className="border-b border-linen text-left text-pebble"><th className="py-2">Item</th><th>Description</th><th className="text-right">Amount</th></tr></thead>
                             <tbody>
                                 {invoice.charges.map((c) => (
                                     <tr key={c.id} className="border-b border-linen">
                                         <td className="py-2">
-                                            <Link href={route('operations.shipments.show', c.shipment.id)} className="font-mono text-xs text-sage print:text-charcoal">{c.shipment.tracking_id}</Link>
-                                            <div>{[c.shipment.vehicle_year, c.shipment.vehicle_make, c.shipment.vehicle_model].filter(Boolean).join(' ')}</div>
-                                            <div className="font-mono text-xs text-stone">{c.shipment.vin}</div>
+                                            <Link href={shipmentHref(c.shipment)} className="font-mono text-xs text-sage print:text-charcoal">{c.shipment.tracking_id}</Link>
+                                            <div>{c.shipment.vehicle_label}</div>
+                                            <div className="font-mono text-xs text-stone">{c.shipment.vin || (c.shipment.bl_number ? `BL ${c.shipment.bl_number}` : '')}</div>
                                         </td>
                                         <td>{c.category}{c.description ? ` · ${c.description}` : ''}</td>
                                         <td className="text-right">{formatMoney(c.amount, invoice.currency)}</td>

@@ -4,6 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import ContainerForm from '@/Components/Operations/ContainerForm';
+import { useCan } from '@/lib/access';
 import { Plus, Search, Ship, Anchor, Car, ExternalLink, Timer } from 'lucide-react';
 import { CONTAINER_STATUS_COLORS, formatDate } from '@/lib/operations';
 import StatCard from '@/Components/StatCard';
@@ -17,7 +18,9 @@ function daysUntil(date) {
 
 function ContainerCard({ c }) {
     const eta = daysUntil(c.eta);
-    const slots = Array.from({ length: Math.max(c.capacity, c.shipments.length) }, (_, i) => c.shipments[i]);
+    const cars = c.shipments.filter((s) => (s.cargo_type || 'vehicle') === 'vehicle');
+    const boxCount = c.shipments.length - cars.length;
+    const slots = Array.from({ length: Math.max(c.capacity, cars.length) }, (_, i) => cars[i]);
     return (
         <Link href={route('operations.containers.show', c.id)} className="block rounded-xl border border-linen bg-white p-3 shadow-sm hover:shadow-md hover:border-sage/40 transition">
             <div className="flex items-start justify-between gap-2">
@@ -34,6 +37,7 @@ function ContainerCard({ c }) {
                     </div>
                 ))}
             </div>
+            {boxCount > 0 && <p className="mt-1 text-[11px] text-amber-700">+ {boxCount} box{boxCount > 1 ? 'es' : ''} of small cargo</p>}
             <div className="mt-2 flex justify-between text-[11px] text-stone">
                 <span>Loaded {formatDate(c.loaded_on)}</span>
                 {c.offloaded_on ? <span>Offloaded {formatDate(c.offloaded_on)}</span>
@@ -44,6 +48,7 @@ function ContainerCard({ c }) {
 }
 
 export default function Index({ containers, statuses, shippingLines, filters, summary }) {
+    const can = useCan();
     const [formOpen, setFormOpen] = useState(false);
     const [search, setSearch] = useState(filters.search || '');
 
@@ -65,7 +70,7 @@ export default function Index({ containers, statuses, shippingLines, filters, su
                         <h1 className="text-display-md text-void">Containers</h1>
                         <p className="text-drift mt-1">Update a container once and every car inside moves with it.</p>
                     </div>
-                    <Button onClick={() => setFormOpen(true)} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> New container</Button>
+                    {can('containers.manage') && <Button onClick={() => setFormOpen(true)} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> New container</Button>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
