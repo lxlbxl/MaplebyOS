@@ -13,6 +13,7 @@ import StatusSelect from '@/Components/StatusSelect';
 import { Plus, Upload, Search, X, ArrowUpDown, Container as ContainerIcon, AlertTriangle } from 'lucide-react';
 import { VEHICLE_STATUS_COLORS, statusOptions, formatDate, todayIso } from '@/lib/operations';
 import { cn } from '@/lib/utils';
+import { useCan } from '@/lib/access';
 
 function useFilters(filters) {
     const apply = (changes) => {
@@ -92,10 +93,12 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
     const [bulkContainer, setBulkContainer] = useState('');
     const apply = useFilters(filters);
     const { flash } = usePage().props;
+    const can = useCan();
+    const canBulk = can('vehicles.bulk');
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        if (params.get('create') === 'true') {
+        if (params.get('create') === 'true' && can('vehicles.create')) {
             setEditing(null);
             setFormOpen(true);
         }
@@ -140,8 +143,8 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
                         <p className="text-drift mt-1">Every car from intake to delivery. {total} in total.</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setImportOpen(true)} className="border-linen"><Upload className="mr-2 h-4 w-4" /> Import sheet</Button>
-                        <Button onClick={() => { setEditing(null); setFormOpen(true); }} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> Add vehicle</Button>
+                        {can('vehicles.import') && <Button variant="outline" onClick={() => setImportOpen(true)} className="border-linen"><Upload className="mr-2 h-4 w-4" /> Import sheet</Button>}
+                        {can('vehicles.create') && <Button onClick={() => { setEditing(null); setFormOpen(true); }} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> Add vehicle</Button>}
                     </div>
                 </div>
 
@@ -187,7 +190,7 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
                     )}
                 </div>
 
-                {selected.length > 0 && (
+                {canBulk && selected.length > 0 && (
                     <div className="sticky top-2 z-20 flex flex-wrap items-center gap-2 bg-void text-white rounded-xl px-4 py-3 shadow-float">
                         <span className="text-sm font-medium mr-2">{selected.length} selected</span>
                         <Select value={bulkStatus} onValueChange={setBulkStatus}>
@@ -218,7 +221,7 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
                         <Table>
                             <TableHeader>
                                 <TableRow className="border-linen bg-cream/50">
-                                    <TableHead className="w-10"><input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-sage" /></TableHead>
+                                    {canBulk && <TableHead className="w-10"><input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-sage" /></TableHead>}
                                     <SortHead column="tracking_id">Tracking ID</SortHead>
                                     <SortHead column="date_added">Added</SortHead>
                                     <SortHead column="vehicle_make">Vehicle</SortHead>
@@ -233,16 +236,16 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
                             <TableBody>
                                 {rows.map((s) => (
                                     <TableRow key={s.id} className={cn('border-linen hover:bg-cream/60', selected.includes(s.id) && 'bg-sage/5')}>
-                                        <TableCell><input type="checkbox" checked={selected.includes(s.id)} onChange={() => toggle(s.id)} className="accent-sage" /></TableCell>
+                                        {canBulk && <TableCell><input type="checkbox" checked={selected.includes(s.id)} onChange={() => toggle(s.id)} className="accent-sage" /></TableCell>}
                                         <TableCell className="whitespace-nowrap">
                                             <Link href={route('operations.shipments.show', s.id)} className="font-mono text-sm text-sage hover:underline">{s.tracking_id}</Link>
                                         </TableCell>
                                         <TableCell className="text-sm text-stone whitespace-nowrap">{formatDate(s.date_added)}</TableCell>
                                         <TableCell className="whitespace-nowrap">
-                                            <button type="button" onClick={() => { setEditing(s); setFormOpen(true); }} className="text-left hover:text-sage">
+                                            <Link href={route('operations.shipments.show', s.id)} className="text-left hover:text-sage">
                                                 <span className="font-medium text-charcoal">{s.vehicle_make} {s.vehicle_model}</span>
                                                 <span className="text-stone ml-1">{s.vehicle_year}</span>
-                                            </button>
+                                            </Link>
                                         </TableCell>
                                         <TableCell>
                                             {s.vin ? <span className="font-mono text-xs text-stone">{s.vin}</span> : <span className="text-xs text-amber-700 inline-flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> missing</span>}
@@ -259,19 +262,19 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
                                         <TableCell className="text-sm text-stone whitespace-nowrap">{formatDate(s.loaded_on)}</TableCell>
                                         <TableCell className="text-sm text-stone whitespace-nowrap">{formatDate(s.offloaded_on)}</TableCell>
                                         <TableCell>
-                                            <StatusSelect
+                                            {can('vehicles.status') ? <StatusSelect
                                                 status={s.status}
                                                 options={statusOptions(statuses)}
                                                 colorMap={VEHICLE_STATUS_COLORS}
                                                 onStatusChange={(status) => router.patch(route('operations.shipments.update-status', s.id), { status }, { preserveScroll: true })}
-                                            />
+                                            /> : <span className={cn('text-xs px-2 py-1 rounded-full font-medium', VEHICLE_STATUS_COLORS[s.status])}>{s.status_label}</span>}
                                         </TableCell>
                                     </TableRow>
                                 ))}
                                 {rows.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={10} className="h-32 text-center text-pebble">
-                                            No vehicles match. <button className="text-sage underline" onClick={() => setImportOpen(true)}>Import the tracking sheet</button> or add one.
+                                            No vehicles match.{can('vehicles.import') && <> <button className="text-sage underline" onClick={() => setImportOpen(true)}>Import the tracking sheet</button> or add one.</>}
                                         </TableCell>
                                     </TableRow>
                                 )}

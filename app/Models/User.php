@@ -19,7 +19,8 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->can('view_admin') || $this->hasRole('Super Admin');
+        // The Filament admin panel bypasses the staff app's per-role screens, so only the CEO gets in.
+        return $this->hasRole(\App\Support\Access::ROLE_CEO) || $this->can('view_admin');
     }
 
     /**
@@ -53,6 +54,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 }

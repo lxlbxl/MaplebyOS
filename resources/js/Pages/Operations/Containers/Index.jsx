@@ -4,6 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import ContainerForm from '@/Components/Operations/ContainerForm';
+import { useCan } from '@/lib/access';
 import { Plus, Search, Ship, Anchor, Car, ExternalLink } from 'lucide-react';
 import { CONTAINER_STATUS_COLORS, formatDate } from '@/lib/operations';
 import { cn } from '@/lib/utils';
@@ -43,6 +44,7 @@ function ContainerCard({ c }) {
 }
 
 export default function Index({ containers, statuses, shippingLines, filters, summary }) {
+    const can = useCan();
     const [formOpen, setFormOpen] = useState(false);
     const [search, setSearch] = useState(filters.search || '');
 
@@ -64,7 +66,7 @@ export default function Index({ containers, statuses, shippingLines, filters, su
                         <h1 className="text-display-md text-void">Containers</h1>
                         <p className="text-drift mt-1">Update a container once and every car inside moves with it.</p>
                     </div>
-                    <Button onClick={() => setFormOpen(true)} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> New container</Button>
+                    {can('containers.manage') && <Button onClick={() => setFormOpen(true)} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> New container</Button>}
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

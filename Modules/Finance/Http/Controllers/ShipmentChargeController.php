@@ -22,14 +22,16 @@ class ShipmentChargeController extends Controller
     public function update(Request $request, ShipmentCharge $charge)
     {
         abort_if($charge->invoice_id && $charge->invoice?->status !== 'draft', 422, 'This line is on a sent invoice and can no longer be edited.');
+        $this->authorizeKind($request, $charge->kind);
         $charge->update($this->validated($request));
         $charge->invoice?->recalculate();
 
         return redirect()->back()->with('success', 'Line updated.');
     }
 
-    public function destroy(ShipmentCharge $charge)
+    public function destroy(Request $request, ShipmentCharge $charge)
     {
+        $this->authorizeKind($request, $charge->kind);
         abort_if($charge->invoice_id && $charge->invoice?->status !== 'draft', 422, 'This line is on a sent invoice and can no longer be removed.');
         $invoice = $charge->invoice;
         $charge->delete();
@@ -38,9 +40,22 @@ class ShipmentChargeController extends Controller
         return redirect()->back()->with('success', 'Line removed.');
     }
 
+    /**
+     * Cost lines (what Mapleby pays) need money.edit_costs; charge lines
+     * (what the customer pays) need finance.manage.
+     */
+    private function authorizeKind(Request $request, ?string $kind): void
+    {
+        $permission = $kind === ShipmentCharge::KIND_COST ? 'money.edit_costs' : 'finance.manage';
+        abort_unless($request->user()?->can($permission), 403, $kind === ShipmentCharge::KIND_COST
+            ? 'Only the CEO can add or change costs.'
+            : 'You cannot add or change customer charges.');
+    }
+
     private function validated(Request $request): array
     {
         $kind = $request->input('kind');
+        $this->authorizeKind($request, $kind);
 
         return $request->validate([
             'kind' => 'required|in:cost,charge',

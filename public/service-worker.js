@@ -1,47 +1,47 @@
-const CACHE_NAME = 'mapleby-v1';
-const urlsToCache = [
-    '/offline',
-    '/images/icons/icon-192x192.png',
-    '/images/icons/icon-512x512.png'
-];
+/*
+ * Mapleby staff app service worker (scope /app/).
+ * - Pages are always fetched live (they contain role-specific, private data and are never cached).
+ * - If the network is down, a page request gets the offline screen.
+ * - Built JS/CSS and icons are cached so the app opens quickly.
+ */
+const VERSION = 'mapleby-staff-v2';
+const SHELL = ['/offline.html', '/images/icons/icon-192.png', '/images/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
+    event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.addAll(urlsToCache);
-            })
+        caches.keys()
+            .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+            .then(() => self.clients.claim())
     );
 });
 
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request)
-            .catch(() => {
-                return caches.match(event.request)
-                    .then((response) => {
-                        if (response) {
-                            return response;
-                        }
-                        // Default offline behavior: if navigation, show offline page (if it existed)
-                        // For now, allow browser default failure or just return nothing
-                        return caches.match('/offline');
-                    });
-            })
-    );
-});
+    const req = event.request;
+    if (req.method !== 'GET') return;
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin) return;
 
-self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
+    // Page loads: network only, offline screen as fallback.
+    if (req.mode === 'navigate') {
+        event.respondWith(fetch(req).catch(() => caches.match('/offline.html')));
+        return;
+    }
+
+    // Static build assets are content-hashed, so cache-first is safe.
+    if (url.pathname.startsWith('/build/') || url.pathname.startsWith('/images/icons/')) {
+        event.respondWith(
+            caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+                if (res.ok) {
+                    const copy = res.clone();
+                    caches.open(VERSION).then((cache) => cache.put(req, copy));
+                }
+                return res;
+            }))
+        );
+    }
+    // Everything else (Inertia JSON, documents, APIs) goes straight to the network.
 });

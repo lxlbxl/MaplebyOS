@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SmartInput from '@/Components/Smart/SmartInput';
 import { containerNumberCheck, guessLine, todayIso } from '@/lib/operations';
 import { AlertTriangle, CheckCircle2, Sparkles } from 'lucide-react';
+import { useCan } from '@/lib/access';
 
 const FIELDS = ['container_number', 'shipping_line', 'size_type', 'seal_number', 'booking_number', 'bl_number', 'vessel', 'voyage',
     'port_of_loading', 'port_of_discharge', 'capacity', 'loaded_on', 'etd', 'eta', 'freight_cost', 'freight_currency', 'notes'];
@@ -24,6 +25,7 @@ function Field({ label, error, children, className }) {
 }
 
 export default function ContainerForm({ open, onOpenChange, container = null, shippingLines = [], shipmentIds = [] }) {
+    const can = useCan();
     const isEdit = !!container;
     const { data, setData, post, put, processing, errors, reset, clearErrors, transform } = useForm({
         container_number: '', shipping_line: '', size_type: '40HC', seal_number: '', booking_number: '', bl_number: '', vessel: '', voyage: '',
@@ -96,7 +98,7 @@ export default function ContainerForm({ open, onOpenChange, container = null, sh
                         <Field label="Loaded on" error={errors.loaded_on}><Input type="date" value={data.loaded_on} onChange={(e) => setData('loaded_on', e.target.value)} className="bg-cream border-linen h-11 [color-scheme:light]" /></Field>
                         <Field label="ETD" error={errors.etd}><Input type="date" value={data.etd} onChange={(e) => setData('etd', e.target.value)} className="bg-cream border-linen h-11 [color-scheme:light]" /></Field>
                         <Field label="ETA Lagos" error={errors.eta}><Input type="date" value={data.eta} onChange={(e) => setData('eta', e.target.value)} className="bg-cream border-linen h-11 [color-scheme:light]" /></Field>
-                        <Field label="Freight cost" error={errors.freight_cost}><Input type="number" step="0.01" value={data.freight_cost} onChange={(e) => setData('freight_cost', e.target.value)} className="bg-cream border-linen h-11" /></Field>
+                        {can('money.edit_costs') && <Field label="Freight cost" error={errors.freight_cost}><Input type="number" step="0.01" value={data.freight_cost} onChange={(e) => setData('freight_cost', e.target.value)} className="bg-cream border-linen h-11" /></Field>}
                     </div>
                     <Field label="Notes" error={errors.notes}><Textarea value={data.notes} onChange={(e) => setData('notes', e.target.value)} className="bg-cream border-linen" /></Field>
                     {errors.shipment_ids && <p className="text-sm text-red-600">{errors.shipment_ids}</p>}

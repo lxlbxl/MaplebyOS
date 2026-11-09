@@ -16,7 +16,12 @@ use Modules\Operations\Services\VinDecoder;
  */
 class Shipment extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, \App\Models\Concerns\HidesRestrictedFields;
+
+    protected static function restrictedFields(): array
+    {
+        return ['money.view' => \App\Support\Access::SHIPMENT_MONEY_FIELDS];
+    }
 
     protected $table = 'shipments';
 
@@ -57,6 +62,7 @@ class Shipment extends Model
         'purchase_date',
         'purchase_price',
         'payment_status',
+        'created_by',
     ];
 
     protected $casts = [
@@ -148,6 +154,27 @@ class Shipment extends Model
         return trim(implode(' ', array_filter([$this->vehicle_year, $this->vehicle_make, $this->vehicle_model])));
     }
 
+    /** Statuses before the car goes into a loaded container. */
+    public const PRE_LOADING_STATUSES = [self::STATUS_ADDED, self::STATUS_PURCHASED, self::STATUS_PICKED_UP, self::STATUS_AT_YARD];
+
+    /**
+     * Whether this user may edit the car: anyone with vehicles.edit, or the
+     * person who added it (vehicles.edit_own) while it has not been loaded.
+     */
+    public function editableBy(?\App\Models\User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        if ($user->can('vehicles.edit')) {
+            return true;
+        }
+
+        return $user->can('vehicles.edit_own')
+            && (int) $this->created_by === (int) $user->id
+            && in_array($this->status, self::PRE_LOADING_STATUSES, true);
+    }
+
     public function getVehicleLabelAttribute(): string
     {
         return $this->buildVehicleLabel() ?: ($this->title ?? '');
@@ -194,6 +221,11 @@ class Shipment extends Model
     public function container()
     {
         return $this->belongsTo(Container::class);
+    }
+
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable')->latest();
     }
 
     public function milestones()

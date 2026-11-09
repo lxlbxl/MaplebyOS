@@ -10,6 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SmartInput from '@/Components/Smart/SmartInput';
 import VinInput from '@/Components/Smart/VinInput';
 import { todayIso } from '@/lib/operations';
+import { useCan } from '@/lib/access';
+
+const DRAFT_KEY = 'mapleby:new-car-draft';
+const readDraft = () => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) { return null; } };
+const writeDraft = (d) => { try { d ? localStorage.setItem(DRAFT_KEY, JSON.stringify(d)) : localStorage.removeItem(DRAFT_KEY); } catch (e) { /* storage blocked */ } };
 
 const EMPTY = {
     vin: '',
@@ -52,6 +57,7 @@ function Field({ label, error, children, className }) {
 
 export default function ShipmentForm({ open, onOpenChange, shipment = null, statuses = {}, users = [] }) {
     const isEdit = !!shipment;
+    const can = useCan();
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({ ...EMPTY, date_added: todayIso() });
 
     useEffect(() => {
@@ -60,9 +66,19 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
             setData(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, shipment[k] == null ? '' : String(shipment[k]).slice(0, k.endsWith('date') || k.startsWith('date') ? 10 : undefined)])));
         } else {
             reset();
-            setData((d) => ({ ...d, date_added: todayIso() }));
+            // Restore an unsaved new car (e.g. the network dropped on the last try).
+            const draft = readDraft();
+            setData((d) => ({ ...d, date_added: todayIso(), ...(draft || {}) }));
         }
     }, [shipment, open]);
+
+    // Keep the new-car form on the phone until it is saved.
+    useEffect(() => {
+        if (!isEdit && open) {
+            const filled = Object.entries(data).some(([k, v]) => v && !['date_added', 'destination_city', 'status'].includes(k));
+            writeDraft(filled ? data : null);
+        }
+    }, [data, isEdit, open]);
 
     const onDecoded = async ({ year, make, model }) => {
         const updates = {};
@@ -79,7 +95,10 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
 
     const submit = (e) => {
         e.preventDefault();
-        const options = { preserveScroll: true, onSuccess: () => onOpenChange(false) };
+        const options = {
+            preserveScroll: true,
+            onSuccess: () => { if (!isEdit) writeDraft(null); onOpenChange(false); },
+        };
         isEdit ? put(route('operations.shipments.update', shipment.id), options) : post(route('operations.shipments.store'), options);
     };
 
@@ -126,14 +145,14 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
 
                     <Field label="Customer">
                         <SmartInput type="customers" value={data.client_id} displayValue={customerLabel}
-                            onChange={(v) => setData('client_id', v || '')} error={errors.client_id} placeholder="Search name, company or phone" />
+                            onChange={(v) => setData('client_id', v || '')} error={errors.client_id} placeholder={can('customers.view') ? 'Search name, company or phone' : 'Search customer name'} />
                     </Field>
 
                     <div className="grid grid-cols-2 gap-3">
                         <Field label="Date added" error={errors.date_added}>
                             <Input type="date" value={data.date_added} onChange={(e) => setData('date_added', e.target.value)} className="bg-cream border-linen h-11 rounded-lg [color-scheme:light]" />
                         </Field>
-                        <Field label="Status" error={errors.status}>
+                        {can('vehicles.status') && <Field label="Status" error={errors.status}>
                             <Select value={data.status} onValueChange={(v) => setData('status', v)}>
                                 <SelectTrigger className="bg-cream border-linen h-11 rounded-lg"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-white border-linen shadow-float rounded-xl">
@@ -142,7 +161,7 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
                                     ))}
                                 </SelectContent>
                             </Select>
-                        </Field>
+                        </Field>}
                     </div>
 
                     <Field label="Destination">
@@ -161,13 +180,13 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
                             <Field label="Purchase date" error={errors.purchase_date}>
                                 <Input type="date" value={data.purchase_date} onChange={(e) => setData('purchase_date', e.target.value)} className="bg-cream border-linen h-11 rounded-lg [color-scheme:light]" />
                             </Field>
-                            <Field label="Purchase price" error={errors.purchase_price}>
+                            {can('money.edit_costs') && <Field label="Purchase price" error={errors.purchase_price}>
                                 <Input type="number" step="0.01" value={data.purchase_price} onChange={(e) => setData('purchase_price', e.target.value)} className="bg-cream border-linen h-11 rounded-lg" />
-                            </Field>
+                            </Field>}
                         </div>
                     </div>
 
-                    <Field label="Assigned to" error={errors.assigned_to}>
+                    {can('vehicles.edit') && <Field label="Assigned to" error={errors.assigned_to}>
                         <Select value={data.assigned_to || 'none'} onValueChange={(v) => setData('assigned_to', v === 'none' ? '' : v)}>
                             <SelectTrigger className="bg-cream border-linen h-11 rounded-lg"><SelectValue placeholder="Nobody" /></SelectTrigger>
                             <SelectContent className="bg-white border-linen shadow-float rounded-xl">
@@ -175,7 +194,7 @@ export default function ShipmentForm({ open, onOpenChange, shipment = null, stat
                                 {users.map((u) => <SelectItem key={u.id} value={String(u.id)} className="focus:bg-cream cursor-pointer">{u.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                    </Field>
+                    </Field>}
 
                     <Field label="Notes" error={errors.description}>
                         <Textarea value={data.description} onChange={(e) => setData('description', e.target.value)} className="bg-cream border-linen min-h-[80px] rounded-lg" />

@@ -29,7 +29,7 @@ class FinanceAndTrackingTest extends TestCase
 
     public function test_charges_invoice_and_payments_flow(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->staff());
         $client = Client::create(['contact_person' => 'Ada Obi']);
         $car = $this->carFor($client);
 
@@ -70,7 +70,7 @@ class FinanceAndTrackingTest extends TestCase
 
     public function test_voiding_an_invoice_frees_its_charges(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->staff());
         $client = Client::create(['contact_person' => 'Ada Obi']);
         $car = $this->carFor($client);
         $charge = $car->charges()->create(['kind' => 'charge', 'category' => ShipmentCharge::CATEGORIES['charge'][0], 'amount' => 100]);

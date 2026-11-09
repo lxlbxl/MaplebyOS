@@ -68,7 +68,7 @@ class TrackingSheetImportTest extends TestCase
 
     public function test_upload_endpoint_previews_then_imports(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->staff());
         $file = fn () => UploadedFile::fake()->createWithContent('sheet.csv', file_get_contents($this->fixture));
 
         $this->post(route('operations.shipments.import'), ['file' => $file()])

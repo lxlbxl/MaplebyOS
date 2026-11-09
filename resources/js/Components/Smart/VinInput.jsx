@@ -3,7 +3,8 @@ import axios from 'axios';
 import { Link } from '@inertiajs/react';
 import { Input } from '@/Components/ui/input';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, CheckCircle2, Loader2, Wand2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2, Wand2, ScanLine } from 'lucide-react';
+import VinScanner from '@/Components/Smart/VinScanner';
 
 /**
  * VIN field with live checks: 17 characters, no I/O/Q, check digit, duplicate
@@ -12,6 +13,7 @@ import { AlertTriangle, CheckCircle2, Loader2, Wand2 } from 'lucide-react';
 export default function VinInput({ value, onChange, onDecoded, ignoreId, error }) {
     const [check, setCheck] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [scanning, setScanning] = useState(false);
     const lastDecoded = useRef(null);
 
     const clean = (v) => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -61,7 +63,8 @@ export default function VinInput({ value, onChange, onDecoded, ignoreId, error }
 
     return (
         <div className="space-y-1">
-            <div className="relative">
+            <div className="relative flex gap-2">
+                <div className="relative flex-1">
                 <Input
                     value={value || ''}
                     onChange={(e) => onChange(clean(e.target.value).slice(0, 18))}
@@ -72,7 +75,13 @@ export default function VinInput({ value, onChange, onDecoded, ignoreId, error }
                 <span className={cn('absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono', vin.length === 17 ? 'text-sage' : 'text-pebble')}>
                     {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : `${vin.length}/17`}
                 </span>
+                </div>
+                <button type="button" onClick={() => setScanning(true)} title="Scan VIN barcode with the camera"
+                    className="h-11 w-11 shrink-0 rounded-lg border border-linen bg-cream flex items-center justify-center text-sage hover:bg-sage-soft">
+                    <ScanLine className="h-5 w-5" />
+                </button>
             </div>
+            <VinScanner open={scanning} onOpenChange={setScanning} onVin={(v) => onChange(v)} />
 
             {check?.existing && (
                 <p className="text-xs text-red-600 flex items-center gap-1">
