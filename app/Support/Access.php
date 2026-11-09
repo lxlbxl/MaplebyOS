@@ -55,6 +55,14 @@ final class Access
         'containers.view' => 'See containers',
         'containers.manage' => 'Create containers, assign cars, move stages',
         'documents.upload' => 'Scan or upload documents on cars and containers',
+        // Container deposits paid to shipping lines, and their refunds
+        'deposits.view' => 'See container deposits and refunds',
+        'deposits.manage' => 'Record deposits, follow up and update refunds',
+        'deposits.oversee' => 'Confirm refunds, write off, change who follows up',
+        // Clearing officers
+        'clearing.view' => 'See clearing officers and who handled each clearing',
+        'clearing.manage' => 'Add clearing officers, assign and reassign them, log their work',
+        'clearing.override' => 'Move credit for clearing work from one officer to another',
         'catalog.manage' => 'Edit the makes/models/lines catalog',
         // Money
         'money.view' => 'See costs, purchase prices and profit',
@@ -78,6 +86,7 @@ final class Access
         self::ROLE_BUSINESS => [
             'vehicles.view', 'vehicles.edit', 'containers.view', 'documents.upload', 'cargo.view',
             'money.view', 'finance.manage',
+            'deposits.view', 'deposits.oversee', 'clearing.view', 'clearing.manage', 'clearing.override',
             'customers.view', 'customers.manage', 'leads.manage', 'quotes.manage', 'inventory.manage',
             'view_reports',
         ],
@@ -85,12 +94,15 @@ final class Access
             'vehicles.view', 'vehicles.create', 'vehicles.edit', 'vehicles.status', 'vehicles.bulk',
             'containers.view', 'containers.manage', 'documents.upload',
             'cargo.view', 'cargo.manage', 'cargo.status',
+            'clearing.view', 'clearing.manage',
         ],
         self::ROLE_PUNCHER => [
             'vehicles.view', 'vehicles.create', 'vehicles.edit_own', 'containers.view', 'documents.upload', 'cargo.view',
+            'deposits.view', 'deposits.manage', 'clearing.view',
         ],
         self::ROLE_LEGACY_STAFF => [
             'vehicles.view', 'vehicles.create', 'vehicles.edit_own', 'containers.view', 'documents.upload', 'cargo.view',
+            'deposits.view', 'deposits.manage', 'clearing.view',
         ],
     ];
 

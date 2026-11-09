@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import DocumentsPanel from '@/Components/Operations/DocumentsPanel';
+import ClearingOfficerPanel from '@/Components/Operations/ClearingOfficerPanel';
+import DepositsPanel from '@/Components/Operations/DepositsPanel';
 import { CargoForm, ChargesCard, HistoryCard, Pipeline, Row, StatusChanger, clientName } from '@/Components/Operations/CargoParts';
 import { ArrowLeft, Pencil, Package, Container as ContainerIcon, ExternalLink, Trash2, FileText } from 'lucide-react';
 import { CLEARING_STATUS_COLORS, CONTAINER_STATUS_COLORS, formatDate } from '@/lib/operations';
@@ -25,7 +27,7 @@ function AddContainers({ jobId }) {
     );
 }
 
-export default function Show({ job, statuses, money, chargeCategories, documents, formOptions }) {
+export default function Show({ job, statuses, money, chargeCategories, documents, clearing, deposits, formOptions }) {
     const can = useCan();
     const [formOpen, setFormOpen] = useState(false);
     const containers = job.cargo_containers || [];
@@ -120,6 +122,8 @@ export default function Show({ job, statuses, money, chargeCategories, documents
                     </div>
 
                     <div className="space-y-6">
+                        <ClearingOfficerPanel panel={clearing} />
+                        <DepositsPanel panel={deposits} />
                         {money && <ChargesCard shipmentId={job.id} lines={job.charges} totals={money} categories={chargeCategories} defaultCurrency="NGN" />}
                         <HistoryCard milestones={job.milestones} statuses={statuses} />
                         {job.description && <Card className="bg-white border-linen shadow-sm"><CardContent className="p-5 text-sm whitespace-pre-line">{job.description}</CardContent></Card>}

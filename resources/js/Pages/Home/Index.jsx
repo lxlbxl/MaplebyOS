@@ -11,8 +11,9 @@ import { VEHICLE_STATUS_COLORS, CONTAINER_STATUS_COLORS, formatDate } from '@/li
 import { formatMoney, cn } from '@/lib/utils';
 import {
     Search, ScanLine, PlusCircle, AlertTriangle, Info, Ship, Car, Container as ContainerIcon,
-    Receipt, Sparkles, FileText, ChevronRight, Wrench, CalendarClock, FileWarning,
+    Receipt, Sparkles, FileText, ChevronRight, Wrench, CalendarClock, FileWarning, Landmark,
 } from 'lucide-react';
+import { money } from '@/lib/deposits';
 
 // ---- small building blocks ------------------------------------------------
 
@@ -333,6 +334,36 @@ function PuncherHome({ data }) {
     );
 }
 
+function DepositsSection({ deposits }) {
+    if (!deposits) return null;
+    const c = deposits.summary.counts;
+    const totals = Object.entries(deposits.summary.byCurrency);
+    if (!c.open && !deposits.due.length) return null;
+    return (
+        <Section title={deposits.oversees ? 'Container deposits' : 'Deposit refunds to chase'} icon={Landmark} action={<SeeAll href={route('operations.deposits.index', { view: 'follow_up' })} />}>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 border-b border-linen">
+                {totals.map(([cur, t]) => <Stat key={cur} label={`Still to come back (${cur})`} value={money(t.outstanding, cur)} hint={`${t.deposits} deposit${t.deposits === 1 ? '' : 's'}`} />)}
+                <Stat label="Follow-up due" value={c.follow_up} tone={c.follow_up ? 'bad' : 'default'} />
+                <Stat label="Claim not filed" value={c.to_claim} tone={c.to_claim ? 'bad' : 'default'} />
+                {deposits.oversees && <Stat label="Refunded, to confirm" value={c.to_confirm} />}
+            </div>
+            <div className="divide-y divide-linen">
+                {deposits.due.map((d) => (
+                    <Link key={d.deposit_id} href={route('operations.deposits.show', d.deposit_id)} className="flex items-center gap-3 px-4 py-3 hover:bg-cream/60">
+                        <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-void font-mono">{d.container_number}</p>
+                            <p className="text-xs text-pebble">{d.line || 'Line not set'} · {d.status_label}</p>
+                        </div>
+                        <span className="text-xs text-red-600 whitespace-nowrap">{d.outstanding > 0 ? money(d.outstanding, d.currency) : ''} · due {formatDate(d.next_follow_up_on)}</span>
+                        <ChevronRight className="h-4 w-4 text-pebble" />
+                    </Link>
+                ))}
+                {deposits.due.length === 0 && <Empty>No refunds to chase today.</Empty>}
+            </div>
+        </Section>
+    );
+}
+
 const HOMES = { ceo: CeoHome, business: BusinessHome, logistics: LogisticsHome, puncher: PuncherHome };
 
 export default function Index({ home, greeting, roleLabel, data }) {
@@ -351,6 +382,7 @@ export default function Index({ home, greeting, roleLabel, data }) {
                 <InstallAppButton variant="banner" />
                 <QuickFind />
                 <Home data={data} currency={currency} />
+                <DepositsSection deposits={data.deposits} />
             </div>
         </AppLayout>
     );

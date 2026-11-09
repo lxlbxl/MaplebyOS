@@ -81,6 +81,12 @@ class Container extends Model
                 $container->shipping_line_id = $line->id;
             }
         });
+        // A returned empty is what makes a deposit refund claimable.
+        static::saved(function (Container $container) {
+            if ($container->wasChanged('empty_returned_on')) {
+                DepositRefund::syncForContainers([$container->id]);
+            }
+        });
     }
 
     public function getStatusLabelAttribute(): string
@@ -125,6 +131,11 @@ class Container extends Model
                 'note' => $note,
                 'user_id' => auth()->id(),
             ]);
+
+            app(\Modules\Operations\Services\ClearingLedger::class)->record(
+                \Modules\Operations\Services\ClearingLedger::clearableFor($this), 'status',
+                "Container {$this->container_number}: {$this->status_label}" . ($note ? " ({$note})" : ''), null, null, $date
+            );
 
             if (isset(self::CASCADE[$status])) {
                 foreach ($this->shipments as $shipment) {
@@ -194,6 +205,11 @@ class Container extends Model
     public function scopeForVehicles($query)
     {
         return $query->whereNull('cargo_shipment_id');
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(ContainerDeposit::class);
     }
 
     public function creator()

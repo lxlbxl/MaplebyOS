@@ -35,6 +35,9 @@ final class DocumentCatalog
         'freight_invoice' => ['Freight invoice', Container::STATUS_SAILED, true, false],
         'arrival_notice' => ['Arrival notice', Container::STATUS_ARRIVED, false, true],
         'release_order' => ['Release / delivery order', Container::STATUS_RELEASED, false, false],
+        'deposit_receipt' => ['Container deposit receipt', Container::STATUS_RELEASED, false, false],
+        'empty_return' => ['Empty container return receipt', null, false, false],
+        'refund_receipt' => ['Deposit refund advice / receipt', null, false, false],
         'other' => ['Other document', null, false, false],
     ];
 
@@ -54,6 +57,8 @@ final class DocumentCatalog
         'delivery_order' => ['Shipping line delivery order', 'released', false, true],
         'waybill_pod' => ['Waybill / proof of delivery', 'delivered', false, true],
         'empty_return' => ['Empty container return receipt', 'empty_returned', false, true],
+        'deposit_receipt' => ['Container deposit receipt', 'released', false, false],
+        'refund_receipt' => ['Deposit refund advice / receipt', null, false, false],
         'other' => ['Other document', null, false, false],
     ];
 

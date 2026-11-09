@@ -70,6 +70,10 @@ class DocumentController extends Controller
         }
 
         $count = count($validated['files']);
+        app(\Modules\Operations\Services\ClearingLedger::class)->record(
+            $owner instanceof Container || ($owner instanceof Shipment && $owner->isGeneralCargo()) ? \Modules\Operations\Services\ClearingLedger::clearableFor($owner) : null,
+            'document', $label . ($count > 1 ? " ({$count} pages)" : '') . ' filed', null, $request->user()
+        );
 
         return redirect()->back()->with('success', $count === 1 ? "{$label} saved." : "{$count} pages of {$label} saved.");
     }

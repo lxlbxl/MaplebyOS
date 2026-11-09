@@ -36,6 +36,17 @@ class DashboardController extends Controller
             default => $this->puncher($user),
         };
 
+        // Container deposit refunds: oversight totals for the CEO and Head of
+        // Business, the chase list for whoever follows them up.
+        if ($user?->can('deposits.view')) {
+            $oversees = $user->can('deposits.oversee');
+            $data['deposits'] = [
+                'summary' => \Modules\Operations\Http\Controllers\DepositController::summary($oversees ? null : $user),
+                'due' => \Modules\Operations\Http\Controllers\DepositController::dueList($oversees ? null : $user),
+                'oversees' => $oversees,
+            ];
+        }
+
         return Inertia::render('Home/Index', [
             'home' => $home,
             'greeting' => $this->greeting(),

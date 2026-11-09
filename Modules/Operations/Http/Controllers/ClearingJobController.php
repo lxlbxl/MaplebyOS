@@ -15,6 +15,7 @@ use Modules\Operations\Entities\Container;
 use Modules\Operations\Entities\Shipment;
 use Modules\Operations\Entities\ShippingLine;
 use Modules\Operations\Services\CanonicalInput;
+use Modules\Operations\Services\ClearingLedger;
 use Modules\Operations\Services\ContainerNumber;
 
 /**
@@ -28,6 +29,15 @@ class ClearingJobController extends Controller
         'APM Terminals Apapa', 'ENL Consortium Apapa', 'Apapa Bulk Terminal', 'Tin Can Island (TICT)',
         'Port & Cargo Terminal Tin Can', 'Five Star Logistics Tin Can', 'Lekki Deep Sea Port', 'Onne Port',
         'Port Harcourt', 'Off-dock terminal',
+    ];
+
+    /** Customs paperwork whose recording counts as clearing work. */
+    public const PAPERWORK_FIELDS = [
+        'form_m_number' => 'Form M',
+        'paar_number' => 'PAAR',
+        'customs_entry_number' => 'SGD',
+        'duty_assessed' => 'duty assessment',
+        'terminal' => 'terminal',
     ];
 
     public const VIEWS = [
@@ -115,6 +125,8 @@ class ClearingJobController extends Controller
             'money' => $seesMoney ? $byCurrency : null,
             'chargeCategories' => ShipmentCharge::CLEARING_CATEGORIES,
             'documents' => DocumentController::panel($job, $user),
+            'clearing' => app(ClearingLedger::class)->panel($job, $user),
+            'deposits' => DepositController::panelFor($job->cargoContainers->pluck('id')->all(), $user),
             'formOptions' => $this->formOptions(),
         ]);
     }
@@ -155,6 +167,10 @@ class ClearingJobController extends Controller
         unset($data['status']);
 
         $job->update($data);
+        $paperwork = collect(self::PAPERWORK_FIELDS)->filter(fn ($label, $field) => $job->wasChanged($field) && filled($job->{$field}));
+        if ($paperwork->isNotEmpty()) {
+            app(ClearingLedger::class)->record($job, 'paperwork', 'Recorded ' . $paperwork->map(fn ($label, $field) => $field === 'duty_assessed' ? $label : "{$label} {$job->{$field}}")->implode(', '), null, $request->user());
+        }
         if ($newStatus !== $job->status) {
             $job->transitionTo($newStatus);
         }
