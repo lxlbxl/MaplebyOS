@@ -1,80 +1,21 @@
 import { Link, usePage } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
-import {
-    LayoutDashboard,
-    Users,
-    Package,
-    FileText,
-    Settings,
-    User,
-    LogOut,
-    DollarSign,
-    Truck,
-    Sparkles,
-    ShieldCheck,
-    Car,
-    Container,
-    BookOpen,
-    Receipt
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const navSections = [
-    {
-        title: 'Overview',
-        items: [
-            { label: 'Dashboard', route: 'dashboard', active: 'dashboard', icon: LayoutDashboard },
-        ]
-    },
-    {
-        title: 'Business',
-        items: [
-            { label: 'Clients', route: 'crm.clients.index', active: 'crm.clients.*', icon: Users },
-            { label: 'Leads', route: 'crm.leads.index', active: 'crm.leads.*', icon: Sparkles },
-        ]
-    },
-    {
-        title: 'Operations',
-        items: [
-            { label: 'Vehicles', route: 'operations.shipments.index', active: 'operations.shipments.*', icon: Car },
-            { label: 'Containers', route: 'operations.containers.index', active: 'operations.containers.*', icon: Container },
-            { label: 'Quotes', route: 'operations.quotes.index', active: 'operations.quotes.*', icon: FileText },
-            { label: 'Inventory', route: 'inventory.vehicles.index', active: 'inventory.*', icon: Package },
-        ]
-    },
-    {
-        title: 'Finance',
-        items: [
-            { label: 'Invoices', route: 'finance.invoices.index', active: 'finance.invoices.*', icon: Receipt },
-            { label: 'Payments', route: 'finance.payments.index', active: 'finance.payments.*', icon: DollarSign },
-        ]
-    },
-    {
-        title: 'System',
-        items: [
-            { label: 'Catalog', route: 'operations.catalog.index', active: 'operations.catalog.*', icon: BookOpen },
-            { label: 'User Management', route: 'users.index', active: 'users.*', icon: ShieldCheck },
-        ]
-    },
-];
-
-const bottomItems = [
-    { label: 'Settings', route: 'settings.index', active: 'settings.*', icon: Settings },
-    { label: 'Profile', route: 'profile.edit', active: 'profile.*', icon: User },
-];
+import { useCan } from '@/lib/access';
+import { NAV_SECTIONS, BOTTOM_ITEMS, allowed, isActivePattern } from '@/lib/nav';
+import InstallAppButton from '@/Components/App/InstallAppButton';
 
 export default function Sidebar() {
     const { url, props } = usePage();
     const currentRoute = props.ziggy?.location || url;
     const user = props.auth?.user;
-
-    const isActive = (pattern) => {
-        if (pattern.endsWith('*')) {
-            const prefix = pattern.slice(0, -1);
-            return currentRoute.includes(prefix.replace(/\./g, '/'));
-        }
-        return currentRoute === route(pattern);
-    };
+    const can = useCan();
+    const isActive = (pattern) => isActivePattern(pattern, currentRoute);
+    const navSections = NAV_SECTIONS
+        .map((section) => ({ ...section, items: section.items.filter((item) => allowed(item, can)) }))
+        .filter((section) => section.items.length > 0);
+    const bottomItems = BOTTOM_ITEMS.filter((item) => allowed(item, can));
 
     return (
         <aside className="sidebar-float scrollbar-thin">
@@ -147,6 +88,7 @@ export default function Sidebar() {
 
             {/* Bottom Section */}
             <div className="border-t border-linen py-3">
+                <div className="px-4 pb-2"><InstallAppButton variant="sidebar" /></div>
                 {bottomItems.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.active);
@@ -179,7 +121,7 @@ export default function Sidebar() {
                                 {user?.name || 'User'}
                             </p>
                             <p className="text-xs text-pebble truncate">
-                                {user?.email || 'email@example.com'}
+                                {props.auth?.role || user?.email}
                             </p>
                         </div>
                         <Link

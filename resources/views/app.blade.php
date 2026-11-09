@@ -9,12 +9,16 @@
     <title inertia>{{ $app_name ?? \Modules\Core\Entities\Setting::get('app_name', config('app.name', 'Laravel')) }}
     </title>
 
-    <link rel="manifest" href="/manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Mapleby">
-    <meta name="theme-color" content="#faf9f6">
+    {{-- The staff app is installable only for signed-in staff; the public website never offers it. --}}
+    @auth
+        <link rel="manifest" href="/manifest.json">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="Mapleby">
+        <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png">
+    @endauth
+    <meta name="theme-color" content="#f2eee3">
 
     @if(isset($favicon))
         <link rel="icon" href="{{ $favicon }}" type="image/x-icon" />

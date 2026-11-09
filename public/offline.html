@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline · Mapleby</title>
+<style>
+  :root { --bg: #f2eee3; --ink: #2d2b26; --muted: #6b675d; --accent: #7d9580; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 16px; box-sizing: border-box; }
+  main { max-width: 360px; text-align: center; }
+  img { width: 72px; height: 72px; border-radius: 16px; }
+  h1 { font-size: 20px; margin: 16px 0 8px; }
+  p { color: var(--muted); margin: 0 0 20px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 20px; font-size: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/images/icons/icon-192.png" alt="">
+  <h1>You're offline</h1>
+  <p>Mapleby needs a connection to load this page. A car you were adding is kept on this phone and will be there when you open the form again.</p>
+  <button onclick="location.reload()">Try again</button>
+</main>
+</body>
+</html>
