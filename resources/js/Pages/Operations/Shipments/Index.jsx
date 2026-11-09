@@ -136,13 +136,13 @@ export default function Index({ shipments, filters, statuses, views, shippingLin
         <AppLayout>
             <Head title="Vehicles" />
 
-            <div className="flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-display-md text-void">Vehicles</h1>
                         <p className="text-drift mt-1">Every car from intake to delivery. {total} in total.</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {can('vehicles.import') && <Button variant="outline" onClick={() => setImportOpen(true)} className="border-linen"><Upload className="mr-2 h-4 w-4" /> Import sheet</Button>}
                         {can('vehicles.create') && <Button onClick={() => { setEditing(null); setFormOpen(true); }} className="btn-sage shadow-soft"><Plus className="mr-2 h-4 w-4" /> Add vehicle</Button>}
                     </div>

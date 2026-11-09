@@ -225,7 +225,7 @@ php artisan db:seed --force
 
 - `migrate` creates every table, including the redesign's catalog, containers, milestones, invoices and charges, and **seeds the catalog** (makes and models with known misspellings, shipping lines with container prefixes, platforms, ports).
 - `db:seed` creates the roles (Super Admin, Staff, User), permissions, default settings and two starter users:
-  `admin@adgod-os.com` and `staff@adgod-os.com`, both with password **`password`**.
+  `admin@maplebyinc.com` and `staff@maplebyinc.com`, both with password **`password`**.
 
 **Immediately** log in to `/admin`, change both passwords (or create real accounts for each staff member and delete the starter ones).
 

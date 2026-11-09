@@ -108,17 +108,18 @@ export default function Index({ users, filters, stats, roles }) {
         <AppLayout>
             <Head title="User Management" />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-serif font-bold tracking-tight text-sage-600">User Management</h1>
-                        <p className="text-sage-400">Manage team members, roles, and permissions.</p>
+                        <h1 className="text-3xl font-serif font-bold tracking-tight text-void">User Management</h1>
+                        <p className="text-drift">Manage team members, roles, and permissions.</p>
                     </div>
                 </div>
 
                 {/* Insights */}
                 <InsightsSection
+                    icon={Users}
                     stats={stats}
                     title="User Status"
                     description="Active vs inactive users"
@@ -126,7 +127,7 @@ export default function Index({ users, filters, stats, roles }) {
                 />
 
                 {/* Tab Navigation */}
-                <div className="flex gap-2 bg-white p-2 rounded-2xl border border-sage-100 shadow-sm">
+                <div className="flex gap-2 bg-white p-2 rounded-2xl border border-linen shadow-sm">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         return (
@@ -138,8 +139,8 @@ export default function Index({ users, filters, stats, roles }) {
                                     setActiveTab(tab.id);
                                 }}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === tab.id
-                                        ? 'bg-sage-600 text-white shadow-lg shadow-sage-600/20'
-                                        : 'text-sage-400 hover:text-sage-600 hover:bg-sage-50'
+                                        ? 'bg-sage text-white shadow-lg shadow-sage/20'
+                                        : 'text-drift hover:text-void hover:bg-cream'
                                     }`}
                             >
                                 <Icon className="w-4 h-4" />
@@ -163,32 +164,32 @@ export default function Index({ users, filters, stats, roles }) {
                         />
 
                         {/* Data Table */}
-                        <Card className="bg-white border-sage-100 shadow-sm overflow-hidden">
+                        <Card className="bg-white border-linen shadow-sm overflow-hidden">
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="border-sage-100 hover:bg-sage-50/50 bg-sage-50/30">
-                                            <TableHead className="text-sage-400 font-medium">User</TableHead>
-                                            <TableHead className="text-sage-400 font-medium">Email</TableHead>
-                                            <TableHead className="text-sage-400 font-medium">Role</TableHead>
-                                            <TableHead className="text-sage-400 font-medium">Status</TableHead>
-                                            <TableHead className="text-right text-sage-400 font-medium">Actions</TableHead>
+                                        <TableRow className="border-linen hover:bg-cream/50 bg-cream/30">
+                                            <TableHead className="text-drift font-medium">User</TableHead>
+                                            <TableHead className="text-drift font-medium">Email</TableHead>
+                                            <TableHead className="text-drift font-medium">Role</TableHead>
+                                            <TableHead className="text-drift font-medium">Status</TableHead>
+                                            <TableHead className="text-right text-drift font-medium">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {users.data.map((user) => (
-                                            <TableRow key={user.id} className="border-sage-100 hover:bg-sage-50 transition-colors">
+                                            <TableRow key={user.id} className="border-linen hover:bg-cream transition-colors">
                                                 <TableCell className="font-medium">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-sage-100 rounded-full flex items-center justify-center text-sage-600 font-semibold">
+                                                        <div className="w-10 h-10 bg-sage-soft rounded-full flex items-center justify-center text-void font-semibold">
                                                             {user.name.charAt(0).toUpperCase()}
                                                         </div>
-                                                        <span className="text-base font-semibold text-sage-600">{user.name}</span>
+                                                        <span className="text-base font-semibold text-void">{user.name}</span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center text-sm text-sage-500">
-                                                        <Mail className="mr-2 h-3 w-3 text-sage-400" />
+                                                    <div className="flex items-center text-sm text-stone">
+                                                        <Mail className="mr-2 h-3 w-3 text-drift" />
                                                         {user.email}
                                                     </div>
                                                 </TableCell>
@@ -207,24 +208,24 @@ export default function Index({ users, filters, stats, roles }) {
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" className="h-8 w-8 p-0 text-sage-400 hover:text-sage-600">
+                                                            <Button variant="ghost" className="h-8 w-8 p-0 text-drift hover:text-void">
                                                                 <span className="sr-only">Open menu</span>
                                                                 <MoreVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="bg-white border-sage-100 text-sage-600 shadow-lg">
+                                                        <DropdownMenuContent align="end" className="bg-white border-linen text-void shadow-lg">
                                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                            <DropdownMenuItem onClick={() => openEdit(user)} className="hover:bg-sage-50 cursor-pointer">
+                                                            <DropdownMenuItem onClick={() => openEdit(user)} className="hover:bg-cream cursor-pointer">
                                                                 <Pencil className="mr-2 h-4 w-4" /> Edit User
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => toggleStatus(user)} className="hover:bg-sage-50 cursor-pointer">
+                                                            <DropdownMenuItem onClick={() => toggleStatus(user)} className="hover:bg-cream cursor-pointer">
                                                                 {user.is_active ? (
                                                                     <><UserX className="mr-2 h-4 w-4" /> Deactivate</>
                                                                 ) : (
                                                                     <><UserCheck className="mr-2 h-4 w-4" /> Activate</>
                                                                 )}
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuSeparator className="bg-sage-100" />
+                                                            <DropdownMenuSeparator className="bg-sage-soft" />
                                                             <DropdownMenuItem onClick={() => confirmDelete(user)} className="text-red-500 hover:bg-red-50 cursor-pointer">
                                                                 <Trash2 className="mr-2 h-4 w-4" /> Delete
                                                             </DropdownMenuItem>
@@ -235,7 +236,7 @@ export default function Index({ users, filters, stats, roles }) {
                                         ))}
                                         {users.data.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={5} className="h-24 text-center text-sage-400">
+                                                <TableCell colSpan={5} className="h-24 text-center text-drift">
                                                     No users found.
                                                 </TableCell>
                                             </TableRow>
@@ -252,15 +253,15 @@ export default function Index({ users, filters, stats, roles }) {
 
                 {activeTab === 'add' && (
                     <div className="max-w-2xl mx-auto w-full animate-in fade-in duration-300">
-                        <Card className="bg-white border-sage-100 shadow-sm overflow-hidden">
-                            <CardHeader className="border-b border-sage-100 bg-sage-50/30">
+                        <Card className="bg-white border-linen shadow-sm overflow-hidden">
+                            <CardHeader className="border-b border-linen bg-cream/30">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-sage-100 text-sage-600">
+                                    <div className="p-2 rounded-xl bg-sage-soft text-void">
                                         <UserPlus className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-sage-700">{editingUser ? 'Edit User' : 'Create New User'}</CardTitle>
-                                        <CardDescription className="text-sage-400">
+                                        <CardTitle className="text-charcoal">{editingUser ? 'Edit User' : 'Create New User'}</CardTitle>
+                                        <CardDescription className="text-drift">
                                             {editingUser ? 'Update user details and permissions.' : 'Add a new team member to the system.'}
                                         </CardDescription>
                                     </div>
@@ -270,25 +271,25 @@ export default function Index({ users, filters, stats, roles }) {
                                 <CardContent className="space-y-6 pt-6">
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label className="text-sage-600 font-medium">Full Name *</Label>
+                                            <Label className="text-void font-medium">Full Name *</Label>
                                             <Input
                                                 value={data.name}
                                                 onChange={e => setData('name', e.target.value)}
                                                 required
-                                                className="border-sage-200 focus:border-sage-400 rounded-xl h-12"
+                                                className="border-linen focus:border-sage rounded-xl h-12"
                                                 placeholder="John Doe"
                                             />
                                             {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-sage-600 font-medium">Email Address *</Label>
+                                            <Label className="text-void font-medium">Email Address *</Label>
                                             <Input
                                                 type="email"
                                                 value={data.email}
                                                 onChange={e => setData('email', e.target.value)}
                                                 required
-                                                className="border-sage-200 focus:border-sage-400 rounded-xl h-12"
+                                                className="border-linen focus:border-sage rounded-xl h-12"
                                                 placeholder="john@example.com"
                                             />
                                             {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
@@ -297,7 +298,7 @@ export default function Index({ users, filters, stats, roles }) {
 
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label className="text-sage-600 font-medium">
+                                            <Label className="text-void font-medium">
                                                 {editingUser ? 'New Password' : 'Password *'}
                                             </Label>
                                             <Input
@@ -305,29 +306,29 @@ export default function Index({ users, filters, stats, roles }) {
                                                 value={data.password}
                                                 onChange={e => setData('password', e.target.value)}
                                                 required={!editingUser}
-                                                className="border-sage-200 focus:border-sage-400 rounded-xl h-12"
+                                                className="border-linen focus:border-sage rounded-xl h-12"
                                                 placeholder={editingUser ? 'Leave blank to keep current' : '••••••••'}
                                             />
                                             {errors.password && <span className="text-red-500 text-sm">{errors.password}</span>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-sage-600 font-medium">Confirm Password</Label>
+                                            <Label className="text-void font-medium">Confirm Password</Label>
                                             <Input
                                                 type="password"
                                                 value={data.password_confirmation}
                                                 onChange={e => setData('password_confirmation', e.target.value)}
                                                 required={!editingUser && data.password}
-                                                className="border-sage-200 focus:border-sage-400 rounded-xl h-12"
+                                                className="border-linen focus:border-sage rounded-xl h-12"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-sage-600 font-medium">Role *</Label>
+                                        <Label className="text-void font-medium">Role *</Label>
                                         <Select value={data.role} onValueChange={val => setData('role', val)}>
-                                            <SelectTrigger className="border-sage-200 rounded-xl h-12">
+                                            <SelectTrigger className="border-linen rounded-xl h-12">
                                                 <SelectValue placeholder="Select a role" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -339,21 +340,21 @@ export default function Index({ users, filters, stats, roles }) {
                                         {errors.role && <span className="text-red-500 text-sm">{errors.role}</span>}
                                     </div>
 
-                                    <div className="flex items-center justify-between border p-4 rounded-xl border-sage-200 bg-sage-50">
+                                    <div className="flex items-center justify-between border p-4 rounded-xl border-linen bg-cream">
                                         <div className="space-y-0.5">
-                                            <Label className="text-sage-700 font-medium">Active Status</Label>
-                                            <div className="text-sm text-sage-400">Allow this user to log in to the system.</div>
+                                            <Label className="text-charcoal font-medium">Active Status</Label>
+                                            <div className="text-sm text-drift">Allow this user to log in to the system.</div>
                                         </div>
                                         <Switch checked={data.is_active} onCheckedChange={val => setData('is_active', val)} />
                                     </div>
                                 </CardContent>
-                                <div className="bg-sage-50/30 border-t border-sage-100 p-6 flex justify-between">
+                                <div className="bg-cream/30 border-t border-linen p-6 flex justify-between">
                                     {editingUser && (
-                                        <Button type="button" variant="outline" onClick={cancelEdit} className="border-sage-200 text-sage-600">
+                                        <Button type="button" variant="outline" onClick={cancelEdit} className="border-linen text-void">
                                             Cancel
                                         </Button>
                                     )}
-                                    <Button type="submit" className="bg-sage-600 hover:bg-sage-700 ml-auto" disabled={processing}>
+                                    <Button type="submit" className="bg-sage hover:bg-maple-deep ml-auto" disabled={processing}>
                                         {editingUser ? 'Update User' : 'Create User'}
                                     </Button>
                                 </div>
@@ -366,7 +367,7 @@ export default function Index({ users, filters, stats, roles }) {
                     <div className="space-y-6 animate-in fade-in duration-300">
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {roles?.map((role) => (
-                                <Card key={role.id} className="bg-white border-sage-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                                <Card key={role.id} className="bg-white border-linen shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-3">
@@ -374,14 +375,14 @@ export default function Index({ users, filters, stats, roles }) {
                                                     <Shield className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-sage-700">{role.name}</h3>
-                                                    <p className="text-sm text-sage-400">{role.description}</p>
+                                                    <h3 className="font-semibold text-charcoal">{role.name}</h3>
+                                                    <p className="text-sm text-drift">{role.description}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="mt-4 pt-4 border-t border-sage-100 flex items-center justify-between">
-                                            <div className="text-sm text-sage-500">
-                                                <span className="font-semibold text-sage-700">{role.users_count}</span> users
+                                        <div className="mt-4 pt-4 border-t border-linen flex items-center justify-between">
+                                            <div className="text-sm text-stone">
+                                                <span className="font-semibold text-charcoal">{role.users_count}</span> users
                                             </div>
                                             <Badge variant="outline" className={roleColors[role.id] || 'bg-gray-100'}>
                                                 {role.users_count === 1 ? 'person' : 'people'}
@@ -392,13 +393,13 @@ export default function Index({ users, filters, stats, roles }) {
                             ))}
                         </div>
 
-                        <Card className="bg-sage-50 border-sage-200">
+                        <Card className="bg-cream border-linen">
                             <CardContent className="p-6">
-                                <div className="flex items-center gap-3 text-sage-600">
+                                <div className="flex items-center gap-3 text-void">
                                     <Shield className="w-5 h-5" />
                                     <div>
                                         <h3 className="font-semibold">Role Permissions</h3>
-                                        <p className="text-sm text-sage-500">
+                                        <p className="text-sm text-stone">
                                             Each person has one role. The CEO / Super Admin sees everything. The other roles only see the screens and data their work needs, and the server enforces it, not just the menus.
                                         </p>
                                     </div>

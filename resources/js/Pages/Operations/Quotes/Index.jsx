@@ -33,7 +33,7 @@ const STATUS_COLORS = {
 export default function Index({ quotes, filters, clients, shipments, vehicles, stats }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingQuote, setEditingQuote] = useState(null);
 
@@ -62,7 +62,7 @@ export default function Index({ quotes, filters, clients, shipments, vehicles, s
         <AppLayout>
             <Head title="Quotes" />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -76,6 +76,7 @@ export default function Index({ quotes, filters, clients, shipments, vehicles, s
 
                 {/* Insights & Filters */}
                 <InsightsSection
+                    icon={FileText}
                     stats={stats}
                     title="Quote Status"
                     description="Distribution of quotes by status"

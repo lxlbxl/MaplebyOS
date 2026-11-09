@@ -18,46 +18,17 @@
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/website/styles.css">
+    @include('website.partials.head')
 </head>
 
 <body class="bg-[#0A0F14] text-white overflow-x-hidden selection:bg-[#D43F3A] selection:text-white font-['Archivo']">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 px-6 py-4 flex justify-between items-center transition-all duration-300" id="navbar">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-[#D43F3A] clip-corner"></div>
-            <a href="index.html" class="font-['Oswald'] text-2xl font-bold tracking-tight text-white">MAPLEBY</a>
-        </div>
-        <div class="hidden md:flex gap-8 items-center font-mono text-xs uppercase tracking-widest text-gray-300">
-            <a href="index.html" class="hover:text-[#D43F3A] transition-colors">Home</a>
-            <a href="services.html" class="hover:text-[#D43F3A] transition-colors">Services</a>
-            <a href="inventory.html" class="hover:text-[#D43F3A] transition-colors">Inventory</a>
-            <a href="process.html" class="hover:text-[#D43F3A] transition-colors">Process</a>
-            <a href="about.html" class="hover:text-[#D43F3A] transition-colors">About</a>
-            <a href="contact.html" class="hover:text-[#D43F3A] transition-colors">Contact</a>
-        </div>
-        <button onclick="toggleModal()" class="hidden md:block btn-primary text-xs">Get Quote</button>
-        <button class="md:hidden text-white" onclick="toggleMobileMenu()"><i data-lucide="menu"
-                class="w-8 h-8"></i></button>
-    </nav>
+    @include('website.partials.nav')
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu"
-        class="fixed inset-0 bg-[#0A0F14] z-40 translate-x-full transition-transform duration-500 flex flex-col justify-center px-8 border-l border-white/10">
-        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6"><i data-lucide="x"
-                class="w-8 h-8"></i></button>
-        <div class="flex flex-col gap-6 font-['Oswald'] text-4xl uppercase">
-            <a href="index.html" class="hover:text-[#D43F3A]">Home</a>
-            <a href="services.html" class="hover:text-[#D43F3A]">Services</a>
-            <a href="inventory.html" class="hover:text-[#D43F3A]">Inventory</a>
-            <a href="process.html" class="hover:text-[#D43F3A]">Process</a>
-            <a href="contact.html" class="hover:text-[#D43F3A]">Contact</a>
-        </div>
-    </div>
 
     <!-- Header -->
-    <header class="pt-40 pb-20 px-6 md:px-20 border-b border-white/10 maple-grid">
+    <header id="main" class="pt-40 pb-20 px-6 md:px-20 border-b border-white/10 maple-grid">
         <div class="max-w-4xl">
             <span class="text-[#D43F3A] font-mono text-sm uppercase tracking-widest mb-4 block reveal-on-scroll">///
                 Field Intel</span>
@@ -73,9 +44,9 @@
         <div class="grid md:grid-cols-3 gap-12">
 
             <!-- Post 1 -->
-            <a href="blog-post-1.html" class="group block reveal-on-scroll">
+            <a href="/blog-post-1.html" class="group block reveal-on-scroll">
                 <div class="aspect-[4/3] overflow-hidden mb-6 border border-white/10 relative">
-                    <img src="https://images.unsplash.com/photo-1533473359331-0135ef1bcfb0?q=80&w=1000&auto=format&fit=crop"
+                    <img src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=1000&auto=format&fit=crop"
                         class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0">
                     <div
                         class="absolute top-4 left-4 bg-[#D43F3A] text-white text-[10px] font-bold uppercase px-3 py-1">
@@ -92,7 +63,7 @@
             </a>
 
             <!-- Post 2 -->
-            <a href="blog-post-2.html" class="group block reveal-on-scroll delay-100">
+            <a href="/blog-post-2.html" class="group block reveal-on-scroll delay-100">
                 <div class="aspect-[4/3] overflow-hidden mb-6 border border-white/10 relative">
                     <img src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=1000&auto=format&fit=crop"
                         class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0">
@@ -111,7 +82,7 @@
             </a>
 
             <!-- Post 3 -->
-            <a href="blog-post-3.html" class="group block reveal-on-scroll delay-200">
+            <a href="/blog-post-3.html" class="group block reveal-on-scroll delay-200">
                 <div class="aspect-[4/3] overflow-hidden mb-6 border border-white/10 relative">
                     <img src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?q=80&w=1000&auto=format&fit=crop"
                         class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0">
@@ -132,18 +103,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-black text-white/50 pt-20 pb-8 px-6 md:px-20 border-t border-white/10">
-        <div
-            class="flex flex-col md:flex-row justify-between items-center text-xs font-mono uppercase border-t border-white/10 pt-8">
-            <span>&copy; 2026 Mapleby Inc. All rights reserved.</span>
-            <div class="flex gap-6 mt-4 md:mt-0">
-                <a href="#" class="hover:text-white">Privacy</a>
-                <a href="#" class="hover:text-white">Terms</a>
-            </div>
-        </div>
-    </footer>
-
+    @include('website.partials.footer')
     <!-- Quote Modal -->
     <div id="quote-modal" class="fixed inset-0 z-[100] hidden">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="toggleModal()"></div>
@@ -167,7 +127,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/website/script.js"></script>
 </body>
 
 </html>

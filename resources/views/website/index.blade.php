@@ -161,6 +161,7 @@
             background: var(--maple-crimson);
         }
     </style>
+    @include('website.partials.head')
 </head>
 
 <body class="selection:bg-[var(--maple-crimson)] selection:text-white">
@@ -179,57 +180,11 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav id="navbar"
-        class="fixed w-full z-[90] px-6 md:px-16 py-10 flex justify-between items-start transition-all duration-700">
-        <div class="flex flex-col">
-            <div class="flex items-center gap-3 mb-1">
-                <div class="w-2 h-2 bg-[var(--maple-crimson)]"></div>
-                <span class="font-heading text-4xl leading-none tracking-tighter font-black">MAPLEBY</span>
-            </div>
-            <span class="font-tech text-[9px] tracking-[0.5em] text-[var(--maple-crimson)] uppercase ml-5">Global
-                Procurement</span>
-        </div>
+    @include('website.partials.nav')
 
-        <div class="hidden lg:flex gap-16 items-center">
-            <div class="flex gap-12 font-tech text-[10px] uppercase tracking-widest text-gray-400">
-                <a href="process.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-                        class="text-[var(--maple-crimson)]">01</span> Logistics</a>
-                <a href="inventory.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-                        class="text-[var(--maple-crimson)]">02</span> Inventory</a>
-                <a href="services.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-                        class="text-[var(--maple-crimson)]">03</span> Clearance</a>
-                <a href="about.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-                        class="text-[var(--maple-crimson)]">04</span> About</a>
-                <a href="contact.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-                        class="text-[var(--maple-crimson)]">05</span> Network</a>
-            </div>
-            <a href="/app/login" class="btn-command text-lg flex items-center justify-center">Staff Login</a>
-        </div>
-
-        <button class="lg:hidden text-white mt-2" onclick="toggleMobileMenu()">
-            <i data-lucide="menu" class="w-8 h-8"></i>
-        </button>
-    </nav>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu"
-        class="fixed inset-0 bg-[#0A0F14] z-[100] translate-x-full transition-transform duration-500 flex flex-col justify-center px-8 border-l border-white/10">
-        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6"><i data-lucide="x"
-                class="w-8 h-8 text-white"></i></button>
-        <div class="flex flex-col gap-8 font-heading text-5xl uppercase text-white">
-            <a href="index.html" class="hover:text-[var(--maple-crimson)] transition-colors">Home</a>
-            <a href="process.html" class="hover:text-[var(--maple-crimson)] transition-colors">01. Logistics</a>
-            <a href="inventory.html" class="hover:text-[var(--maple-crimson)] transition-colors">02. Inventory</a>
-            <a href="services.html" class="hover:text-[var(--maple-crimson)] transition-colors">03. Clearance</a>
-            <a href="about.html" class="hover:text-[var(--maple-crimson)] transition-colors">04. About</a>
-            <a href="contact.html" class="hover:text-[var(--maple-crimson)] transition-colors">05. Network</a>
-            <a href="/app/login" class="text-[var(--maple-crimson)] mt-4 text-3xl">Staff Login</a>
-        </div>
-    </div>
 
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center px-6 md:px-16 pt-32 overflow-hidden">
+    <section id="main" class="relative min-h-screen flex items-center px-6 md:px-16 pt-32 overflow-hidden">
         <!-- Main Background Image -->
         <div class="absolute inset-0 z-0">
             <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80"
@@ -246,7 +201,7 @@
                 </div>
 
                 <h1
-                    class="font-heading text-8xl md:text-[11rem] leading-[0.8] font-black uppercase mb-12 stagger-reveal">
+                    class="font-heading text-[clamp(3.25rem,17vw,6rem)] md:text-[11rem] leading-[0.85] md:leading-[0.8] font-black uppercase mb-12 stagger-reveal">
                     Canadian <br>
                     <span class="text-[var(--maple-crimson)]">Sourcing.</span> <br>
                     <span class="parallax-title">Lagos Bound.</span>
@@ -258,8 +213,8 @@
                             The definitive bridge for automotive procurement and freight. We connect Canadian auctions
                             directly to Lagos terminals with uncompromising security and real-time telemetry.
                         </p>
-                        <div class="flex gap-6">
-                            <button class="btn-command text-xl px-12" onclick="openTerminal('LOGISTICS')">Start
+                        <div class="flex flex-wrap gap-4 sm:gap-6">
+                            <button class="btn-command text-lg sm:text-xl px-8 sm:px-12" onclick="openTerminal('LOGISTICS')">Start
                                 Shipment</button>
                             <button class="btn-outline-steel" onclick="openTerminal('PROCUREMENT')">View
                                 Inventory</button>
@@ -449,66 +404,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-[#0A0A0A] border-t border-white/5 pt-32 pb-12 px-6 md:px-16">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid lg:grid-cols-4 gap-20 mb-32">
-                <div class="lg:col-span-2">
-                    <div class="flex items-center gap-4 mb-10">
-                        <div class="w-3 h-3 bg-[var(--maple-crimson)]"></div>
-                        <span class="font-heading text-4xl tracking-tighter">MAPLEBY LOGISTICS</span>
-                    </div>
-                    <p class="text-gray-400 text-lg max-w-md mb-12 leading-relaxed">
-                        The architectural backbone of North American-West African automotive supply chains. Redefining
-                        vehicle exports through technology, transparency, and trust.
-                    </p>
-                    <div class="flex gap-4">
-                        <a href="#"
-                            class="w-12 h-12 panel-steel flex items-center justify-center hover:bg-[var(--maple-crimson)] transition-colors"><i
-                                data-lucide="instagram" class="w-5 h-5"></i></a>
-                        <a href="#"
-                            class="w-12 h-12 panel-steel flex items-center justify-center hover:bg-[var(--maple-crimson)] transition-colors"><i
-                                data-lucide="linkedin" class="w-5 h-5"></i></a>
-                        <a href="#"
-                            class="w-12 h-12 panel-steel flex items-center justify-center hover:bg-[var(--maple-crimson)] transition-colors"><i
-                                data-lucide="twitter" class="w-5 h-5"></i></a>
-                    </div>
-                </div>
-
-                <div class="space-y-10">
-                    <h4 class="font-heading text-2xl uppercase tracking-widest text-white">Operations</h4>
-                    <ul class="space-y-4 font-tech text-[10px] uppercase text-gray-600 tracking-widest">
-                        <li><a href="tracking.html" class="hover:text-white transition-colors">Vessel Tracking</a></li>
-                        <li><a href="schedules.html" class="hover:text-white transition-colors">Port Schedules</a></li>
-                        <li><a href="valuation.html" class="hover:text-white transition-colors">Customs Valuation</a>
-                        </li>
-                        <li><a href="inventory.html" class="hover:text-white transition-colors">Fleet Inventory</a></li>
-                    </ul>
-                </div>
-
-                <div class="space-y-10">
-                    <h4 class="font-heading text-2xl uppercase tracking-widest text-white">Contact</h4>
-                    <div class="font-tech text-[10px] uppercase text-gray-600 tracking-widest leading-loose">
-                        HQ: 96 MILLWICK DR, TORONTO, ON<br>
-                        OPS: TINCAN ISLAND, LAGOS, NG<br><br>
-                        PH: +1 (416) 555-0199<br>
-                        EM: <span class="text-white">DISPATCH@MAPLEBY.COM</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 pt-12 border-t border-white/5">
-                <span class="font-tech text-[9px] uppercase tracking-[0.5em] text-gray-700">
-                    &copy; MMXXVI MAPLEBY INC. [ VER 3.0.1 ]
-                </span>
-                <div class="flex gap-10 font-tech text-[9px] uppercase tracking-[0.5em] text-gray-700">
-                    <a href="security.html" class="hover:text-white transition-colors">Security Protocol</a>
-                    <a href="terms.html" class="hover:text-white transition-colors">Terms of Carriage</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
+    @include('website.partials.footer')
     <!-- Dynamic Terminal Modal -->
     <div id="terminal-modal" class="fixed inset-0 z-[100] hidden">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeTerminal()"></div>
@@ -541,8 +437,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="forms.js"></script>
-    <script src="script.js"></script>
+    <script src="/website/forms.js"></script>
+    <script src="/website/script.js"></script>
     <script>
         // Initialize Icons
         lucide.createIcons();
@@ -594,18 +490,6 @@
             });
         });
 
-        // Navbar Scroll FX
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('bg-black/80', 'backdrop-blur-xl', 'py-6', 'border-b', 'border-white/5');
-                nav.classList.remove('py-10');
-            } else {
-                nav.classList.remove('bg-black/80', 'backdrop-blur-xl', 'py-6', 'border-b', 'border-white/5');
-                nav.classList.add('py-10');
-            }
-        });
-
         // Modal Logic
         function toggleModal() {
             const modal = document.getElementById('quote-modal');
@@ -620,7 +504,6 @@
             }
         }
 
-        // Mobile Menu Placeholder
 
     </script>
 </body>

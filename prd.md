@@ -1,9 +1,9 @@
-# ADGOD Internal Business Management Tool - Product Requirements Document
+# MAPLEBY Internal Business Management Tool - Product Requirements Document
 
 ## 1. Project Overview
 
 ### 1.1 Product Vision
-A comprehensive web-based business management platform that centralizes operations for ADGOD Inc., managing leads, clients, jobs, inventory, and operations from a single unified dashboard.
+A comprehensive web-based business management platform that centralizes operations for Mapleby Inc., managing leads, clients, jobs, inventory, and operations from a single unified dashboard.
 
 ### 1.2 Technical Stack
 - **Backend Framework:** Laravel 11.x with Filament 3.x Admin Panel
@@ -349,7 +349,7 @@ A comprehensive web-based business management platform that centralizes operatio
 
 #### 3.1.1 Dashboard Layout
 - **Top Navigation Bar:**
-  - ADGOD logo/branding
+  - MAPLEBY logo/branding
   - Global search bar (clients, jobs, leads, inventory)
   - Quick-add dropdown (New Lead, New Shipment, New Quote)
   - Notifications icon with badge
@@ -1515,8 +1515,8 @@ Additional fields:
 
 **Installation:**
 ```bash
-composer create-project laravel/laravel adgod-management
-cd adgod-management
+composer create-project laravel/laravel mapleby-management
+cd mapleby-management
 composer require filament/filament:"^3.0"
 php artisan filament:install --panels
 composer require filament/spatie-laravel-translatable-plugin
@@ -1553,7 +1553,7 @@ composer require spatie/laravel-medialibrary
         'driver' => 'mysql',
         'host' => env('DB_HOST', '127.0.0.1'),
         'port' => env('DB_PORT', '3306'),
-        'database' => env('DB_DATABASE', 'adgod_management'),
+        'database' => env('DB_DATABASE', 'mapleby-management'),
         'username' => env('DB_USERNAME', 'root'),
         'password' => env('DB_PASSWORD', ''),
         'charset' => 'utf8mb4',

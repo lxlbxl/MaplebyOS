@@ -16,7 +16,7 @@ const buttonVariants = cva(
         secondary: "bg-cream text-charcoal hover:bg-linen",
         ghost: "text-stone hover:text-void hover:bg-cream",
         link: "text-sage underline-offset-4 hover:underline",
-        sage: "bg-sage text-white hover:bg-sage-light shadow-soft hover:shadow-glow-sage",
+        sage: "bg-sage text-white hover:bg-maple-deep shadow-soft hover:shadow-glow-sage",
         minimal: "text-drift hover:text-void hover:bg-cream/50",
       },
       size: {

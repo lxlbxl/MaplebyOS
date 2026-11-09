@@ -36,7 +36,7 @@ export default function Show({ job, statuses, money, chargeCategories, documents
         <AppLayout>
             <Head title={`${job.tracking_id} · ${job.cargo_description || 'Clearing job'}`} />
 
-            <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Link href={route('operations.clearing.index')}><Button variant="outline" size="icon" className="border-linen"><ArrowLeft className="h-4 w-4" /></Button></Link>
@@ -73,7 +73,7 @@ export default function Show({ job, statuses, money, chargeCategories, documents
                                     <Row label="Packages">{job.package_count ? `${job.package_count} ${job.package_type || ''}` : null}</Row>
                                     <Row label="Gross weight">{job.gross_weight_kg ? `${Number(job.gross_weight_kg).toLocaleString()} kg` : null}</Row>
                                     <Row label="Volume">{job.volume_cbm ? `${Number(job.volume_cbm)} CBM` : null}</Row>
-                                    {'declared_value' in job && <Row label="Declared value">{job.declared_value ? formatMoney(job.declared_value, job.declared_currency || 'USD') : null}</Row>}
+                                    {'declared_value' in job && <Row label="Declared value">{job.declared_value ? formatMoney(job.declared_value, job.declared_currency || 'NGN') : null}</Row>}
                                     <Row label="Client">{clientName(job.client)}</Row>
                                     <Row label="Consignee">{job.consignee}</Row>
                                     <Row label="Handled by">{job.assignee?.name}</Row>

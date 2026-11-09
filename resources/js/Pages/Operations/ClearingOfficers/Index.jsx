@@ -77,7 +77,7 @@ export default function Index({ officers, filters, unassigned, recentChanges, us
     return (
         <AppLayout>
             <Head title="Clearing officers" />
-            <div className="flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-display-md text-void">Clearing officers</h1>

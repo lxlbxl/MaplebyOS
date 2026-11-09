@@ -82,7 +82,7 @@ class InvoiceController extends Controller
                 'client_id' => $data['client_id'],
                 'issue_date' => $data['issue_date'] ?? now()->toDateString(),
                 'due_date' => $data['due_date'] ?? now()->addDays(14)->toDateString(),
-                'currency' => strtoupper($data['currency'] ?? $charges->first()->currency ?? 'USD'),
+                'currency' => strtoupper($data['currency'] ?? $charges->first()->currency ?? \Modules\Core\Entities\Setting::get('default_currency', 'NGN')),
                 'notes' => $data['notes'] ?? null,
                 'status' => 'draft',
                 'created_by' => $request->user()?->id,

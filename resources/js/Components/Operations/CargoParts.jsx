@@ -64,7 +64,7 @@ export function CargoForm({ kind, open, onOpenChange, item = null, options }) {
     const fields = kind === 'clearing' ? CLEARING_FIELDS : BOX_FIELDS;
     const blank = Object.fromEntries(fields.map((f) => [f, '']));
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
-        ...blank, declared_currency: 'USD', destination_city: 'Lagos', containers: '', package_type: kind === 'box' ? 'Box' : 'Cartons',
+        ...blank, declared_currency: 'NGN', destination_city: 'Lagos', containers: '', package_type: kind === 'box' ? 'Box' : 'Cartons',
     });
 
     useEffect(() => {
@@ -133,7 +133,7 @@ export function CargoForm({ kind, open, onOpenChange, item = null, options }) {
                         {can('money.view') && <>
                             <Field label="Declared value" error={errors.declared_value}>{text('declared_value', { type: 'number', step: '0.01' })}</Field>
                             <Field label="Currency" error={errors.declared_currency}>
-                                <PickList value={data.declared_currency} onChange={(v) => setData('declared_currency', v)} options={['USD', 'CAD', 'NGN', 'EUR', 'GBP', 'CNY'].map((c) => ({ value: c, label: c }))} />
+                                <PickList value={data.declared_currency} onChange={(v) => setData('declared_currency', v)} options={['NGN', 'USD', 'CAD', 'EUR', 'GBP', 'CNY'].map((c) => ({ value: c, label: c }))} />
                             </Field>
                         </>}
 

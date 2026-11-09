@@ -33,7 +33,7 @@ import { formatMoney } from '@/lib/utils';
 export default function Index({ payments, filters, quotes, invoices = [] }) {
     const { props } = usePage();
     const settings = props.settings || {};
-    const currency = settings.currency || 'USD';
+    const currency = settings.currency || 'NGN';
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingPayment, setEditingPayment] = useState(null);
 
@@ -95,7 +95,7 @@ export default function Index({ payments, filters, quotes, invoices = [] }) {
         <AppLayout>
             <Head title="Payments" />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-display-md text-void">Payments</h1>

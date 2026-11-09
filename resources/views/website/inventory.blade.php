@@ -18,63 +18,17 @@
   <!-- Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/website/styles.css">
+    @include('website.partials.head')
 </head>
 
 <body class="bg-[#0A0F14] text-white overflow-x-hidden selection:bg-[#D43F3A] selection:text-white font-['Archivo']">
 
-  <!-- Navigation -->
-  <nav id="navbar"
-    class="fixed w-full z-[90] px-6 md:px-16 py-6 flex justify-between items-start transition-all duration-700 bg-black/80 backdrop-blur-xl border-b border-white/5">
-    <div class="flex flex-col">
-      <div class="flex items-center gap-3 mb-1">
-        <div class="w-2 h-2 bg-[var(--maple-crimson)]"></div>
-        <a href="index.html"
-          class="font-['Oswald'] text-4xl leading-none tracking-tighter font-bold text-white decoration-0">MAPLEBY</a>
-      </div>
-      <span class="font-mono text-[9px] tracking-[0.5em] text-[var(--maple-crimson)] uppercase ml-5">Global
-        Procurement</span>
-    </div>
+    @include('website.partials.nav')
 
-    <div class="hidden lg:flex gap-16 items-center">
-      <div class="flex gap-12 font-mono text-[10px] uppercase tracking-widest text-gray-400">
-        <a href="process.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">01</span> Logistics</a>
-        <a href="inventory.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">02</span> Inventory</a>
-        <a href="services.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">03</span> Clearance</a>
-        <a href="about.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">04</span> About</a>
-        <a href="contact.html" class="hover:text-white transition-colors flex items-center gap-2"><span
-            class="text-[var(--maple-crimson)]">05</span> Network</a>
-      </div>
-      <a href="/app/login" class="btn-command text-lg flex items-center justify-center">Staff Login</a>
-    </div>
-
-    <button class="lg:hidden text-white mt-2" onclick="toggleMobileMenu()">
-      <i data-lucide="menu" class="w-8 h-8"></i>
-    </button>
-  </nav>
-
-  <!-- Mobile Menu -->
-  <div id="mobile-menu"
-    class="fixed inset-0 bg-[#0A0F14] z-[100] translate-x-full transition-transform duration-500 flex flex-col justify-center px-8 border-l border-white/10">
-    <button onclick="toggleMobileMenu()" class="absolute top-6 right-6"><i data-lucide="x"
-        class="w-8 h-8 text-white"></i></button>
-    <div class="flex flex-col gap-8 font-['Oswald'] text-5xl uppercase text-white">
-      <a href="index.html" class="hover:text-[var(--maple-crimson)] transition-colors">Home</a>
-      <a href="process.html" class="hover:text-[var(--maple-crimson)] transition-colors">01. Logistics</a>
-      <a href="inventory.html" class="hover:text-[var(--maple-crimson)] transition-colors">02. Inventory</a>
-      <a href="services.html" class="hover:text-[var(--maple-crimson)] transition-colors">03. Clearance</a>
-      <a href="about.html" class="hover:text-[var(--maple-crimson)] transition-colors">04. About</a>
-      <a href="contact.html" class="hover:text-[var(--maple-crimson)] transition-colors">05. Network</a>
-      <a href="/app/login" class="text-[var(--maple-crimson)] mt-4 text-3xl">Staff Login</a>
-    </div>
-  </div>
 
   <!-- Header -->
-  <header class="pt-40 pb-12 px-6 md:px-20 border-b border-white/10">
+  <header id="main" class="pt-40 pb-12 px-6 md:px-20 border-b border-white/10">
     <div class="flex flex-col md:flex-row justify-between items-end gap-8">
       <div>
         <h1 class="font-['Oswald'] text-5xl md:text-7xl font-bold uppercase leading-none mb-4 reveal-on-scroll">
@@ -104,7 +58,7 @@
       <div
         class="group border border-white/10 bg-[#0F1419] hover:border-[#D43F3A] transition-all duration-300 reveal-on-scroll">
         <div class="relative aspect-[16/10] overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1533473359331-0135ef1bcfb0?q=80&w=2670&auto=format&fit=crop"
+          <img src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=2670&auto=format&fit=crop"
             class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0">
           <div class="absolute top-4 left-4 bg-[#D43F3A] text-white text-[10px] font-bold uppercase px-3 py-1">Ready to
             Ship</div>
@@ -176,22 +130,11 @@
         </div>
       </section>
 
-      <!-- Footer -->
-      <footer class="bg-black text-white/50 pt-20 pb-8 px-6 md:px-20 border-t border-white/10">
-        <div
-          class="flex flex-col md:flex-row justify-between items-center text-xs font-mono uppercase border-t border-white/10 pt-8">
-          <span>&copy; 2026 Mapleby Inc. All rights reserved.</span>
-          <div class="flex gap-6 mt-4 md:mt-0">
-            <a href="#" class="hover:text-white">Privacy</a>
-            <a href="#" class="hover:text-white">Terms</a>
-          </div>
-        </div>
-      </footer>
-
+    @include('website.partials.footer')
     </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/website/script.js"></script>
 </body>
 
 </html>

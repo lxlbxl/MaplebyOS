@@ -81,6 +81,15 @@ class WebsiteController extends Controller
             'digital-transformation' => 'website.blog-post-3',
         ];
 
+        if (isset($map[$slug])) {
+            return view($map[$slug]);
+        }
+
+        // /blog-post-{id}.html passes only the number
+        if (ctype_digit((string) $slug)) {
+            $slug = 'blog-post-' . $slug;
+        }
+
         // Specific handling for static files named blog-post-1.html etc.
         // We can also just return the view if the slug matches the numbering
         if (preg_match('/^blog-post-\d+$/', $slug)) {

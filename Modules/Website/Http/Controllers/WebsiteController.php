@@ -237,7 +237,7 @@ class WebsiteController extends Controller
             'vehicle_year' => 'nullable|string|max:10',
 
             // Shipping info
-            'mode_of_shipping' => 'required|string|in:ADGOD,CONTAINER,RORO,UNSURE,REPAIR',
+            'mode_of_shipping' => 'required|string|in:MAPLEBY,CONTAINER,RORO,UNSURE,REPAIR',
             'ready_to_go' => 'required|string|in:YES,NO,NA',
             'if_no_why' => 'nullable|string|max:500',
 

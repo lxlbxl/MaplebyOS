@@ -1,8 +1,8 @@
-# ADGOD-OS User Testing Guide
+# Mapleby OS User Testing Guide
 
 **Version:** 1.0  
 **Date:** December 8, 2025  
-**System:** ADGOD Operating System - Freight Forwarding & Vehicle Export Management
+**System:** MAPLEBY Operating System - Freight Forwarding & Vehicle Export Management
 
 ---
 

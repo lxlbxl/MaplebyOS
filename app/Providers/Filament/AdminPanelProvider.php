@@ -25,12 +25,20 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->brandName('ADGOD')
+            ->brandName('Mapleby')
+            ->brandLogo(fn () => view('filament.brand-logo'))
+            ->brandLogoHeight('2.75rem')
+            ->favicon(asset('favicon.ico'))
             ->path('admin')
             ->login(\App\Filament\Pages\Auth\Login::class)
             ->profile()
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::hex('#ED1722'),
+                'gray' => [
+                    50 => '250, 250, 248', 100 => '243, 243, 241', 200 => '221, 222, 223',
+                    300 => '201, 202, 203', 400 => '154, 156, 160', 500 => '98, 101, 106',
+                    600 => '75, 78, 82', 700 => '57, 59, 62', 800 => '36, 36, 36', 900 => '23, 24, 25', 950 => '17, 18, 19',
+                ],
                 'danger' => Color::Rose,
                 'info' => Color::Sky,
                 'success' => Color::Emerald,
@@ -42,7 +50,11 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs()
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->renderHook(\Filament\View\PanelsRenderHook::HEAD_END, fn () => app(\Illuminate\Foundation\Vite::class)('resources/css/filament/admin/theme.css'))
+            // The collapsible-sidebar store persists "open"; on phones start with it closed.
+            ->renderHook(\Filament\View\PanelsRenderHook::BODY_END, fn () => new \Illuminate\Support\HtmlString(
+                "<script>document.addEventListener('alpine:initialized', () => { if (window.innerWidth < 1024) Alpine.store('sidebar').close(); });</script>"
+            ))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: base_path('Modules/CRM/Filament/Resources'), for: 'Modules\\CRM\\Filament\\Resources')
             ->discoverResources(in: base_path('Modules/Core/Filament/Resources'), for: 'Modules\\Core\\Filament\\Resources')

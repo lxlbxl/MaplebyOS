@@ -1,7 +1,7 @@
 {
     "name": "Operations",
     "alias": "operations",
-    "description": "Operations module for ADGOD OS",
+    "description": "Operations module for Mapleby OS",
     "keywords": [],
     "priority": 0,
     "providers": [

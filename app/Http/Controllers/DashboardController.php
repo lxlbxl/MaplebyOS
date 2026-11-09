@@ -56,10 +56,16 @@ class DashboardController extends Controller
     }
 
     /**
-     * Money tiles add up dollar invoices only. Clearing is billed in naira and
-     * must not be summed into the same figure.
+     * Money tiles add up invoices in the default currency (naira) only, so a
+     * rare foreign-currency invoice is never summed into the same figure.
      */
-    private const MONEY_CURRENCY = 'USD';
+    private const MONEY_CURRENCY_FALLBACK = 'NGN';
+
+    /** Money figures follow the app's default currency (Settings). */
+    private static function moneyCurrency(): string
+    {
+        return strtoupper((string) \Modules\Core\Entities\Setting::get('default_currency', self::MONEY_CURRENCY_FALLBACK));
+    }
 
     private function ceo(): array
     {
@@ -67,8 +73,8 @@ class DashboardController extends Controller
 
         return [
             'money' => [
-                'invoiced_month' => (float) Invoice::where('currency', self::MONEY_CURRENCY)->where('status', '!=', 'void')->where('issue_date', '>=', $monthStart)->sum('total'),
-                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::MONEY_CURRENCY))->where('payment_date', '>=', $monthStart)->sum('amount'),
+                'invoiced_month' => (float) Invoice::where('currency', self::moneyCurrency())->where('status', '!=', 'void')->where('issue_date', '>=', $monthStart)->sum('total'),
+                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::moneyCurrency()))->where('payment_date', '>=', $monthStart)->sum('amount'),
                 'outstanding' => $this->outstanding(),
                 'profit_month' => $this->profitFor(Shipment::vehicles()->where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
             ],
@@ -86,7 +92,7 @@ class DashboardController extends Controller
         return [
             'money' => [
                 'outstanding' => $this->outstanding(),
-                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::MONEY_CURRENCY))->where('payment_date', '>=', $monthStart)->sum('amount'),
+                'collected_month' => (float) Payment::whereHas('invoice', fn ($i) => $i->where('currency', self::moneyCurrency()))->where('payment_date', '>=', $monthStart)->sum('amount'),
                 'profit_month' => $this->profitFor(Shipment::vehicles()->where('delivered_on', '>=', $monthStart)->pluck('id')->all()),
             ],
             'unpaidInvoices' => Invoice::with('client:id,company_name,contact_person')
@@ -232,7 +238,8 @@ class DashboardController extends Controller
 
     private function outstanding(): float
     {
-        return (float) Invoice::where('currency', self::MONEY_CURRENCY)->whereIn('status', ['sent', 'partial'])
+        // toBase(): the model's computed `balance` accessor would otherwise shadow the aggregate.
+        return (float) Invoice::where('currency', self::moneyCurrency())->whereIn('status', ['sent', 'partial'])->toBase()
             ->selectRaw('COALESCE(SUM(total - COALESCE(amount_paid, 0)), 0) as balance')->value('balance');
     }
 

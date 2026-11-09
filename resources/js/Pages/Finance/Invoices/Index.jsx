@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
 import Pagination from '@/Components/Pagination';
 import FilterBar from '@/Components/FilterBar';
-import { FileText } from 'lucide-react';
+import { FileText, Wallet, AlertTriangle } from 'lucide-react';
+import StatCard from '@/Components/StatCard';
 import { formatDate } from '@/lib/operations';
 import { formatMoney, cn } from '@/lib/utils';
 
@@ -39,20 +40,20 @@ function Billable({ group, currency }) {
 }
 
 export default function Index({ invoices, filters, statuses, summary, billable }) {
-    const currency = usePage().props.settings?.currency || 'USD';
+    const currency = usePage().props.settings?.currency || 'NGN';
     return (
         <AppLayout>
             <Head title="Invoices" />
-            <div className="flex flex-col gap-5">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5">
                 <div>
                     <h1 className="text-display-md text-void">Invoices</h1>
                     <p className="text-drift mt-1">Bill customers for the charges on their cars. Add charges on each vehicle's page.</p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble">Outstanding</p><p className="text-2xl font-semibold">{formatMoney(summary.outstanding, currency)}</p></div>
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble">Overdue</p><p className={cn('text-2xl font-semibold', summary.overdue > 0 && 'text-red-700')}>{formatMoney(summary.overdue, currency)}</p></div>
-                    <div className="rounded-xl bg-white border border-linen p-4"><p className="text-xs text-pebble">Open invoices</p><p className="text-2xl font-semibold">{summary.open_count}</p></div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <StatCard dark icon={Wallet} label="Outstanding" value={formatMoney(summary.outstanding, currency)} hint="Owed across open invoices" />
+                    <StatCard icon={AlertTriangle} tone={summary.overdue > 0 ? 'alert' : 'default'} label="Overdue" value={formatMoney(summary.overdue, currency)} hint="Past the due date" />
+                    <StatCard icon={FileText} label="Open invoices" value={summary.open_count} hint="Sent or part-paid" />
                 </div>
 
                 {billable.length > 0 && (

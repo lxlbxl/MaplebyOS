@@ -13,7 +13,7 @@ import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import Pagination from '@/Components/Pagination';
-import { Plus, MoreVertical, Phone, Mail } from 'lucide-react';
+import { Plus, MoreVertical, Phone, Mail, Users } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -50,7 +50,7 @@ export default function Index({ clients, filters, stats }) {
         <AppLayout>
             <Head title="Clients" />
 
-            <div className="flex flex-col gap-6">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
@@ -64,6 +64,7 @@ export default function Index({ clients, filters, stats }) {
 
                 {/* Insights & Filters */}
                 <InsightsSection
+                    icon={Users}
                     stats={stats}
                     title="Client Status"
                     description="Distribution of active vs inactive clients"

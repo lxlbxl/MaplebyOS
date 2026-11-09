@@ -147,7 +147,7 @@ Then open:
 - Admin panel: http://localhost:8000/admin
 - Website: http://localhost:8000
 
-The seeder creates `admin@adgod-os.com` (Super Admin) and `staff@adgod-os.com` (Staff), both with password `password`. **Change these on any shared or live system.**
+The seeder creates `admin@maplebyinc.com` (Super Admin) and `staff@maplebyinc.com` (Staff), both with password `password`. **Change these on any shared or live system.**
 
 `composer dev` runs the web server, queue worker, log viewer and Vite together.
 

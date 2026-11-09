@@ -9,7 +9,7 @@ return [
     | The base URL to use when generating Ziggy routes.
     |
     */
-    'url' => env('APP_URL', 'https://adgod.d20.com.ng'),
+    'url' => env('APP_URL', 'https://maplebyinc.com'),
 
     /*
     |--------------------------------------------------------------------------

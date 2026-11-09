@@ -1,11 +1,11 @@
 <?php
 
 /**
- * ADGOD-OS MySQL Setup Script
+ * Mapleby OS MySQL Setup Script
  * Use this to verify connection, create the database, and run migrations.
  */
 
-echo "\n--- ADGOD-OS Database Setup ---\n\n";
+echo "\n--- Mapleby OS Database Setup ---\n\n";
 
 // 1. Check for MySQL Extension
 if (!extension_loaded('pdo_mysql')) {
@@ -53,7 +53,7 @@ $host = $env['DB_HOST'] ?? '127.0.0.1';
 $port = $env['DB_PORT'] ?? '3306';
 $user = $env['DB_USERNAME'] ?? 'root';
 $pass = $env['DB_PASSWORD'] ?? '';
-$db = $env['DB_DATABASE'] ?? 'adgod_os';
+$db = $env['DB_DATABASE'] ?? 'mapleby_os';
 
 echo "Target: mysql://$user@$host:$port/$db\n\n";
 

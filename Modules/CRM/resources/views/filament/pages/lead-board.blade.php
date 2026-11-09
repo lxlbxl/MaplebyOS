@@ -128,7 +128,7 @@
                         </div>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">
-                        ${{ number_format($this->getStatusValue($status), 0) }} total
+                        ₦{{ number_format($this->getStatusValue($status), 0) }} total
                     </p>
                 </div>
                 <div class="kanban-cards">
@@ -152,7 +152,7 @@
                             @endif
                             <div class="flex justify-between items-center">
                                 <span class="text-sm font-bold text-emerald-600">
-                                    ${{ number_format($lead->estimated_value ?? 0, 0) }}
+                                    ₦{{ number_format($lead->estimated_value ?? 0, 0) }}
                                 </span>
                                 @if($lead->assignee)
                                     <span class="text-xs text-gray-500">

@@ -43,7 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create a Super Admin User
         $user = User::firstOrCreate([
-            'email' => 'admin@adgod-os.com',
+            'email' => 'admin@maplebyinc.com',
         ], [
             'name' => 'Super Admin',
             'password' => Hash::make('password'), // Change this in production!
@@ -53,7 +53,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create a Staff User
         $staff = User::firstOrCreate([
-            'email' => 'staff@adgod-os.com',
+            'email' => 'staff@maplebyinc.com',
         ], [
             'name' => 'Staff Member',
             'password' => Hash::make('password'),

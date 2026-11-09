@@ -59,7 +59,7 @@ class SalesWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-funnel')
                 ->color('primary'),
 
-            Stat::make('Pipeline Value', '$' . number_format($pipelineValue, 0))
+            Stat::make('Pipeline Value', '₦' . number_format($pipelineValue, 0))
                 ->description('Total estimated value')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

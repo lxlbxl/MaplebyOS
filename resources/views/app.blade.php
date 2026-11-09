@@ -14,17 +14,19 @@
         <link rel="manifest" href="/manifest.json">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="Mapleby">
         <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png">
     @endauth
-    <meta name="theme-color" content="#f2eee3">
+    <meta name="theme-color" content="#171819">
 
     @if(isset($favicon))
         <link rel="icon" href="{{ $favicon }}" type="image/x-icon" />
     @else
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/brand/badge-192.png" />
     @endif
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <script>
         window.appName = "{{ $app_name ?? \Modules\Core\Entities\Setting::get('app_name', config('app.name', 'Laravel')) }}";

@@ -30,6 +30,7 @@ Route::get('/tracking/lookup', [\Modules\Operations\Http\Controllers\PublicTrack
 
 
 // Dashboard - moved to /app/dashboard
+Route::redirect('/app', '/app/dashboard');
 Route::get('/app/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 use Modules\CRM\Http\Controllers\LeadController;

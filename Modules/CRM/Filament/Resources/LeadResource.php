@@ -99,7 +99,7 @@ class LeadResource extends Resource
                             ]),
                         Forms\Components\TextInput::make('estimated_value')
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix('₦'),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Assignment')
@@ -147,7 +147,7 @@ class LeadResource extends Resource
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('estimated_value')
-                    ->money('USD')
+                    ->money(fn () => \Modules\Core\Entities\Setting::get('default_currency', 'NGN'))
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('assignee.name')

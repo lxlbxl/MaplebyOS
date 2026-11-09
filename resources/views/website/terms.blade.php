@@ -37,19 +37,12 @@
             backdrop-filter: blur(10px);
         }
     </style>
+    @include('website.partials.head')
 </head>
 
 <body class="selection:bg-[var(--maple-crimson)] selection:text-white min-h-screen flex flex-col">
-    <!-- Nav -->
-    <nav
-        class="fixed w-full z-50 px-6 md:px-16 py-8 flex justify-between items-center bg-black/80 backdrop-blur-xl border-b border-white/5">
-        <a href="index.html" class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-[var(--maple-crimson)]"></div>
-            <span class="font-heading text-3xl tracking-tighter font-black">MAPLEBY</span>
-        </a>
-    </nav>
-
-    <main class="flex-grow pt-40 px-6 md:px-16 max-w-4xl mx-auto mb-20">
+    @include('website.partials.nav')
+    <main id="main" class="flex-grow pt-40 px-6 md:px-16 max-w-4xl mx-auto mb-20">
         <h1 class="font-heading text-6xl md:text-8xl uppercase font-black mb-12">Terms of <span
                 class="text-[var(--maple-crimson)]">Carriage</span></h1>
 
@@ -65,10 +58,7 @@
         </div>
     </main>
 
-    <footer
-        class="py-8 border-t border-white/5 text-center font-tech text-[10px] uppercase text-gray-600 tracking-widest">
-        &copy; 2026 MAPLEBY LOGISTICS
-    </footer>
+    @include('website.partials.footer')
     <script>lucide.createIcons();</script>
 </body>
 

@@ -1,7 +1,7 @@
 {
     "name": "Core",
     "alias": "core",
-    "description": "Core module for ADGOD OS",
+    "description": "Core module for Mapleby OS",
     "keywords": [],
     "priority": 0,
     "providers": [

@@ -1,7 +1,7 @@
 {
     "name": "Inventory",
     "alias": "inventory",
-    "description": "Inventory module for ADGOD OS",
+    "description": "Inventory module for Mapleby OS",
     "keywords": [],
     "priority": 0,
     "providers": [

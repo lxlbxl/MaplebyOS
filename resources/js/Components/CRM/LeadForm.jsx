@@ -96,7 +96,7 @@ export default function LeadForm({ open, onOpenChange, lead = null, clients = []
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="estimated_value" className="text-charcoal font-medium">Value ($)</Label>
+                                <Label htmlFor="estimated_value" className="text-charcoal font-medium">Value (₦)</Label>
                                 <Input id="estimated_value" type="number" value={data.estimated_value} onChange={e => setData('estimated_value', e.target.value)} className="bg-cream border-linen text-charcoal h-11 rounded-lg" />
                             </div>
                             <div className="space-y-2">

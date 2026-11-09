@@ -95,7 +95,7 @@ export default function Index({ makes, shippingLines, platforms, ports }) {
     return (
         <AppLayout>
             <Head title="Catalog" />
-            <div className="flex flex-col gap-5 max-w-5xl">
+            <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-5 max-w-5xl">
                 <div>
                     <h1 className="text-display-md text-void">Catalog</h1>
                     <p className="text-drift mt-1">The lists behind every suggestion box. Add common misspellings as “other spellings” and they will always be corrected to the right name, including on import. Renaming an entry renames it on every vehicle.</p>

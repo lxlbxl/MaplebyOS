@@ -69,8 +69,8 @@
             <tr>
                 <td style="border: none;">
                     <div class="company-info">
-                        <h1>ADGOD OS</h1>
-                        <p>123 Shipping Lane<br>Logistics City, LC 45678<br>contact@adgodos.com</p>
+                        <h1>Mapleby OS</h1>
+                        <p>123 Shipping Lane<br>Logistics City, LC 45678<br>contact@maplebyinc.com</p>
                     </div>
                 </td>
                 <td style="border: none; text-align: right;">
@@ -110,8 +110,8 @@
                 <tr>
                     <td>{{ $item->description }}</td>
                     <td style="text-align: center;">{{ $item->quantity }}</td>
-                    <td style="text-align: right;">${{ number_format($item->unit_price, 2) }}</td>
-                    <td style="text-align: right;">${{ number_format($item->amount, 2) }}</td>
+                    <td style="text-align: right;">NGN {{ number_format($item->unit_price, 2) }}</td>
+                    <td style="text-align: right;">NGN {{ number_format($item->amount, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -121,17 +121,17 @@
         <table class="totals-table">
             <tr>
                 <td><strong>Subtotal:</strong></td>
-                <td>${{ number_format($quote->subtotal, 2) }}</td>
+                <td>NGN {{ number_format($quote->subtotal, 2) }}</td>
             </tr>
             @if($quote->tax_total > 0)
                 <tr>
                     <td><strong>Tax:</strong></td>
-                    <td>${{ number_format($quote->tax_total, 2) }}</td>
+                    <td>NGN {{ number_format($quote->tax_total, 2) }}</td>
                 </tr>
             @endif
             <tr style="font-size: 1.2em;">
                 <td style="border-top: 2px solid #333;"><strong>Total:</strong></td>
-                <td style="border-top: 2px solid #333;"><strong>${{ number_format($quote->total_amount, 2) }}</strong>
+                <td style="border-top: 2px solid #333;"><strong>NGN {{ number_format($quote->total_amount, 2) }}</strong>
                 </td>
             </tr>
         </table>

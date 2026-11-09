@@ -1,4 +1,4 @@
--- ADGOD-OS Database Update Script
+-- Mapleby OS Database Update Script
 -- compatible with MySQL 8.0+
 
 -- 1. Create Payments Table

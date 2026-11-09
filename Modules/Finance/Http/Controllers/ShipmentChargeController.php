@@ -14,8 +14,9 @@ class ShipmentChargeController extends Controller
     {
         $data = $this->validated($request, $shipment->cargo_type);
         $data['created_by'] = $request->user()?->id;
-        if (empty($data['currency']) && $shipment->isGeneralCargo()) {
-            $data['currency'] = 'NGN'; // Clearing is paid and billed in naira unless stated.
+        if (empty($data['currency'])) {
+            // Clearing is always billed in naira; everything else uses the app's default currency.
+            $data['currency'] = $shipment->isGeneralCargo() ? 'NGN' : \Modules\Core\Entities\Setting::get('default_currency', 'NGN');
         }
         $shipment->charges()->create($data);
 

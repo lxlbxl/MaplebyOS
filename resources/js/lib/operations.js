@@ -1,27 +1,29 @@
 // Shared labels and colours for vehicle and container statuses.
 
+// The journey reads grey (Canada side) -> gold (in our hands) -> maple (at sea / Lagos)
+// -> green (done), so colour alone tells you roughly where a car is.
 export const VEHICLE_STATUS_COLORS = {
-    added: 'bg-linen text-stone',
-    purchased: 'bg-purple-50 text-purple-700',
-    picked_up: 'bg-indigo-50 text-indigo-700',
-    at_yard: 'bg-blue-50 text-blue-700',
-    loaded: 'bg-amber-50 text-amber-700',
-    sailed: 'bg-sky-50 text-sky-700',
-    arrived: 'bg-orange-50 text-orange-700',
-    offloaded: 'bg-teal-50 text-teal-700',
-    cleared: 'bg-lime-50 text-lime-700',
-    delivered: 'bg-emerald-50 text-emerald-700',
-    on_hold: 'bg-gray-100 text-gray-600',
-    issue: 'bg-red-50 text-red-700',
+    added: 'bg-gray-100 text-gray-600',
+    purchased: 'bg-gray-200 text-gray-800',
+    picked_up: 'bg-amber-50 text-amber-700',
+    at_yard: 'bg-amber-100 text-amber-800',
+    loaded: 'bg-red-50 text-red-600',
+    sailed: 'bg-red-100 text-red-700',
+    arrived: 'bg-red-200 text-red-800',
+    offloaded: 'bg-emerald-50 text-emerald-700',
+    cleared: 'bg-emerald-100 text-emerald-800',
+    delivered: 'bg-emerald-600 text-white',
+    on_hold: 'bg-white text-gray-500 ring-1 ring-inset ring-gray-300',
+    issue: 'bg-red-700 text-white',
 };
 
 export const CONTAINER_STATUS_COLORS = {
-    planned: 'bg-linen text-stone',
-    loaded: 'bg-amber-50 text-amber-700',
-    sailed: 'bg-sky-50 text-sky-700',
-    arrived: 'bg-orange-50 text-orange-700',
-    offloaded: 'bg-teal-50 text-teal-700',
-    released: 'bg-emerald-50 text-emerald-700',
+    planned: 'bg-gray-100 text-gray-600',
+    loaded: 'bg-red-50 text-red-600',
+    sailed: 'bg-red-100 text-red-700',
+    arrived: 'bg-red-200 text-red-800',
+    offloaded: 'bg-emerald-50 text-emerald-700',
+    released: 'bg-emerald-600 text-white',
 };
 
 export function statusOptions(statuses) {

@@ -39,11 +39,11 @@ class ManageSettings extends Page implements HasForms
     {
         $this->form->fill([
             // General
-            'company_name' => Setting::get('company_name', 'ADGOD OS'),
+            'company_name' => Setting::get('company_name', 'Mapleby OS'),
             'company_email' => Setting::get('company_email', ''),
             'company_phone' => Setting::get('company_phone', ''),
             'company_address' => Setting::get('company_address', ''),
-            'currency' => Setting::get('currency', 'USD'),
+            'currency' => Setting::get('currency', 'NGN'),
             'timezone' => Setting::get('timezone', 'UTC'),
 
             // Email
@@ -54,7 +54,7 @@ class ManageSettings extends Page implements HasForms
             'mail_password' => Setting::get('mail_password', ''),
             'mail_encryption' => Setting::get('mail_encryption', 'tls'),
             'mail_from_address' => Setting::get('mail_from_address', ''),
-            'mail_from_name' => Setting::get('mail_from_name', 'ADGOD OS'),
+            'mail_from_name' => Setting::get('mail_from_name', 'Mapleby OS'),
 
             // Finance
             'default_tax_rate' => Setting::get('default_tax_rate', '0'),
@@ -153,7 +153,7 @@ class ManageSettings extends Page implements HasForms
                                             ->placeholder('noreply@example.com'),
                                         TextInput::make('mail_from_name')
                                             ->label('From Name')
-                                            ->placeholder('ADGOD OS'),
+                                            ->placeholder('Mapleby OS'),
                                     ])->columns(2),
                             ]),
 

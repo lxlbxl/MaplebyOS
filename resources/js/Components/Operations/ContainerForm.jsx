@@ -29,7 +29,7 @@ export default function ContainerForm({ open, onOpenChange, container = null, sh
     const isEdit = !!container;
     const { data, setData, post, put, processing, errors, reset, clearErrors, transform } = useForm({
         container_number: '', shipping_line: '', size_type: '40HC', seal_number: '', booking_number: '', bl_number: '', vessel: '', voyage: '',
-        port_of_loading: '', port_of_discharge: 'LAGOS', capacity: 4, loaded_on: todayIso(), etd: '', eta: '', freight_cost: '', freight_currency: 'USD', notes: '',
+        port_of_loading: '', port_of_discharge: 'LAGOS', capacity: 4, loaded_on: todayIso(), etd: '', eta: '', freight_cost: '', freight_currency: 'NGN', notes: '',
     });
 
     useEffect(() => {
