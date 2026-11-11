@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Input } from '@/Components/ui/input';
 import { cn } from '@/lib/utils';
 import { Check, AlertTriangle, Plus, Sparkles } from 'lucide-react';
+import { useCan } from '@/lib/access';
 
 /**
  * Text input backed by the canonical catalog. It suggests as you type, snaps
@@ -26,6 +27,9 @@ export default function SmartInput({
     autoFocus = false,
 }) {
     const isCustomer = type === 'customers';
+    const can = useCan();
+    // Only staff who may add customers get the "New customer" shortcut.
+    const canAdd = allowAdd && (!isCustomer || can('customers.manage'));
     const [text, setText] = useState(displayValue ?? value ?? '');
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([]);
@@ -216,13 +220,16 @@ export default function SmartInput({
                                 {s.label}
                             </button>
                         ))}
-                        {allowAdd && (
+                        {canAdd && (
                             <button type="button" onClick={addToCatalog} disabled={adding}
                                 className="px-2 py-0.5 rounded-full border border-dashed border-pebble text-stone hover:border-sage flex items-center gap-1">
                                 <Plus className="h-3 w-3" /> {isCustomer ? 'New customer' : `Add “${notice.typed.toUpperCase()}”`}
                             </button>
                         )}
                     </div>
+                    {isCustomer && !canAdd && (
+                        <p className="text-stone">New customer? Leave this blank and ask the office to add them, then link the vehicle.</p>
+                    )}
                 </div>
             )}
 

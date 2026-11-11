@@ -35,6 +35,11 @@ export default function Index({ clients, filters, stats }) {
         setIsSheetOpen(true);
     };
 
+    // Opened from "New customer" elsewhere in the app (?create=true).
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get('create') === 'true') openCreate();
+    }, []);
+
     const openEdit = (client) => {
         setEditingClient(client);
         setIsSheetOpen(true);

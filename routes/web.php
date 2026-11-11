@@ -31,6 +31,8 @@ Route::get('/tracking/lookup', [\Modules\Operations\Http\Controllers\PublicTrack
 
 // Dashboard - moved to /app/dashboard
 Route::redirect('/app', '/app/dashboard');
+// Old or bookmarked sign-in links land on the staff app's sign-in page.
+Route::redirect('/login', '/app/login');
 Route::get('/app/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 use Modules\CRM\Http\Controllers\LeadController;
