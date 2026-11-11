@@ -46,6 +46,8 @@ class LeadResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\Select::make('client_id')
                             ->relationship('client', 'company_name')
+                            // Individual customers have no company name; show their name instead.
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->company_name ?: $record->contact_person ?: "Customer #{$record->id}")
                             ->searchable()
                             ->preload()
                             ->createOptionForm([

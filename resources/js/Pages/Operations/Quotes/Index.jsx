@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useCan } from '@/lib/access';
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { Card, CardContent } from "@/Components/ui/card";
@@ -31,6 +32,8 @@ const STATUS_COLORS = {
 };
 
 export default function Index({ quotes, filters, clients, shipments, vehicles, stats }) {
+    // Only roles allowed to delete records see the Delete action.
+    const canDelete = useCan()('records.delete');
     const { props } = usePage();
     const settings = props.settings || {};
     const currency = settings.currency || 'NGN';
@@ -208,8 +211,10 @@ export default function Index({ quotes, filters, clients, shipments, vehicles, s
                                                     <DropdownMenuLabel className="text-drift">Actions</DropdownMenuLabel>
                                                     <DropdownMenuItem onClick={() => router.visit(route('operations.quotes.show', quote.id))} className="hover:bg-cream cursor-pointer">View Invoice</DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => openEdit(quote)} className="hover:bg-cream cursor-pointer">Edit Quote</DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-linen" />
-                                                    <DropdownMenuItem onClick={() => confirmDelete(quote)} className="text-error hover:bg-error-soft cursor-pointer">Delete</DropdownMenuItem>
+                                                    {canDelete && (<>
+                                                        <DropdownMenuSeparator className="bg-linen" />
+                                                        <DropdownMenuItem onClick={() => confirmDelete(quote)} className="text-error hover:bg-error-soft cursor-pointer">Delete</DropdownMenuItem>
+                                                    </>)}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>

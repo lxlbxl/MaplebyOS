@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useCan } from '@/lib/access';
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { Card, CardContent } from "@/Components/ui/card";
@@ -22,6 +23,8 @@ import {
 } from "@/Components/ui/dropdown-menu";
 
 export default function Index({ leads, filters, clients, users, stats }) {
+    // Only roles allowed to delete records see the Delete action.
+    const canDelete = useCan()('records.delete');
     const [view, setView] = useState(filters.view || 'list');
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingLead, setEditingLead] = useState(null);
@@ -197,8 +200,10 @@ export default function Index({ leads, filters, clients, users, stats }) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="bg-white border-linen text-void">
                                                         <DropdownMenuItem onClick={() => openEdit(lead)} className="hover:bg-cream cursor-pointer">Edit</DropdownMenuItem>
-                                                        <DropdownMenuSeparator className="bg-sage-soft" />
-                                                        <DropdownMenuItem onClick={() => confirmDelete(lead)} className="text-red-500 hover:bg-red-50 cursor-pointer">Delete</DropdownMenuItem>
+                                                        {canDelete && (<>
+                                                            <DropdownMenuSeparator className="bg-sage-soft" />
+                                                            <DropdownMenuItem onClick={() => confirmDelete(lead)} className="text-red-500 hover:bg-red-50 cursor-pointer">Delete</DropdownMenuItem>
+                                                        </>)}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>

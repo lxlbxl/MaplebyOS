@@ -58,9 +58,13 @@ class VehicleResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('buyer_id')
                             ->relationship('buyer', 'company_name')
+                            // Individual customers have no company name; show their name instead.
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->company_name ?: $record->contact_person ?: "Customer #{$record->id}")
                             ->searchable(),
                         Forms\Components\Select::make('supplier_id')
                             ->relationship('supplier', 'company_name')
+                            // Individual customers have no company name; show their name instead.
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->company_name ?: $record->contact_person ?: "Customer #{$record->id}")
                             ->searchable(),
                         Forms\Components\Textarea::make('notes')->columnSpanFull(),
                     ])->columns(2),

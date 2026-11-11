@@ -54,7 +54,7 @@ class ManageBackups extends Page implements HasTable
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function ($record) {
-                        Storage::disk('local')->delete('backups/' . $record->name);
+                        Storage::disk('backups')->delete('backups/' . $record->name);
                         Notification::make()->title('Backup Deleted')->success()->send();
                     }),
             ])
