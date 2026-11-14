@@ -31,6 +31,8 @@ Route::get('/tracking/lookup', [\Modules\Operations\Http\Controllers\PublicTrack
 
 // Dashboard - moved to /app/dashboard
 Route::redirect('/app', '/app/dashboard');
+// Old or bookmarked sign-in links land on the staff app's sign-in page.
+Route::redirect('/login', '/app/login');
 Route::get('/app/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 use Modules\CRM\Http\Controllers\LeadController;
@@ -155,6 +157,7 @@ Route::middleware('auth')->prefix('app')->group(function () {
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update');
 
     Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index')->middleware('permission:manage_settings');
     Route::post('/settings', [\App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update')->middleware('permission:manage_settings');
@@ -172,6 +175,14 @@ Route::middleware('auth')->prefix('app')->group(function () {
         Route::put('/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('update')->middleware('permission:manage_users');
         Route::delete('/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('destroy')->middleware('permission:manage_users');
         Route::patch('/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('toggle-status')->middleware('permission:manage_users');
+    });
+
+    // Roles and their permissions
+    Route::prefix('roles')->name('roles.')->middleware('permission:manage_roles')->group(function () {
+        Route::get('/', [\App\Http\Controllers\RoleController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\RoleController::class, 'store'])->name('store');
+        Route::put('/{role}', [\App\Http\Controllers\RoleController::class, 'update'])->name('update');
+        Route::delete('/{role}', [\App\Http\Controllers\RoleController::class, 'destroy'])->name('destroy');
     });
 
     // Finance Module Routes

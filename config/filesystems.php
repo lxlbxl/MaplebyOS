@@ -30,6 +30,14 @@ return [
 
     'disks' => [
 
+        // Database backups (spatie/laravel-backup) go to storage/app/backups,
+        // which the admin Backups page lists. Not publicly served.
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useCan } from '@/lib/access';
 import {
     Table,
     TableBody,
@@ -27,6 +28,8 @@ import InsightsSection from '@/Components/InsightsSection';
 import FilterBar from '@/Components/FilterBar';
 
 export default function Index({ clients, filters, stats }) {
+    // Only roles allowed to delete records see the Delete action.
+    const canDelete = useCan()('records.delete');
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [editingClient, setEditingClient] = useState(null);
 
@@ -34,6 +37,11 @@ export default function Index({ clients, filters, stats }) {
         setEditingClient(null);
         setIsSheetOpen(true);
     };
+
+    // Opened from "New customer" elsewhere in the app (?create=true).
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get('create') === 'true') openCreate();
+    }, []);
 
     const openEdit = (client) => {
         setEditingClient(client);
@@ -144,8 +152,10 @@ export default function Index({ clients, filters, stats }) {
                                                     <DropdownMenuLabel className="text-drift">Actions</DropdownMenuLabel>
                                                     <DropdownMenuItem onClick={() => openEdit(client)} className="hover:bg-cream cursor-pointer">Edit Details</DropdownMenuItem>
                                                     <DropdownMenuItem className="hover:bg-cream cursor-pointer">View History</DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-linen" />
-                                                    <DropdownMenuItem onClick={() => confirmDelete(client)} className="text-error hover:bg-error-soft cursor-pointer">Delete</DropdownMenuItem>
+                                                    {canDelete && (<>
+                                                        <DropdownMenuSeparator className="bg-linen" />
+                                                        <DropdownMenuItem onClick={() => confirmDelete(client)} className="text-error hover:bg-error-soft cursor-pointer">Delete</DropdownMenuItem>
+                                                    </>)}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>

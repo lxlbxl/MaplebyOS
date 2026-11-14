@@ -21,7 +21,8 @@ class CoreServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'core');
+        // Views live in Resources/views (capital R); keep the lowercase path too.
+        $this->loadViewsFrom([__DIR__ . '/../Resources/views', __DIR__ . '/../resources/views'], 'core');
         $this->registerRoutes();
     }
 

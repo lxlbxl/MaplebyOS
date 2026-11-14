@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use Modules\Operations\Entities\Job;
 
 class ProjectProgressChart extends ChartWidget
 {

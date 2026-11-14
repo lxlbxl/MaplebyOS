@@ -44,6 +44,8 @@ class QuoteResource extends Resource
                                     ->readOnly(),
                                 Forms\Components\Select::make('client_id')
                                     ->relationship('client', 'company_name')
+                                    // Individual customers have no company name; show their name instead.
+                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->company_name ?: $record->contact_person ?: "Customer #{$record->id}")
                                     ->required()
                                     ->searchable()
                                     ->preload(),
@@ -68,10 +70,11 @@ class QuoteResource extends Resource
                                     ->default(now()->addDays(30)),
                                 Forms\Components\Select::make('shipment_id')
                                     ->label('Linked Shipment')
-                                    ->options(fn() => \Modules\Operations\Entities\Shipment::whereIn('status', ['pending', 'received'])->pluck('shipment_number', 'id'))
+                                    ->options(fn() => \Modules\Operations\Entities\Shipment::where('status', '!=', 'delivered')->latest('id')->limit(300)->get()
+                                        ->mapWithKeys(fn ($s) => [$s->id => trim(($s->tracking_id ?: $s->shipment_number) . ' · ' . ($s->title ?: $s->cargo_description ?: ''), ' ·')]))
                                     ->searchable()
                                     ->preload()
-                                    ->helperText('Only pending or received shipments can be linked.'),
+                                    ->helperText('Shipments that have not been delivered yet.'),
                                 Forms\Components\MorphToSelect::make('inventory')
                                     ->label('Linked Inventory (Vehicle/Equipment)')
                                     ->types([
@@ -279,26 +282,15 @@ class QuoteResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('convert_to_job')
-                    ->label('Convert to Job')
-                    ->icon('heroicon-o-briefcase')
+                // The old "Convert to Job" created a Job model that no longer exists.
+                // Work now continues as a vehicle in the staff app, prefilled for this customer.
+                Tables\Actions\Action::make('add_vehicle')
+                    ->label('Add vehicle')
+                    ->icon('heroicon-o-truck')
                     ->color('success')
-                    ->requiresConfirmation()
-                    ->visible(fn(Quote $record) => in_array($record->status, ['approved', 'sent']))
-                    ->action(function (Quote $record) {
-                        $job = \Modules\Operations\Entities\Job::create([
-                            'job_number' => 'J-' . $record->quote_number,
-                            'quote_id' => $record->id,
-                            'client_id' => $record->client_id,
-                            'service_type' => 'freight_forwarding',
-                            'status' => 'pending',
-                            'title' => 'Job from ' . $record->quote_number,
-                            'description' => "Converted from Quote #{$record->quote_number}",
-                            'total_value' => $record->total_amount,
-                        ]);
-                        $record->update(['status' => 'converted']);
-                        return redirect()->to(\Modules\Operations\Filament\Resources\JobResource::getUrl('edit', ['record' => $job]));
-                    }),
+                    ->visible(fn(Quote $record) => in_array($record->status, ['approved', 'accepted', 'sent']))
+                    ->url(fn(Quote $record) => route('operations.shipments.index') . '?create=true' . ($record->client_id ? '&client_id=' . $record->client_id : ''))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

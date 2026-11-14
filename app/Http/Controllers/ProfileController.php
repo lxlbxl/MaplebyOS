@@ -7,7 +7,9 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,7 +36,7 @@ class ProfileController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $request->user()->id,
         ]);
 
-        $request->user()->fill($request->all());
+        $request->user()->fill($request->only('name', 'email'));
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -43,6 +45,23 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('success', 'Profile updated successfully.');
+    }
+
+    /**
+     * Change the signed-in user's password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'current_password.current_password' => 'Your current password is not correct.',
+        ]);
+
+        $request->user()->update(['password' => Hash::make($validated['password'])]);
+
+        return back()->with('success', 'Password updated.');
     }
 
     /**

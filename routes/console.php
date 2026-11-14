@@ -18,12 +18,12 @@ Schedule::call(function () {
         ->where('due_date', '<', now())
         ->where('status', '!=', 'completed')
         ->whereNull('notified_at')
-        ->with('assignee')
+        ->with('assignedTo')
         ->get();
 
     foreach ($overdueTasks as $task) {
-        if ($task->assignee) {
-            $task->assignee->notify(new \Modules\Core\Notifications\TaskOverdue($task));
+        if ($task->assignedTo) {
+            $task->assignedTo->notify(new \Modules\Core\Notifications\TaskOverdue($task));
             $task->update(['notified_at' => now()]);
         }
     }
