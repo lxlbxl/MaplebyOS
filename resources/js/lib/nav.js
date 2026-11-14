@@ -1,7 +1,6 @@
 import {
     LayoutDashboard, Users, Sparkles, Car, Container, FileText, Package, Receipt, DollarSign,
-    BookOpen, ShieldCheck, Settings, User, PlusCircle, Boxes, Anchor, Landmark, UserCheck,
-} from 'lucide-react';
+    BookOpen, ShieldCheck, Settings, User, PlusCircle, Boxes, Anchor, Landmark, UserCheck, KeyRound } from 'lucide-react';
 
 /**
  * One list of screens, each with the permission it needs. Routes that a
@@ -43,7 +42,8 @@ export const NAV_SECTIONS = [
         title: 'System',
         items: [
             { label: 'Catalog', route: 'operations.catalog.index', active: 'operations.catalog.*', icon: BookOpen, perm: 'catalog.manage' },
-            { label: 'Staff & roles', route: 'users.index', active: 'users.*', icon: ShieldCheck, perm: 'manage_users' },
+            { label: 'Staff', route: 'users.index', active: 'users.*', icon: ShieldCheck, perm: 'manage_users' },
+            { label: 'Roles & permissions', route: 'roles.index', active: 'roles.*', icon: KeyRound, perm: 'manage_roles' },
         ],
     },
 ];

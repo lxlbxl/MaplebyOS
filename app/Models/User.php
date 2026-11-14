@@ -15,7 +15,10 @@ use Filament\Panel;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use /* HasApiTokens, */ HasFactory, Notifiable, HasRoles;
+    use /* HasApiTokens, */ HasFactory, Notifiable;
+    use HasRoles {
+        hasPermissionTo as traitHasPermissionTo;
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -55,6 +58,31 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'denied_permissions' => 'array',
         ];
+    }
+
+    /**
+     * Spatie's check, plus per-user denials: a permission denied to this user
+     * is refused even when their role grants it. Every can()/@can/permission
+     * middleware check ends up here. (Super Admin passes earlier, via Gate::before.)
+     */
+    public function hasPermissionTo($permission, $guardName = null): bool
+    {
+        $denied = $this->denied_permissions ?? [];
+        if ($denied) {
+            $name = match (true) {
+                is_string($permission) => $permission,
+                $permission instanceof \BackedEnum => (string) $permission->value,
+                $permission instanceof \Spatie\Permission\Contracts\Permission => $permission->name,
+                is_int($permission) => \Spatie\Permission\Models\Permission::find($permission)?->name,
+                default => null,
+            };
+            if ($name !== null && in_array($name, $denied, true)) {
+                return false;
+            }
+        }
+
+        return $this->traitHasPermissionTo($permission, $guardName);
     }
 }

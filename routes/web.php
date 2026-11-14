@@ -177,6 +177,14 @@ Route::middleware('auth')->prefix('app')->group(function () {
         Route::patch('/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('toggle-status')->middleware('permission:manage_users');
     });
 
+    // Roles and their permissions
+    Route::prefix('roles')->name('roles.')->middleware('permission:manage_roles')->group(function () {
+        Route::get('/', [\App\Http\Controllers\RoleController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\RoleController::class, 'store'])->name('store');
+        Route::put('/{role}', [\App\Http\Controllers\RoleController::class, 'update'])->name('update');
+        Route::delete('/{role}', [\App\Http\Controllers\RoleController::class, 'destroy'])->name('destroy');
+    });
+
     // Finance Module Routes
     Route::prefix('finance')->name('finance.')->group(function () {
         Route::get('/payments', [\Modules\Finance\Http\Controllers\PaymentController::class, 'index'])->name('payments.index')->middleware('permission:finance.manage');

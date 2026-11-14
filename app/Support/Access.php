@@ -77,10 +77,64 @@ final class Access
         // Admin
         'records.delete' => 'Delete records',
         'view_reports' => 'See business totals',
-        'manage_users' => 'Manage staff and roles',
+        'manage_users' => 'Add and edit staff accounts',
+        'manage_roles' => 'Create and edit roles and permissions',
         'manage_settings' => 'Change settings and backups',
         'view_admin' => 'Open the admin panel',
     ];
+
+    /** How the permission list is grouped on the roles and user screens. */
+    public const PERMISSION_GROUPS = [
+        'Vehicles' => ['vehicles.'],
+        'Clearing jobs (cargo)' => ['cargo.'],
+        'Containers and documents' => ['containers.', 'documents.'],
+        'Deposits' => ['deposits.'],
+        'Clearing officers' => ['clearing.'],
+        'Money' => ['money.', 'finance.'],
+        'Customers and sales' => ['customers.', 'leads.', 'quotes.', 'inventory.'],
+        'Admin' => ['records.', 'view_reports', 'manage_', 'view_admin', 'catalog.'],
+    ];
+
+    /** Home screens a role can land on; the first two show money. */
+    public const HOME_LABELS = [
+        'ceo' => 'Whole business (CEO view)',
+        'business' => 'Sales and money (Head of Business view)',
+        'logistics' => 'Containers and shipping (Logistics view)',
+        'puncher' => 'Data entry (Puncher view)',
+    ];
+
+    private const MONEY_HOMES = ['ceo', 'business'];
+
+    /** Permissions grouped for display: [['group' => ..., 'permissions' => [['name','label'], ...]], ...]. */
+    public static function permissionGroups(): array
+    {
+        $groups = [];
+        $placed = [];
+        foreach (self::PERMISSION_GROUPS as $group => $prefixes) {
+            $items = [];
+            foreach (self::PERMISSIONS as $name => $label) {
+                if (isset($placed[$name])) {
+                    continue;
+                }
+                foreach ($prefixes as $prefix) {
+                    if (str_starts_with($name, $prefix)) {
+                        $items[] = ['name' => $name, 'label' => $label];
+                        $placed[$name] = true;
+                        break;
+                    }
+                }
+            }
+            if ($items) {
+                $groups[] = ['group' => $group, 'permissions' => $items];
+            }
+        }
+        $rest = array_diff_key(self::PERMISSIONS, $placed);
+        if ($rest) {
+            $groups[] = ['group' => 'Other', 'permissions' => collect($rest)->map(fn ($l, $n) => ['name' => $n, 'label' => $l])->values()->all()];
+        }
+
+        return $groups;
+    }
 
     public const ROLE_PERMISSIONS = [
         self::ROLE_BUSINESS => [
@@ -115,7 +169,12 @@ final class Access
     ];
 
     /**
-     * Create/refresh every permission and role so the database matches this class.
+     * Make sure every permission and built-in role exists.
+     *
+     * Roles are edited in the app (Staff & roles → Roles), so this never takes
+     * permissions away. A built-in role created here starts with its defaults;
+     * an existing one only gains permissions that are new in this run, so a
+     * future permission still reaches the roles meant to have it.
      */
     public static function syncRoles(): void
     {
@@ -123,19 +182,32 @@ final class Access
         $registrar->forgetCachedPermissions();
         $guard = config('auth.defaults.guard', 'web');
 
+        $new = [];
         foreach (array_keys(self::PERMISSIONS) as $name) {
-            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $name, 'guard_name' => $guard]);
+            $permission = \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $name, 'guard_name' => $guard]);
+            if ($permission->wasRecentlyCreated) {
+                $new[] = $name;
+            }
         }
 
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => self::ROLE_CEO, 'guard_name' => $guard])
             ->givePermissionTo(array_keys(self::PERMISSIONS));
 
-        foreach (self::ROLE_PERMISSIONS as $role => $permissions) {
-            \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => $guard])
-                ->syncPermissions($permissions);
+        foreach (self::ROLE_PERMISSIONS as $roleName => $permissions) {
+            $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard]);
+            $grant = $role->wasRecentlyCreated ? $permissions : array_values(array_intersect($permissions, $new));
+            if ($grant) {
+                $role->givePermissionTo($grant);
+            }
         }
 
         $registrar->forgetCachedPermissions();
+    }
+
+    /** The user's (single) role model, with its label/description/home columns. */
+    public static function roleOf(?User $user): ?\Spatie\Permission\Models\Role
+    {
+        return $user?->roles->first();
     }
 
     public static function home(?User $user): string
@@ -143,17 +215,29 @@ final class Access
         if (!$user) {
             return 'puncher';
         }
-        foreach (self::HOMES as $role => $home) {
-            if ($user->hasRole($role)) {
-                return $home;
-            }
+        if ($user->hasRole(self::ROLE_CEO)) {
+            return 'ceo';
         }
 
-        return 'puncher';
+        $role = self::roleOf($user);
+        $home = $role?->home ?: (self::HOMES[$role?->name] ?? 'puncher');
+        if (!array_key_exists($home, self::HOME_LABELS)) {
+            $home = 'puncher';
+        }
+        // The CEO and business homes show money; never show them to someone who cannot see it.
+        if (in_array($home, self::MONEY_HOMES, true) && !$user->can('money.view')) {
+            $home = $user->can('containers.manage') ? 'logistics' : 'puncher';
+        }
+
+        return $home;
     }
 
     public static function roleLabel(?User $user): ?string
     {
+        $role = self::roleOf($user);
+        if ($role?->label) {
+            return $role->label;
+        }
         foreach (self::ROLE_LABELS as $role => $label) {
             if ($user?->hasRole($role)) {
                 return $label;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
+import { UserPermissionOverrides } from '@/Components/Permissions';
 import {
     Table,
     TableBody,
@@ -19,7 +20,7 @@ import { Switch } from "@/Components/ui/switch";
 import Pagination from '@/Components/Pagination';
 import InsightsSection from '@/Components/InsightsSection';
 import FilterBar from '@/Components/FilterBar';
-import { Plus, MoreVertical, Mail, Shield, UserCheck, UserX, Pencil, Trash2, Users, UserPlus, Settings2 } from 'lucide-react';
+import { Plus, MoreVertical, Mail, Shield, UserCheck, UserX, Pencil, Trash2, Users, UserPlus, Settings2, KeyRound, ArrowRight } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,9 +30,14 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 
-export default function Index({ users, filters, stats, roles }) {
+export default function Index({ users, filters, stats, roles, permissionGroups = [], grantable = [], isSuperAdmin = false, currentUserId }) {
     const [activeTab, setActiveTab] = useState('users');
     const [editingUser, setEditingUser] = useState(null);
+    const [showPerms, setShowPerms] = useState(false);
+    const { auth } = usePage().props;
+    const canManageRoles = !!auth?.can?.manage_roles;
+    const assignableRoles = (roles || []).filter((r) => isSuperAdmin || !r.is_super_admin);
+    const roleByName = Object.fromEntries((roles || []).map((r) => [r.id, r]));
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: '',
@@ -40,12 +46,14 @@ export default function Index({ users, filters, stats, roles }) {
         password_confirmation: '',
         role: 'Puncher',
         is_active: true,
+        allow: [],
+        deny: [],
     });
 
     const tabs = [
         { id: 'users', label: 'All Users', icon: Users },
         { id: 'add', label: 'Add User', icon: UserPlus },
-        { id: 'roles', label: 'Manage Roles', icon: Settings2 },
+        ...(canManageRoles ? [] : [{ id: 'roles', label: 'Roles', icon: Settings2 }]),
     ];
 
     const openEdit = (user) => {
@@ -57,7 +65,10 @@ export default function Index({ users, filters, stats, roles }) {
             password_confirmation: '',
             role: user.role || 'Puncher',
             is_active: user.is_active,
+            allow: user.allow || [],
+            deny: user.deny || [],
         });
+        setShowPerms((user.allow?.length || 0) + (user.deny?.length || 0) > 0);
         setActiveTab('add');
     };
 
@@ -127,7 +138,7 @@ export default function Index({ users, filters, stats, roles }) {
                 />
 
                 {/* Tab Navigation */}
-                <div className="flex gap-2 bg-white p-2 rounded-2xl border border-linen shadow-sm">
+                <div className="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-linen shadow-sm">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         return (
@@ -135,7 +146,7 @@ export default function Index({ users, filters, stats, roles }) {
                                 key={tab.id}
                                 onClick={() => {
                                     if (tab.id !== 'add') setEditingUser(null);
-                                    if (tab.id === 'add') reset();
+                                    if (tab.id === 'add') { reset(); setShowPerms(false); }
                                     setActiveTab(tab.id);
                                 }}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === tab.id
@@ -148,6 +159,15 @@ export default function Index({ users, filters, stats, roles }) {
                             </button>
                         );
                     })}
+                    {canManageRoles && (
+                        <Link
+                            href={route('roles.index')}
+                            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all text-drift hover:text-void hover:bg-cream"
+                        >
+                            <Settings2 className="w-4 h-4" />
+                            Roles & permissions
+                        </Link>
+                    )}
                 </div>
 
                 {/* Tab Content */}
@@ -197,6 +217,11 @@ export default function Index({ users, filters, stats, roles }) {
                                                     <Badge variant="outline" className={roleColors[user.role] || 'bg-gray-100 text-gray-600'}>
                                                         {user.role_label || 'No role'}
                                                     </Badge>
+                                                    {(user.allow.length + user.deny.length) > 0 && (
+                                                        <Badge variant="outline" className="ml-1 bg-amber-50 text-amber-700 border-amber-200" title="This person has their own permission changes">
+                                                            <KeyRound className="w-3 h-3 mr-1" />{user.allow.length + user.deny.length}
+                                                        </Badge>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline" className={user.is_active
@@ -206,6 +231,7 @@ export default function Index({ users, filters, stats, roles }) {
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right">
+                                                    {(isSuperAdmin || !roleByName[user.role]?.is_super_admin) && (
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="ghost" className="h-8 w-8 p-0 text-drift hover:text-void">
@@ -231,6 +257,7 @@ export default function Index({ users, filters, stats, roles }) {
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -252,7 +279,7 @@ export default function Index({ users, filters, stats, roles }) {
                 )}
 
                 {activeTab === 'add' && (
-                    <div className="max-w-2xl mx-auto w-full animate-in fade-in duration-300">
+                    <div className="max-w-3xl mx-auto w-full animate-in fade-in duration-300">
                         <Card className="bg-white border-linen shadow-sm overflow-hidden">
                             <CardHeader className="border-b border-linen bg-cream/30">
                                 <div className="flex items-center gap-3">
@@ -332,13 +359,60 @@ export default function Index({ users, filters, stats, roles }) {
                                                 <SelectValue placeholder="Select a role" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {(roles || []).map((r) => (
+                                                {assignableRoles.map((r) => (
                                                     <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                        {roleByName[data.role]?.description && (
+                                            <p className="text-xs text-drift">{roleByName[data.role].description}</p>
+                                        )}
                                         {errors.role && <span className="text-red-500 text-sm">{errors.role}</span>}
                                     </div>
+
+                                    {roleByName[data.role]?.is_super_admin ? (
+                                        <div className="rounded-xl border border-linen bg-cream p-4 text-sm text-stone">
+                                            Super Admins have every permission, so there is nothing to adjust per person.
+                                        </div>
+                                    ) : editingUser && editingUser.id === currentUserId ? (
+                                        <div className="rounded-xl border border-linen bg-cream p-4 text-sm text-stone">
+                                            You can't change your own permissions. Ask another admin.
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-xl border border-linen">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPerms(!showPerms)}
+                                                className="w-full flex items-center justify-between gap-3 p-4 text-left"
+                                            >
+                                                <span className="flex items-center gap-3">
+                                                    <KeyRound className="w-5 h-5 text-void" />
+                                                    <span>
+                                                        <span className="block font-medium text-charcoal">Permissions for this person</span>
+                                                        <span className="block text-sm text-drift">
+                                                            {data.allow.length + data.deny.length === 0
+                                                                ? 'Same as the role'
+                                                                : `${data.allow.length} extra allowed, ${data.deny.length} denied`}
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                                <ArrowRight className={`w-4 h-4 text-drift transition-transform ${showPerms ? 'rotate-90' : ''}`} />
+                                            </button>
+                                            {showPerms && (
+                                                <div className="border-t border-linen p-4">
+                                                    <UserPermissionOverrides
+                                                        groups={permissionGroups}
+                                                        rolePermissions={roleByName[data.role]?.permissions || []}
+                                                        allow={data.allow}
+                                                        deny={data.deny}
+                                                        grantable={grantable}
+                                                        onChange={({ allow, deny }) => setData((d) => ({ ...d, allow, deny }))}
+                                                    />
+                                                    {(errors.allow || errors.deny) && <span className="text-red-500 text-sm">{errors.allow || errors.deny}</span>}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     <div className="flex items-center justify-between border p-4 rounded-xl border-linen bg-cream">
                                         <div className="space-y-0.5">
